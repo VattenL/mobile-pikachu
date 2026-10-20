@@ -1,0 +1,37 @@
+@startuml uc-m2-play-with-bot
+title Biểu đồ use case chi tiết - Modul Play With Bot
+
+left to right direction
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam nodesep 25
+skinparam ranksep 90
+skinparam usecase {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+}
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Player" as Player
+
+rectangle "Modul: Play With Bot" {
+  usecase "Play With Bot" as UC05
+  usecase "Match Tiles" as UC05_2
+  usecase "Select Difficulty" as UC05_1
+  usecase "Login" as UC02
+  usecase "Quit Match" as UC05_3
+}
+
+Player --> UC05
+
+UC05 ..> UC05_2 : <<include>>
+UC05 ..> UC05_1 : <<include>>
+UC05 ..> UC02 : <<include>>
+
+UC05_2 <.. UC05_3 : <<extend>>
+@enduml

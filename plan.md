@@ -373,10 +373,11 @@ Chia theo modul, khớp với phần code mỗi người sở hữu:
 
 Đề bài chưa nói rõ, cần thống nhất trước khi viết kịch bản và code phần liên quan:
 
-- [ ] **Điều kiện hòa:** hết giờ mà cả 2 chưa xong? Hoàn thành cùng lúc (chênh lệch bao nhiêu ms thì coi là cùng lúc)? Hết giờ có so số ô còn lại không?
-- [ ] **Thời gian giới hạn** mỗi ván là bao nhiêu?
-- [ ] **Trung bình điểm đối thủ:** tính theo từng trận hay theo từng đối thủ (không đếm trùng)? Lấy tổng điểm hiện tại của đối thủ hay điểm tại thời điểm gặp?
-- [ ] **Trận đấu máy** có được tính vào BXH không? (Mặc định: không.)
+- [x] **Điều kiện thắng/hòa:** ai xóa hết ô trước thắng; hết giờ mà cả 2 chưa xong thì hòa; thoát ngang hoặc mất kết nối thì thua.
+- [x] **Thời gian giới hạn** mỗi ván: 10 phút.
+- [x] **Trung bình điểm đối thủ:** trung bình tổng điểm hiện tại của đối thủ, tính theo từng ván.
+- [x] **Trận đấu máy** không tính vào BXH và không lưu.
+- [ ] **Cách tính điểm:** theo đề (thắng 1, hòa 0.5, thua 0) hay Elo? Bàn sau; tài liệu pha 1, 2 chỉ ghi "điểm theo kết quả ván".
 - [ ] **Xáo bài khi bế tắc:** server xáo rồi gửi cho cả 2, hay sinh đề luôn giải được để không cần xáo?
 - [ ] **Số loại icon** trên bàn 10x10.
 - [ ] **CSDL server:** MySQL hay SQLite.

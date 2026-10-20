@@ -1,0 +1,29 @@
+@startuml uc-m1-view-ranking
+title Biểu đồ use case chi tiết - Modul View Ranking
+
+left to right direction
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam nodesep 25
+skinparam ranksep 90
+skinparam usecase {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+}
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Player" as Player
+
+rectangle "Modul: View Ranking" {
+  usecase "View Ranking" as UC04
+  usecase "Login" as UC02
+}
+
+Player --> UC04
+UC04 ..> UC02 : <<include>>
+@enduml

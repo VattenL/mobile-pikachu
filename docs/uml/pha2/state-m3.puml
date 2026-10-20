@@ -1,0 +1,32 @@
+@startuml state-m3
+title Biểu đồ trạng thái - Modul Challenge Player
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam defaultFontSize 13
+skinparam nodesep 120
+skinparam ranksep 110
+skinparam state {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+state "Hiển thị MainScreen" as Main
+state "Hiển thị InvitationDialog" as Invitation
+state "Hiển thị MatchScreen" as Match
+state "Hiển thị ResultDialog" as Result
+
+[*] --> Main
+Main --> Main : [click tên đối thủ rỗi]\n[đối thủ từ chối]
+Main --> Invitation : [nhận lời mời]
+Invitation --> Main : [click reject]
+Invitation --> Match : [click OK]
+Main --> Match : [đối thủ chấp nhận]
+Match --> Match : [click hai ô]
+Match --> Main : [click thoát]
+Match --> Result : [một bên xóa hết ô,\nhết giờ hoặc\nđối thủ thoát]
+Result --> Match : [cả hai click\ntiếp tục]
+Result --> Main : [click dừng hoặc\nđối thủ dừng]
+@enduml

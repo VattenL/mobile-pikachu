@@ -1,0 +1,56 @@
+@startuml class-analysis-m1
+title Biểu đồ lớp pha phân tích - Modul View Ranking
+
+hide circle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam class {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+' ===== Tang 1: lop bien =====
+class LoginScreen {
+  - inUsername
+  - inPassword
+  - outMessage
+  - subLogin
+}
+
+class MainScreen {
+  - subViewRanking
+}
+
+class RankingScreen {
+  - outRanking
+  - subBack
+}
+
+' ===== Tang 2: lop thuc the =====
+class Player {
+  - username
+  - password
+  - name
+  - status
+  + checkLogin()
+}
+
+class PlayerRanking {
+  - totalPoint
+  - avgOpponentPoint
+  - avgWinTime
+  + getRanking()
+}
+
+LoginScreen -right- MainScreen
+MainScreen -right- RankingScreen
+
+LoginScreen -down- Player
+RankingScreen -down- PlayerRanking
+@enduml

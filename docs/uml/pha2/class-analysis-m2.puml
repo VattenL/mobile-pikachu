@@ -1,0 +1,63 @@
+@startuml class-analysis-m2
+title Biểu đồ lớp pha phân tích - Modul Play With Bot
+
+hide circle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 70
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam class {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+' ===== Tang 1: lop bien =====
+class MainScreen {
+  - subPlayWithBot
+}
+
+class DifficultyScreen {
+  - inDifficulty
+  - subStart
+  - subBack
+}
+
+class BotGameScreen {
+  - outBoard
+  - outRemainingTime
+  - outPlayerTileCount
+  - outBotTileCount
+  - inTile
+  - subQuit
+}
+
+class BotResultDialog {
+  - outResult
+  - subOK
+}
+
+' ===== Tang 2: lop thuc the =====
+class Board {
+  - rowCount
+  - columnCount
+  - tiles
+  + generateBoard()
+  + checkPath()
+  + removePair()
+  + isCleared()
+  + findAvailablePair()
+  + shuffle()
+}
+
+MainScreen -right- DifficultyScreen
+DifficultyScreen -right- BotGameScreen
+BotGameScreen -right- BotResultDialog
+BotResultDialog -[norank]- MainScreen
+
+DifficultyScreen -down- Board
+BotGameScreen -down- Board
+@enduml

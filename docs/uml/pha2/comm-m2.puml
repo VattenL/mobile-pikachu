@@ -1,0 +1,43 @@
+@startuml comm-m2
+title Biểu đồ giao tiếp - Modul Play With Bot
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 100
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam boundary {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam entity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Người chơi" as Actor
+
+boundary MainScreen
+boundary DifficultyScreen
+boundary BotGameScreen
+boundary BotResultDialog
+
+entity Board
+
+Actor -down- MainScreen : "1: click chơi với máy ↓\n32: hiển thị ↑"
+Actor -down- DifficultyScreen : "3: hiển thị ↑\n4: chọn độ khó, click bắt đầu ↓"
+Actor -down- BotGameScreen : "9: hiển thị ↑\n<U+002A>10: click hai ô ↓\n<U+002A>20: hiển thị ↑\n<U+002A>27: hiển thị ↑"
+Actor -down- BotResultDialog : "29: hiển thị ↑\n30: click OK ↓"
+MainScreen -right- DifficultyScreen : "2: gọi →"
+DifficultyScreen -right- BotGameScreen : "8: gọi →"
+BotGameScreen -right- BotResultDialog : "28: gọi →"
+BotResultDialog -[norank]- MainScreen : "31: gọi ←"
+DifficultyScreen -down- Board : "5: gọi ↓\n7: trả về ↑"
+BotGameScreen -down- Board : "<U+002A>11: gọi ↓\n<U+002A>13: trả về ↑\n<U+002A>14: gọi ↓\n<U+002A>16: trả về ↑\n<U+002A>17: gọi ↓\n<U+002A>19: trả về ↑\n<U+002A>21: gọi ↓\n<U+002A>23: trả về ↑\n<U+002A>24: gọi ↓\n<U+002A>26: trả về ↑"
+Board -right- Board : "6: generateBoard()\n<U+002A>12: checkPath()\n<U+002A>15: removePair()\n<U+002A>18: isCleared()\n<U+002A>22: findAvailablePair()\n<U+002A>25: removePair()"
+@enduml

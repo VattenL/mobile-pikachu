@@ -1,0 +1,29 @@
+@startuml state-m2
+title Biểu đồ trạng thái - Modul Play With Bot
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam defaultFontSize 13
+skinparam nodesep 120
+skinparam ranksep 90
+skinparam state {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+state "Hiển thị MainScreen" as Main
+state "Hiển thị DifficultyScreen" as Difficulty
+state "Hiển thị BotGameScreen" as Game
+state "Hiển thị BotResultDialog" as Result
+
+[*] --> Main
+Main --> Difficulty : [click chơi với máy]
+Difficulty --> Main : [click quay lại]
+Difficulty --> Game : [click bắt đầu]
+Game --> Game : [click hai ô]
+Game --> Main : [click thoát]
+Game --> Result : [một bên xóa hết ô\nhoặc hết giờ]
+Result --> Main : [click OK]
+@enduml

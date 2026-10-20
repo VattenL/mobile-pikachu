@@ -1,0 +1,41 @@
+@startuml comm-m1
+title Biểu đồ giao tiếp - Modul View Ranking
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 90
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam boundary {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam entity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Người chơi" as Actor
+
+boundary LoginScreen
+boundary MainScreen
+boundary RankingScreen
+
+entity Player
+entity PlayerRanking
+
+Actor -down- LoginScreen : "1: nhập tài khoản, click đăng nhập ↓"
+Actor -down- MainScreen : "6: hiển thị ↑\n7: click xem bảng xếp hạng ↓\n15: hiển thị ↑"
+Actor -down- RankingScreen : "12: hiển thị ↑\n13: click quay lại ↓"
+LoginScreen -right- MainScreen : "5: gọi →"
+MainScreen -right- RankingScreen : "8: gọi →\n14: gọi ←"
+LoginScreen -down- Player : "2: gọi ↓\n4: trả về ↑"
+Player -right- Player : "3: checkLogin()"
+RankingScreen -down- PlayerRanking : "9: gọi ↓\n11: trả về ↑"
+PlayerRanking -right- PlayerRanking : "10: getRanking()"
+@enduml

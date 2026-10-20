@@ -1,0 +1,45 @@
+@startuml uc-m3-challenge-player
+title Biểu đồ use case chi tiết - Modul Challenge Player
+
+left to right direction
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam nodesep 25
+skinparam ranksep 90
+skinparam usecase {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+}
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Player" as Player
+
+rectangle "Modul: Challenge Player" {
+  usecase "Challenge Player" as UC06
+  usecase "Respond To Challenge" as UC07
+  usecase "Select Opponent" as UC06_1
+  usecase "Login" as UC02
+  usecase "Play Online Match" as UC08
+  usecase "Match Tiles" as UC08_1
+  usecase "Decide To Continue" as UC08_2
+  usecase "Quit Match" as UC08_3
+}
+
+Player --> UC06
+Player --> UC07
+
+UC06 ..> UC06_1 : <<include>>
+UC06 ..> UC02 : <<include>>
+UC06 ..> UC08 : <<include>>
+UC07 ..> UC02 : <<include>>
+UC07 ..> UC08 : <<include>>
+
+UC08 ..> UC08_1 : <<include>>
+UC08 ..> UC08_2 : <<include>>
+UC08_1 <.. UC08_3 : <<extend>>
+@enduml

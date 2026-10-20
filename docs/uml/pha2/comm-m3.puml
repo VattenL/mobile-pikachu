@@ -1,0 +1,62 @@
+@startuml comm-m3
+title Biểu đồ giao tiếp - Modul Challenge Player
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam nodesep 60
+skinparam ranksep 110
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam boundary {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam entity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Người chơi B" as B
+actor "Người chơi A" as A
+
+boundary MainScreen
+boundary InvitationDialog
+boundary MatchScreen
+boundary ResultDialog
+
+entity Player
+entity PlayerRanking
+entity Match
+entity Board
+
+A -down- MainScreen : "1: click tên đối thủ ↓\n5: hiển thị thông báo chờ ↑\n47: hiển thị ↑"
+B -down- MainScreen : "47: hiển thị ↑"
+B -down- InvitationDialog : "7: hiển thị ↑\n8: click OK ↓"
+A -down- MatchScreen : "19: hiển thị ↑\n<U+002A>20: click hai ô ↓\n<U+002A>30: hiển thị ↑"
+B -down- MatchScreen : "19: hiển thị ↑\n<U+002A>30: hiển thị ↑"
+A -down- ResultDialog : "35: hiển thị ↑\n36: click dừng ↓"
+B -down- ResultDialog : "35: hiển thị ↑"
+
+MainScreen -right- InvitationDialog : "6: gọi →"
+InvitationDialog -right- MatchScreen : "18: gọi →"
+MatchScreen -right- ResultDialog : "34: gọi →"
+ResultDialog -[norank]- MainScreen : "40: gọi ←"
+
+MainScreen -down- Player : "2: gọi ↓\n4: trả về ↑\n41: gọi ↓\n43: trả về ↑"
+MainScreen -down- PlayerRanking : "44: gọi ↓\n46: trả về ↑"
+InvitationDialog -down- Board : "9: gọi ↓\n11: trả về ↑"
+InvitationDialog -down- Match : "12: gọi ↓\n14: trả về ↑"
+InvitationDialog -down- Player : "15: gọi ↓\n17: trả về ↑"
+MatchScreen -down- Board : "<U+002A>21: gọi ↓\n<U+002A>23: trả về ↑\n<U+002A>24: gọi ↓\n<U+002A>26: trả về ↑\n<U+002A>27: gọi ↓\n<U+002A>29: trả về ↑"
+MatchScreen -down- Match : "31: gọi ↓\n33: trả về ↑"
+ResultDialog -down- Player : "37: gọi ↓\n39: trả về ↑"
+
+Player -[norank]- Player : "3: sendInvitation()\n16: updateStatus()\n38: updateStatus()\n42: getOnlinePlayers()"
+PlayerRanking -[norank]- PlayerRanking : "45: getTotalPoints()"
+Match -[norank]- Match : "13: createMatch()\n32: saveMatch()"
+Board -[norank]- Board : "10: generateBoard()\n<U+002A>22: checkPath()\n<U+002A>25: removePair()\n<U+002A>28: isCleared()"
+@enduml
