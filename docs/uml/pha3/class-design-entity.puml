@@ -1,0 +1,62 @@
+@startuml class-design-entity
+title Biểu đồ lớp thực thể pha thiết kế - Game Pikachu
+
+hide circle
+hide methods
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 70
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam class {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+class Player {
+  - id : int
+  - username : String
+  - password : String
+  - name : String
+  - status : String
+}
+
+class PlayerRanking {
+  - totalPoint : float
+  - avgOpponentPoint : float
+  - avgWinTime : Float
+}
+
+class Match {
+  - id : int
+  - startTime : Date
+  - endTime : Date
+  - timeLimit : int
+  - board : Board
+  - results : MatchResult[]
+}
+
+class MatchResult {
+  - id : int
+  - player : Player
+  - board : Board
+  - result : String
+  - point : float
+  - finishTime : Integer
+}
+
+class Board {
+  - rowCount : int
+  - columnCount : int
+  - tiles : int[][]
+}
+
+Board "1" -down-o "0..1" Match
+Board "1" -right-o "0..1" MatchResult
+Match "1" *-right- "2" MatchResult
+Player "1" -up-o "0..*" MatchResult
+PlayerRanking -left-|> Player
+@enduml

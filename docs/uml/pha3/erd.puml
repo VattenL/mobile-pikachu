@@ -1,0 +1,54 @@
+@startuml erd
+title Biểu đồ thiết kế cơ sở dữ liệu - Game Pikachu
+
+hide circle
+hide empty members
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam class {
+  BackgroundColor #FFF3E0
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+entity tblPlayer {
+  * id : int(10) <<PK>>
+  --
+  username : varchar(50) <<U>>
+  password : varchar(64)
+  name : varchar(100)
+}
+
+entity tblMatch {
+  * id : int(10) <<PK>>
+  --
+  startTime : datetime
+  endTime : datetime
+  timeLimit : int(10)
+  tiles : varchar(300)
+}
+
+entity tblMatchResult {
+  * id : int(10) <<PK>>
+  --
+  result : varchar(10)
+  finishTime : int(10) <<N>>
+  tiles : varchar(300)
+  --
+  matchId : int(10) <<FK>>
+  playerId : int(10) <<FK>>
+}
+
+tblPlayer ||-down-o{ tblMatchResult
+tblMatch ||-left-|{ tblMatchResult
+
+note bottom of tblMatchResult
+  UNIQUE (matchId, playerId)
+  matchId: ON DELETE CASCADE
+end note
+@enduml

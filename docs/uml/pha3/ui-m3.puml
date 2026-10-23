@@ -1,0 +1,101 @@
+@startuml ui-m3
+title Thiết kế giao diện - Modul Challenge Player (màn hình ngang)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Main [
+{{salt
+{+
+  { {+
+      <b>Hoàng Nam
+      11 điểm
+      .
+      <color:blue>Đang chờ Minh Anh trả lời...
+      [ Chơi với máy ] | [ Chơi solo ]
+      [ Xếp hạng ] | [ Đăng xuất ]
+    } | {+
+      <b>Người chơi online
+      {#
+        Minh Anh | 12.5 | Rỗi | [Thách đấu]
+        Quốc Bảo | 10.5 | Bận | [Thách đấu]
+        Thu Hà | 7.5 | Luyện tập | [Thách đấu]
+      }
+    } }
+}
+}}
+]
+
+rectangle Invite [
+{{salt
+{+
+  <b>Thách đấu!
+  .
+  Hoàng Nam muốn thách đấu bạn
+  .
+  [ Từ chối ] | [ Đồng ý ]
+}
+}}
+]
+
+rectangle Match [
+{{salt
+{+
+  { {+
+      <b>Đấu với Minh Anh
+      08:30
+      .
+      <b>Bạn
+      98 ô
+      .
+      [ Thoát ]
+    } | {#
+      A | B | C | D | E | F
+      G | A | . | H | B | C
+      D | . | E | F | G | H
+      B | C | A | . | D | E
+      F | G | H | A | . | B
+      C | D | E | F | G | A
+    } | {+
+      <b>Minh Anh · 92 ô
+      {#
+        A | . | C | D | . | F
+        G | A | . | H | B | C
+        . | . | E | F | G | H
+        B | C | . | . | D | E
+        F | G | H | A | . | B
+        C | . | E | F | G | .
+      }
+      <i>(bàn của đối thủ, chỉ xem)
+    } }
+}
+}}
+]
+
+rectangle Result [
+{{salt
+{+
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 06:42.
+  Đánh tiếp ván nữa không?
+  .
+  [ Dừng ] | [ Tiếp tục ]
+}
+}}
+]
+
+Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
+Invite -left-> Main : từ chối
+Invite -down-> Match : đồng ý
+Main -down-> Match : đối thủ đồng ý
+Match -right-> Result : kết thúc ván
+Result -up-> Match : cả hai tiếp tục
+Result -up-> Main : dừng
+Match -up-> Main : thoát
+@enduml

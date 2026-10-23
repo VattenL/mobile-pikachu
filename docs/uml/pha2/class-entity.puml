@@ -47,9 +47,9 @@ class Board {
   tiles
 }
 
-Player -[hidden]right- PlayerRanking
-Player "1" -down-o "0..*" MatchResult
-Match "1" *-right- "2" MatchResult
 Board "1" -down-o "0..1" Match
-PlayerRanking .down.> MatchResult : <<derive>>
+Board "1" -right-o "0..1" MatchResult
+Match "1" *-right- "2" MatchResult
+Player "1" -up-o "0..*" MatchResult
+PlayerRanking -left-|> Player
 @enduml

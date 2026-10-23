@@ -1,0 +1,56 @@
+@startuml package
+title Biểu đồ gói - Game Pikachu
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam packageStyle folder
+skinparam package {
+  BorderColor #4A4A4A
+}
+skinparam rectangle {
+  BorderColor #4A4A4A
+  BackgroundColor #FFFFFF
+}
+
+package "app (Android client)" as app #E3F2FD {
+  package "view" as view {
+    rectangle "LoginActivity\nMainActivity\nRankingActivity\nDifficultyActivity\nBotGameActivity\nMatchActivity\nInvitationDialog\nResultDialog\nBotResultDialog\nBoardView" as viewC
+  }
+  package "network" as network {
+    rectangle "ServerConnection\nMessageListener\nClientSession" as netC
+  }
+}
+
+package "server (Java)" as server #E8F5E9 {
+  package "controller" as controller {
+    rectangle "GameServer\nClientHandler\nLoginController\nRankingController\nChallengeController\nMatchController\nOnlinePlayerManager\nMatchManager\nMatchRoom" as ctrlC
+  }
+  package "dao" as dao {
+    rectangle "DAO\nPlayerDAO\nPlayerRankingDAO\nMatchDAO" as daoC
+  }
+}
+
+package "core (Java thuần, dùng chung)" as core #FFF3E0 {
+  package "model" as model {
+    rectangle "Player\nPlayerRanking\nMatch\nMatchResult\nBoard\nCell" as modelC
+  }
+  package "logic" as logic {
+    rectangle "PathFinder\nBoardGenerator\nBot\nDifficulty" as logicC
+  }
+  package "protocol" as protocol {
+    rectangle "Message\nMessageType" as protoC
+  }
+}
+
+view ..> network
+view ..> logic
+view ..> model
+network ..> protocol
+controller ..> dao
+controller ..> logic
+controller ..> protocol
+dao ..> model
+logic ..> model
+network ..> controller : TCP
+@enduml

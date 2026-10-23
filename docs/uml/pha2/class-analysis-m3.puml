@@ -103,5 +103,6 @@ ResultDialog -down- Player
 Player "1" -[norank]-o "0..*" MatchResult
 Match "1" *-down- "2" MatchResult
 Match "0..1" o-right- "1" Board
-PlayerRanking .[norank].> MatchResult : <<derive>>
+MatchResult "0..1" o-[norank]- "1" Board
+PlayerRanking -[norank]-|> Player
 @enduml

@@ -1,0 +1,81 @@
+@startuml seq-m3-1
+title Biểu đồ tuần tự - Modul Challenge Player (phần 1: thách đấu)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam ArrowColor #4A4A4A
+skinparam sequence {
+  LifeLineBorderColor #4A4A4A
+  ParticipantBorderColor #4A4A4A
+  ParticipantBackgroundColor #F7F7F7
+  ActorBorderColor #4A4A4A
+  ActorBackgroundColor #F7F7F7
+}
+autonumber "<b>0:"
+
+actor "Người chơi A" as A
+boundary MainActivity
+boundary "Invitation\nDialog" as InvitationDialog
+boundary MatchActivity
+control "Server\nConnection" as ServerConnection
+control "Client\nHandler" as ClientHandler
+control "Challenge\nController" as ChallengeController
+control "OnlinePlayer\nManager" as OnlinePlayerManager
+control "Board\nGenerator" as BoardGenerator
+control "Match\nManager" as MatchManager
+entity Board
+entity Match
+actor "Người chơi B" as B
+
+A -> MainActivity : click tên B
+MainActivity -> ServerConnection : send(INVITE)
+MainActivity -> A : hiển thị
+ServerConnection -> ClientHandler : INVITE (TCP)
+ClientHandler -> ChallengeController : handleInvite()
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : sendInvitation()
+activate OnlinePlayerManager
+OnlinePlayerManager -> ClientHandler : send(INVITE_RECEIVED)
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ClientHandler -> ServerConnection : INVITE_RECEIVED (TCP)
+ServerConnection -> MainActivity : onMessage()
+MainActivity -> InvitationDialog : gọi
+InvitationDialog -> B : hiển thị
+B -> InvitationDialog : click OK
+InvitationDialog -> ServerConnection : send(INVITE_REPLY)
+ServerConnection -> ClientHandler : INVITE_REPLY (TCP)
+ClientHandler -> ChallengeController : handleInviteReply()
+ChallengeController -> BoardGenerator : gọi
+BoardGenerator -> BoardGenerator : generateBoard()
+activate BoardGenerator
+BoardGenerator -> Board : gọi
+Board -> Board : Board()
+activate Board
+Board --> BoardGenerator : trả về
+deactivate Board
+BoardGenerator --> ChallengeController : trả về
+deactivate BoardGenerator
+ChallengeController -> MatchManager : gọi
+MatchManager -> MatchManager : createMatch()
+activate MatchManager
+MatchManager -> Match : gọi
+Match -> Match : Match()
+activate Match
+Match --> MatchManager : trả về
+deactivate Match
+MatchManager --> ChallengeController : trả về
+deactivate MatchManager
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : updateStatus()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ChallengeController -> ClientHandler : send(MATCH_START)
+ClientHandler -> ServerConnection : MATCH_START (TCP)
+ServerConnection -> MainActivity : onMessage()
+MainActivity -> MatchActivity : gọi
+MatchActivity -> A : hiển thị
+@enduml

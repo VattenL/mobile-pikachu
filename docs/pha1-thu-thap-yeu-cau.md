@@ -42,7 +42,7 @@ Bảng giải thích ngữ nghĩa của từng khái niệm:
 | 13 | Xem bảng xếp hạng | View ranking | Người chơi xem thứ hạng của toàn bộ người chơi trong hệ thống. |
 | | **Nhóm các khái niệm liên quan đến vật, đối tượng xử lý** | | |
 | 14 | Tài khoản | Account | Cặp tên đăng nhập và mật khẩu gắn với một người chơi. |
-| 15 | Trạng thái người chơi | Player status | Tình trạng hiện tại của người chơi đang online: rỗi (không chơi với ai) hoặc bận (đang trong một ván). |
+| 15 | Trạng thái người chơi | Player status | Tình trạng hiện tại của người chơi đang online, có ba giá trị: rỗi (idle: không chơi với ai, đang ở giao diện chính hoặc các màn hình khác), luyện tập (training: đang chơi với máy, vẫn nhận được lời mời thách đấu), bận (busy: đang đấu với người chơi khác, không nhận lời mời). |
 | 16 | Lời mời thách đấu | Challenge invitation | Yêu cầu đấu một ván do một người chơi gửi tới người chơi khác, chờ người được mời trả lời. |
 | 17 | Ván đấu | Match | Một lượt đấu giữa hai người chơi trên cùng một đề bài, có thời gian giới hạn 10 phút, do server làm trọng tài. |
 | 18 | Đề bài | Puzzle | Cách sắp xếp các hình trên bàn chơi của một ván, do server sinh tự động và gửi giống nhau cho cả hai người chơi. |
@@ -85,15 +85,15 @@ Mô tả chi tiết ba chức năng được chọn làm modul phân tích, thi�
 
 - Người chơi chơi với máy: Tại giao diện chính, người chơi bấm Chơi với máy → hệ thống hiện giao diện chọn độ khó (Dễ, Trung bình, Khó) → người chơi chọn độ khó và bấm Bắt đầu → hệ thống sinh một đề bài 10x10, hiện bàn chơi, đồng hồ đếm ngược 10 phút, số ô còn lại của người chơi và của máy, nút Thoát; máy bắt đầu chơi trên một bàn riêng có cùng đề bài → người chơi click lần lượt hai ô cùng hình, nếu hai ô nối được bằng tối đa 3 đoạn thẳng thì hệ thống vẽ đường nối và xóa hai ô, nếu không thì bỏ chọn; máy cũng tự xóa từng cặp sau mỗi khoảng thời gian theo độ khó; nếu bàn bị bế tắc thì hệ thống xáo lại các ô còn lại → bên nào xóa hết ô trước thì thắng; hết giờ mà chưa bên nào xong thì hòa → hệ thống hiện kết quả, người chơi bấm OK để về giao diện chính. Kết quả ván với máy không được lưu và không tính vào bảng xếp hạng.
 
-- Người chơi thách đấu và đấu đối kháng: Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi trong danh sách online → hệ thống gửi lời mời tới B và báo A đang chờ trả lời → trên máy của B hiện dialog lời mời với hai nút OK và Reject → nếu B bấm Reject thì hệ thống báo A bị từ chối; nếu B bấm OK thì server tạo ván đấu, sinh một đề bài, gửi cùng đề cho cả hai máy và chuyển trạng thái hai người sang bận → hai người cùng chơi trên đề bài đó trong 10 phút, mỗi lần click một cặp ô thì server kiểm tra đường nối và báo kết quả; nếu bế tắc thì server xáo lại và gửi bàn mới → người xóa hết ô trước thắng; hết giờ mà cả hai chưa xong thì hòa; người bấm Thoát hoặc mất kết nối giữa ván bị xử thua → server lưu kết quả ván, cập nhật điểm và gửi kết quả cho cả hai → mỗi máy hiện dialog kết quả kèm câu hỏi có muốn tiếp tục không → nếu cả hai chọn tiếp tục thì bắt đầu ván mới với đề bài mới; nếu một người dừng thì cả hai về giao diện chính, server báo cho người còn lại biết đối thủ đã dừng chơi, trạng thái hai người trở về rỗi.
+- Người chơi thách đấu và đấu đối kháng: Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi trong danh sách online → hệ thống gửi lời mời tới B và báo A đang chờ trả lời → trên máy của B hiện dialog lời mời với hai nút OK và Reject → nếu B bấm Reject thì hệ thống báo A bị từ chối; nếu B bấm OK thì server tạo ván đấu, sinh một đề bài, gửi cùng đề cho cả hai máy và chuyển trạng thái hai người sang bận → hai người cùng chơi trên đề bài đó trong 10 phút, mỗi lần click một cặp ô thì server kiểm tra đường nối và báo kết quả; mỗi người xóa cặp trên bàn của riêng mình; nếu bàn của một người bị bế tắc thì server xáo lại bàn đó và chỉ gửi bàn mới cho người đó → người xóa hết ô trước thắng; hết giờ mà cả hai chưa xong thì hòa; người bấm Thoát hoặc mất kết nối giữa ván bị xử thua → server lưu kết quả ván, cập nhật điểm và gửi kết quả cho cả hai → mỗi máy hiện dialog kết quả kèm câu hỏi có muốn tiếp tục không → nếu cả hai chọn tiếp tục thì bắt đầu ván mới với đề bài mới; nếu một người dừng thì cả hai về giao diện chính, server báo cho người còn lại biết đối thủ đã dừng chơi, trạng thái hai người trở về rỗi.
 
 Các chức năng đăng ký, đăng nhập, đăng xuất là chức năng thông thường, không mô tả chi tiết.
 
 ### Bước 4: Thông tin các đối tượng cần xử lý, quản lý
 
-- Người chơi: tên đăng nhập, mật khẩu, tên hiển thị, trạng thái (rỗi, bận). Trạng thái chỉ có ý nghĩa khi người chơi đang online, không cần lưu lâu dài.
+- Người chơi: tên đăng nhập, mật khẩu, tên hiển thị, trạng thái (rỗi, luyện tập, bận; người rỗi và người luyện tập đều nhận được lời mời thách đấu). Trạng thái chỉ có ý nghĩa khi người chơi đang online, không cần lưu lâu dài.
 - Ván đấu: thời điểm bắt đầu, thời điểm kết thúc, thời gian giới hạn.
-- Kết quả của một người chơi trong ván: kết quả (thắng, hòa, thua), điểm nhận được, thời gian hoàn thành (chỉ có khi người đó xóa hết ô).
+- Kết quả của một người chơi trong ván: kết quả (thắng, hòa, thua), điểm nhận được, thời gian hoàn thành (chỉ có khi người đó xóa hết ô), bàn chơi của người đó khi ván kết thúc.
 - Bàn chơi (đề bài): số hàng, số cột, các ô hình.
 - Bảng xếp hạng: với mỗi người chơi có tổng điểm, trung bình điểm của các đối thủ đã gặp, trung bình thời gian hoàn thành các ván thắng. Đây là thông tin tính ra từ kết quả các ván, không nhập trực tiếp.
 
@@ -102,6 +102,7 @@ Các chức năng đăng ký, đăng nhập, đăng xuất là chức năng thô
 - Một ván đấu có đúng hai người chơi; một người chơi tham gia nhiều ván đấu.
 - Mỗi người chơi trong một ván có đúng một kết quả; một ván có đúng hai kết quả.
 - Một ván đấu được chơi trên đúng một đề bài; hai người trong ván dùng chung đề bài đó.
+- Mỗi người chơi trong ván xóa cặp trên bàn chơi riêng của mình, bắt đầu từ đề bài chung; mỗi kết quả gắn với đúng một bàn chơi riêng đó.
 - Một ván với máy cũng dùng một đề bài nhưng không tạo ván đấu được lưu.
 - Bảng xếp hạng của một người chơi được tính từ tất cả kết quả của người đó và điểm của các đối thủ trong cùng các ván.
 - Tại một thời điểm, một người chơi tham gia tối đa một ván.

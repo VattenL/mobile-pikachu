@@ -85,7 +85,7 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 - **Bước 3:** đánh giá, chọn danh từ thành lớp thực thể và thuộc tính. Chưa cần thuộc tính id ở pha này.
 - **Bước 4:** xác định quan hệ số lượng giữa các lớp.
 - **Bước 5:** vẽ biểu đồ lớp thực thể toàn hệ thống.
-- Ứng viên dự kiến: `Player` (người chơi), `Match` (ván đấu), `MatchResult` (kết quả của một người trong một ván), lớp thống kê xếp hạng là lớp dẫn xuất từ `MatchResult`. Bàn chơi, lời mời, trạng thái online là dữ liệu tạm thời, cần cân nhắc có phải thực thể lưu trữ hay không.
+- Ứng viên dự kiến: `Player` (người chơi), `Match` (ván đấu), `MatchResult` (kết quả của một người trong một ván), lớp thống kê xếp hạng `PlayerRanking` kế thừa `Player` (theo cách giáo trình làm với lớp thống kê), các chỉ số tính từ `MatchResult`. Bàn chơi, lời mời, trạng thái online là dữ liệu tạm thời, cần cân nhắc có phải thực thể lưu trữ hay không.
 
 ### 2.3. Trích lớp biên và lớp điều khiển, biểu đồ lớp phân tích (§3.2.3)
 
@@ -124,11 +124,12 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 
 | Bảng | Cột |
 | --- | --- |
-| `tblPlayer` | `id`, `username`, `passwordHash`, `createdAt` |
-| `tblMatch` | `id`, `startedAt`, `endedAt` |
-| `tblMatchResult` | `id`, `points` (1 / 0.5 / 0), `finishTimeMs` (null nếu chưa hoàn thành), `matchId`, `playerId` |
+| `tblPlayer` | `id`, `username`, `password` (lưu dạng băm), `name` |
+| `tblMatch` | `id`, `startTime`, `endTime`, `timeLimit`, `tiles` (đề bài, gộp từ `Board` theo quan hệ 1-0..1) |
+| `tblMatchResult` | `id`, `result`, `finishTime` (null nếu chưa xóa hết ô), `tiles` (bàn của người chơi lúc ván kết thúc, gộp từ `Board` theo quan hệ 1-0..1), `matchId`, `playerId` |
 
-- Tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng là dữ liệu dẫn xuất, tính bằng truy vấn. Trạng thái online / bận chỉ giữ trong bộ nhớ server.
+- Điểm mỗi ván (thắng 1, hòa 0.5, thua 0) suy ra từ `result` nên không lưu. Tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng là dữ liệu dẫn xuất, tính bằng truy vấn. Trạng thái người chơi chỉ giữ trong bộ nhớ server.
+- Tên bảng và tên cột dùng thống nhất trong tài liệu và code (`tblXxx`, cột camelCase theo thuộc tính lớp thực thể).
 
 ### 3.3. Thiết kế chi tiết cho modul (§4.3)
 
@@ -162,13 +163,13 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 Mỗi thuật toán có mã giả và hình minh họa.
 
 - **Nối hai ô:** nối 2 ô cùng loại bằng tối đa 3 đoạn thẳng (tối đa 2 lần gấp khúc), chỉ đi qua ô trống. Bàn 10x10 đặt trong lưới 12x12 có viền trống để đường nối được vòng ra ngoài. Dùng BFS với trạng thái (ô, hướng, số lần rẽ), hoặc xét trực tiếp các dạng đường thẳng / chữ L / chữ Z, U. Hình minh họa tọa độ `(x1, y1) → (x2, y2)` với đường hợp lệ và không hợp lệ.
-- **Sinh đề và kiểm tra bế tắc:** sinh 100 ô (50 cặp), mỗi loại hình xuất hiện số chẵn lần; phát hiện bế tắc (còn ô nhưng không còn cặp nối được) và xáo lại. Ở chế độ đối kháng, server xáo để 2 người luôn cùng một bàn.
+- **Sinh đề và kiểm tra bế tắc:** sinh 100 ô (50 cặp), mỗi loại hình xuất hiện số chẵn lần; phát hiện bế tắc (còn ô nhưng không còn cặp nối được) và xáo lại. Ở chế độ đối kháng, 2 người chỉ chung **đề ban đầu**: mỗi người xóa cặp trên bản riêng nên sau nước đi đầu hai bàn đã khác nhau. Bế tắc xảy ra riêng trên bàn của từng người, nên server xáo riêng bàn của người bị bế tắc và chỉ gửi bàn mới cho người đó. Sinh đề "luôn giải được" không bỏ được bước xáo, vì đề giải được vẫn bế tắc nếu xóa sai thứ tự.
 - **Bot:** quét bàn tìm các cặp nối được; mức dễ chọn ngẫu nhiên sau thời gian chờ `T_delay` dài, mức khó `T_delay` ngắn hơn và ưu tiên cặp mở thêm đường cho ô khác.
 - **Xếp hạng:**
-  - Tổng điểm: `S = Σ điểm các ván` (thắng 1, hòa 0.5, thua 0).
-  - Trung bình điểm đối thủ: `AOS = Σ điểm của đối thủ / số ván` (cách tính chính xác cần chốt, xem [Phần II mục 8](#8-vấn-đề-cần-chốt)).
-  - Trung bình thời gian thắng: `AWT = Σ thời gian hoàn thành các ván thắng / số ván thắng`.
-  - Thứ tự: `ORDER BY totalScore DESC, avgOpponentScore DESC, avgWinTime ASC`.
+  - Tổng điểm: `S = Σ point các ván` (`point` mỗi ván: thắng 1, hòa 0.5, thua 0, tính từ `result`).
+  - Trung bình điểm đối thủ: `AOS = Σ S(đối thủ của ván i) / số ván`, với `S(đối thủ)` là tổng điểm **hiện tại** của đối thủ; gặp cùng một người 2 ván thì tính 2 lần.
+  - Trung bình thời gian thắng: `AWT = Σ finishTime / số ván thắng có finishTime`. Ván thắng do đối thủ thoát hoặc mất kết nối không có `finishTime` nên không tính vào AWT (đề xuất, xem mục 8). Người chưa có ván thắng nào có AWT rỗng, xếp sau cùng ở tiêu chí 3.
+  - Thứ tự: `ORDER BY totalPoint DESC, avgOpponentPoint DESC, avgWinTime ASC` (AWT rỗng xếp cuối).
 
 ## Chương 4. Cài đặt (giáo trình chương 5)
 
@@ -206,7 +207,7 @@ Test case hộp đen cho từng use case, gồm cả kiểm tra giao diện và 
 
 ## Kết luận và hướng phát triển
 
-- **Kết luận:** mức độ hoàn thành so với 3 chức năng của đề (Dễ, Trung bình, Khó); ưu điểm, hạn chế.
+- **Kết luận:** mức độ hoàn thành so với 3 chức năng của đề (Dễ, Trung bình, Khó); ưu điểm, hạn chế (ví dụ: mật khẩu đi qua TCP dạng rõ, chưa mã hoá kênh truyền).
 - **Hướng phát triển:** chuyển giao thức sang WebSocket; thêm vật phẩm hỗ trợ, tự động ghép cặp; mở rộng sang web.
 
 ## Tài liệu tham khảo
@@ -264,8 +265,8 @@ pikachu/
 
 - `server`:
   - `ServerSocket` đa luồng, mỗi client một `ClientHandler`.
-  - Quản lý session, danh sách online, trạng thái rỗi / bận.
-  - CSDL: các bảng `users`, `matches`, `match_results`; đăng ký, đăng nhập (hash mật khẩu).
+  - Quản lý session, danh sách online, trạng thái rỗi / luyện tập / bận.
+  - CSDL: các bảng `tblPlayer`, `tblMatch`, `tblMatchResult` (như Phần I §3.2); đăng ký, đăng nhập (hash mật khẩu).
   - Truy vấn BXH 3 tiêu chí. Có thể nhập sẵn dữ liệu trận giả để test.
 - `app`:
   - Tầng network client: kết nối, gửi/nhận message JSON trên luồng nền, đẩy sự kiện về UI thread.
@@ -281,14 +282,17 @@ pikachu/
 ### Dev A: luồng trận đấu phía client
 
 - Màn bàn chơi nhận đề từ server thay vì tự sinh.
-- Gửi nước đi lên server, cập nhật bàn theo phản hồi.
+- Gửi nước đi lên server, cập nhật bàn theo phản hồi; thay bàn khi nhận `BOARD_SHUFFLED`; hiện số ô còn lại của đối thủ theo `OPPONENT_PROGRESS`.
+- Nút Thoát gửi `LEAVE_MATCH`.
 - Dialog: nhận lời thách đấu (OK / Reject), kết quả ván (thắng / hòa / thua), hỏi tiếp tục, thông báo đối thủ đã thoát.
 
 ### Dev B: phòng chơi và trọng tài
 
 - Luồng thách đấu: chuyển lời mời, phản hồi, đối thủ đang bận.
-- Tạo phòng, sinh đề bằng `core`, gửi cùng đề cho 2 client.
-- Kiểm tra nước đi bằng `PathFinder`, ghi nhận thời điểm hoàn thành của mỗi bên.
+- Tạo phòng, sinh đề bằng `core`, gửi cùng đề ban đầu cho 2 client; server giữ một bản bàn riêng cho mỗi người.
+- Kiểm tra nước đi bằng `PathFinder` trên bàn của chính người gửi, ghi nhận thời điểm hoàn thành của mỗi bên theo đồng hồ server.
+- Khi bàn của một người bế tắc: xáo riêng bàn đó, gửi `BOARD_SHUFFLED` cho người đó.
+- Server giữ đồng hồ 10 phút và tự kết thúc ván khi hết giờ; client chỉ hiển thị.
 - Xác định kết quả, tính điểm, lưu CSDL, gửi kết quả cho 2 bên.
 - Xử lý tái đấu, một bên dừng, mất kết nối giữa trận (xử thua).
 
@@ -296,32 +300,41 @@ pikachu/
 
 ### 5.1. Interface `core` (Dev A cung cấp)
 
-Chữ ký dự kiến, chốt chi tiết ngày đầu:
+Chữ ký dự kiến, chốt chi tiết ngày đầu. Tên phương thức giữ đúng tên ở biểu đồ lớp phân tích (`docs/pha2-phan-tich.md`) để truy vết được:
 
 ```java
-// Bàn chơi: lưới có viền, ô trống = 0
+// Toạ độ một ô. core tự định nghĩa, không dùng java.awt.Point (Android không có java.awt)
+public final class Cell {
+    public final int row, col;
+}
+
+// Bàn chơi: lưới 12x12 gồm vùng chơi 10x10 và viền trống, ô trống = 0
 public final class Board {
-    public static Board fromMatrix(int[][] cells);
-    public int[][] toMatrix();
-    public int get(int row, int col);
-    public void remove(Point a, Point b);
+    public Board(int rowCount, int columnCount, int[][] tiles);
+    public int[][] getTiles();
+    public int getTile(Cell c);
+    public void removePair(Cell a, Cell b);
     public boolean isCleared();
+    public int countRemaining();
+    public Board copy();
 }
 
 public final class PathFinder {
-    // Trả về các điểm trên đường nối (tối đa 2 góc), hoặc null nếu không nối được
-    public static List<Point> findPath(Board board, Point a, Point b);
+    // Các điểm của đường nối (2 đầu mút + tối đa 2 góc), hoặc null nếu không nối được
+    public static List<Cell> checkPath(Board board, Cell a, Cell b);
+    // Một cặp còn nối được, hoặc null nếu bàn bế tắc
+    public static Cell[] findAvailablePair(Board board);
 }
 
 public final class BoardGenerator {
-    public static Board generate(int rows, int cols, int iconTypes, long seed);
-    public static boolean hasAnyMove(Board board);
+    public static Board generateBoard(int rows, int cols, int iconTypes, long seed);
     public static Board shuffle(Board board, long seed);
 }
 
 public final class Bot {
     public Bot(Difficulty difficulty);
-    public Move nextMove(Board board);
+    public long getDelayMs();          // T_delay theo độ khó
+    public Cell[] nextMove(Board board);
 }
 ```
 
@@ -331,20 +344,30 @@ JSON, mỗi message một dòng, trường `type` xác định loại:
 
 | Chiều | `type` | Nội dung chính |
 | --- | --- | --- |
-| C → S | `LOGIN` / `REGISTER` | `username`, `password` |
-| S → C | `LOGIN_RESULT` | `ok`, `error` |
-| S → C | `ONLINE_LIST` | danh sách `{username, totalScore, status}` |
+| C → S | `REGISTER` | `username`, `password`, `name` |
+| S → C | `REGISTER_RESULT` | `ok`, `error` |
+| C → S | `LOGIN` | `username`, `password` |
+| S → C | `LOGIN_RESULT` | `ok`, `error`, `player` `{username, name, totalPoint}` |
+| C → S | `LOGOUT` | |
+| C → S | `UPDATE_STATUS` | `status`: `TRAINING` khi bắt đầu chơi với máy, `IDLE` khi thôi; server bỏ qua nếu người chơi đang `BUSY` |
+| S → C | `ONLINE_LIST` | danh sách `{username, name, totalPoint, status}`. Server **tự đẩy** cho mọi client rỗi mỗi khi có người đăng nhập, đăng xuất, đổi trạng thái hoặc đổi điểm; client không cần hỏi |
 | C → S | `GET_RANKING` | |
-| S → C | `RANKING` | danh sách đã sắp xếp |
+| S → C | `RANKING` | danh sách `{rank, name, totalPoint, avgOpponentPoint, avgWinTime}` đã sắp xếp |
 | C → S | `INVITE` | `to` |
-| S → C | `INVITE_RECEIVED` | `from` |
+| S → C | `INVITE_RECEIVED` | `from` (gửi cho người được mời) |
 | C → S | `INVITE_REPLY` | `from`, `accept` |
-| S → C | `MATCH_START` | `matchId`, `matrix`, `timeLimitSec` |
-| C → S | `MOVE` | `matchId`, `p1`, `p2` |
-| S → C | `MOVE_RESULT` | `ok`, `path`, hoặc bàn mới nếu đã xáo |
-| S → C | `MATCH_END` | `result` (WIN / DRAW / LOSE), `points`, thời gian 2 bên |
+| S → C | `INVITE_RESULT` | `to`, `accepted`, `reason` (`REJECTED` / `BUSY` / `OFFLINE`), gửi cho người mời |
+| S → C | `MATCH_START` | `matchId`, `tiles` (đề ban đầu), `timeLimitSec`, `opponent` `{username, name}` |
+| C → S | `MOVE` | `matchId`, `a`, `b` |
+| S → C | `MOVE_RESULT` | `ok`, `path` (khi hợp lệ), `remaining` |
+| S → C | `BOARD_SHUFFLED` | `tiles` (bàn mới), chỉ gửi cho người có bàn bị bế tắc |
+| S → C | `OPPONENT_PROGRESS` | `remaining`, `a`, `b`, `path`, `tiles` (bàn hiện tại của đối thủ), `shuffled`: để mỗi người nhìn thấy bàn của đối thủ |
+| C → S | `LEAVE_MATCH` | `matchId` (bấm Thoát, bị xử thua) |
+| S → C | `MATCH_END` | `result` (WIN / DRAW / LOSE), `point`, `finishTime` hai bên, `remaining` hai bên, `reason` (`CLEARED` / `TIMEOUT` / `QUIT` / `DISCONNECT`) |
 | C → S | `REMATCH_REPLY` | `matchId`, `accept` |
-| S → C | `OPPONENT_LEFT` | |
+| S → C | `OPPONENT_LEFT` | gửi cho người còn lại khi đối thủ chọn Dừng, thoát ván hoặc mất kết nối |
+
+Ván mới sau khi cả hai chọn Tiếp tục bắt đầu bằng một `MATCH_START` mới.
 
 ## 6. Cân bằng khối lượng
 
@@ -377,7 +400,14 @@ Chia theo modul, khớp với phần code mỗi người sở hữu:
 - [x] **Thời gian giới hạn** mỗi ván: 10 phút.
 - [x] **Trung bình điểm đối thủ:** trung bình tổng điểm hiện tại của đối thủ, tính theo từng ván.
 - [x] **Trận đấu máy** không tính vào BXH và không lưu.
-- [ ] **Cách tính điểm:** theo đề (thắng 1, hòa 0.5, thua 0) hay Elo? Bàn sau; tài liệu pha 1, 2 chỉ ghi "điểm theo kết quả ván".
-- [ ] **Xáo bài khi bế tắc:** server xáo rồi gửi cho cả 2, hay sinh đề luôn giải được để không cần xáo?
-- [ ] **Số loại icon** trên bàn 10x10.
-- [ ] **CSDL server:** MySQL hay SQLite.
+- [x] **Trạng thái người chơi:** ba trạng thái, nhãn hiển thị trên giao diện là Rỗi, Luyện tập, Bận: `IDLE` (rỗi), `TRAINING` (đang chơi với máy, vẫn tính là online và vẫn nhận lời mời; đồng ý thì bỏ ván với máy để vào trận), `BUSY` (trong trận với người khác, không nhận lời mời; chỉ server đặt).
+- [x] **Xáo bài khi bế tắc:** server xáo riêng bàn của người bị bế tắc và chỉ gửi cho người đó (`BOARD_SHUFFLED`). Hai người chỉ chung đề ban đầu; sinh đề "luôn giải được" không thay được bước xáo.
+- [x] **Đồng hồ:** server giữ đồng hồ 10 phút, tự kết thúc ván khi hết giờ và ghi `finishTime` theo giờ server; client chỉ hiển thị.
+- [x] **Cách tính điểm:** theo đề, thắng 1, hòa 0.5, thua 0 (`de_bai.md` là nguồn quyết định). Điểm suy ra từ `result` nên CSDL không lưu cột điểm.
+- [x] **Lưu bàn chơi:** CSDL lưu đề bài ban đầu (`tblMatch.tiles`) và bàn của từng người lúc ván kết thúc (`tblMatchResult.tiles`), theo quan hệ `Match` ◇ `Board` và `MatchResult` ◇ `Board` ở biểu đồ lớp thực thể.
+- [ ] **AWT với ván thắng do đối thủ bỏ cuộc:** đề xuất không tính vào AWT (người thắng chưa xóa hết ô nên không có `finishTime`).
+- [ ] **Một tài khoản đăng nhập ở 2 máy:** đề xuất từ chối lần đăng nhập sau (`LOGIN_RESULT` báo "tài khoản đang đăng nhập ở máy khác"), khớp ngoại lệ 2b của kịch bản M1.
+- [ ] **Mất kết nối ngoài ván:** đề xuất: đang có lời mời chờ thì server coi như từ chối (`INVITE_RESULT` với `OFFLINE`); đang ở dialog tiếp tục thì coi như chọn Dừng (`OPPONENT_LEFT`).
+- [ ] **Trạng thái trong lúc ở dialog tiếp tục:** đề xuất vẫn là bận cho đến khi cả hai trả lời, để không ai mời chen vào.
+- [ ] **Số loại icon** trên bàn 10x10: đề xuất 25 loại, mỗi loại 4 ô.
+- [ ] **CSDL server:** MySQL hay SQLite. Đề xuất MySQL (server đa luồng ghi đồng thời, giáo trình cũng dùng MySQL).

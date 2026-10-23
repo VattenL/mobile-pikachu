@@ -1,0 +1,36 @@
+@startuml deployment
+title Biểu đồ triển khai - Game Pikachu
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam node {
+  BorderColor #4A4A4A
+  BackgroundColor #F7F7F7
+}
+skinparam artifact {
+  BorderColor #4A4A4A
+  BackgroundColor #FFFFFF
+}
+skinparam database {
+  BorderColor #4A4A4A
+  BackgroundColor #FFFFFF
+}
+
+node "Thiết bị Android\n(người chơi A)" as devA {
+  artifact "pikachu.apk\n(app + core)" as apkA
+}
+node "Thiết bị Android\n(người chơi B)" as devB {
+  artifact "pikachu.apk\n(app + core)" as apkB
+}
+node "Máy chủ game\n(JVM)" as srv {
+  artifact "pikachu-server.jar\n(server + core)" as jar
+}
+node "Máy chủ CSDL" as dbn {
+  database "MySQL: pikachu\n(tblPlayer, tblMatch,\ntblMatchResult)" as db
+}
+
+devA -down- srv : TCP, cổng 9999\nJSON mỗi dòng một message
+devB -down- srv : TCP, cổng 9999\nJSON mỗi dòng một message
+srv -down- dbn : JDBC
+@enduml

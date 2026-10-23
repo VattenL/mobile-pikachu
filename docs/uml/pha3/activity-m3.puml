@@ -1,0 +1,77 @@
+@startuml activity-m3
+title Biểu đồ hoạt động - Modul Challenge Player
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam activity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam partition {
+  BorderColor #9E9E9E
+}
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #9E9E9E
+}
+
+start
+partition "Xử lí tại MainActivity (máy A)" {
+  :Hiển thị danh sách người chơi online;
+}
+->[click tên B đang rỗi];
+partition "Xử lí tại server: ChallengeController.handleInvite()" {
+  :Gửi lời mời tới B;
+  note right: OnlinePlayerManager:\nsendInvitation()
+}
+partition "Xử lí tại InvitationDialog (máy B)" {
+  :Hiển thị lời mời;
+}
+->[B click OK];
+partition "Xử lí tại server: ChallengeController.handleInviteReply()" {
+  :Sinh đề bài;
+  note right: BoardGenerator:\ngenerateBoard()
+  :Tạo ván đấu;
+  note right: MatchManager:\ncreateMatch()
+  :Chuyển A, B sang bận;
+  note right: OnlinePlayerManager:\nupdateStatus()
+  :Gửi MATCH_START cho A và B;
+}
+repeat
+  partition "Xử lí tại MatchActivity (A, B)" {
+    :Hiển thị bàn chơi, đồng hồ;
+    :Nhận hai ô được click, gửi MOVE;
+  }
+  partition "Xử lí tại server: MatchController.handleMove()" {
+    :Kiểm tra đường nối trên bàn của người gửi;
+    note right: PathFinder:\ncheckPath()
+    :Xóa hai ô, kiểm tra hết ô;
+    note right: Board: removePair()\nBoard: isCleared()
+    :Kiểm tra bế tắc, xáo riêng bàn đó nếu cần;
+    note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
+    :Gửi MOVE_RESULT cho người gửi,\nOPPONENT_PROGRESS cho đối thủ;
+  }
+repeat while (Có người xóa hết ô, hết giờ hoặc thoát?) is ([chưa]) not ([rồi])
+partition "Xử lí tại server: MatchController.endMatch()" {
+  :Tính kết quả và điểm;
+  :Lưu ván đấu và hai kết quả;
+  note right: MatchDAO:\nsaveMatch()
+  :Gửi MATCH_END cho A và B;
+}
+partition "Xử lí tại ResultDialog (A, B)" {
+  :Hiển thị kết quả, hỏi tiếp tục;
+}
+->[A click dừng];
+partition "Xử lí tại server: MatchController.handleRematchReply()" {
+  :Chuyển A, B về rỗi;
+  note right: OnlinePlayerManager:\nupdateStatus()
+  :Gửi OPPONENT_LEFT cho B;
+  :Gửi danh sách online mới;
+  note right: OnlinePlayerManager: getOnlinePlayers()\nPlayerRankingDAO: getTotalPoints()
+}
+partition "Xử lí tại MainActivity (A, B)" {
+  :Hiển thị danh sách online đã cập nhật;
+}
+stop
+@enduml

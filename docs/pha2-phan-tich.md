@@ -12,7 +12,7 @@ Dữ liệu mẫu dùng chung: người chơi Hoàng Nam (tên đăng nhập `ho
 | **Actor** | Player (Người chơi) |
 | **Tiền điều kiện** | Người chơi đã có tài khoản và đang ở giao diện đăng nhập của ứng dụng |
 | **Hậu điều kiện** | Người chơi xem được bảng xếp hạng và quay về giao diện chính |
-| **Kịch bản chuẩn** | 1. Tại giao diện đăng nhập, Hoàng Nam nhập tên đăng nhập `hoangnam`, mật khẩu và click nút **Đăng nhập**.<br>2. Hệ thống kiểm tra tài khoản hợp lệ, hiện giao diện chính gồm danh sách người chơi online và các nút **Xem bảng xếp hạng**, **Chơi với máy**, **Đăng xuất**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Quốc Bảo</td><td>10</td><td>Bận</td></tr><tr><td>3</td><td>Thu Hà</td><td>7.5</td><td>Rỗi</td></tr></table><br>3. Hoàng Nam click nút **Xem bảng xếp hạng**.<br>4. Giao diện bảng xếp hạng hiện lên, sắp xếp theo tổng điểm giảm dần, rồi trung bình điểm đối thủ giảm dần, rồi trung bình thời gian thắng tăng dần; có nút **Quay lại**:<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>9.2</td><td>05:48</td></tr><tr><td>2</td><td>Hoàng Nam</td><td>11</td><td>10.1</td><td>06:10</td></tr><tr><td>3</td><td>Quốc Bảo</td><td>10</td><td>9.5</td><td>06:31</td></tr><tr><td>4</td><td>Thu Hà</td><td>7.5</td><td>11.0</td><td>07:02</td></tr><tr><td>5</td><td>Đức Long</td><td>7.5</td><td>8.4</td><td>06:55</td></tr></table><br>5. Hoàng Nam click nút **Quay lại**.<br>6. Hệ thống đưa Hoàng Nam về giao diện chính. |
+| **Kịch bản chuẩn** | 1. Tại giao diện đăng nhập, Hoàng Nam nhập tên đăng nhập `hoangnam`, mật khẩu và click nút **Đăng nhập**.<br>2. Hệ thống kiểm tra tài khoản hợp lệ, hiện giao diện chính gồm danh sách người chơi online và các nút **Xem bảng xếp hạng**, **Chơi với máy**, **Đăng xuất**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Quốc Bảo</td><td>10.5</td><td>Bận</td></tr><tr><td>3</td><td>Thu Hà</td><td>7.5</td><td>Rỗi</td></tr></table><br>3. Hoàng Nam click nút **Xem bảng xếp hạng**.<br>4. Giao diện bảng xếp hạng hiện lên, sắp xếp theo tổng điểm giảm dần, rồi trung bình điểm đối thủ giảm dần, rồi trung bình thời gian thắng tăng dần; có nút **Quay lại**:<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>9.2</td><td>05:48</td></tr><tr><td>2</td><td>Hoàng Nam</td><td>11</td><td>10.1</td><td>06:10</td></tr><tr><td>3</td><td>Quốc Bảo</td><td>10.5</td><td>9.5</td><td>06:31</td></tr><tr><td>4</td><td>Thu Hà</td><td>7.5</td><td>11.0</td><td>07:02</td></tr><tr><td>5</td><td>Đức Long</td><td>7.5</td><td>8.4</td><td>06:55</td></tr></table><br>5. Hoàng Nam click nút **Quay lại**.<br>6. Hệ thống đưa Hoàng Nam về giao diện chính. |
 | **Ngoại lệ** | 2a. Tên đăng nhập hoặc mật khẩu không đúng.<br>2b. Tài khoản đang được đăng nhập trên một máy khác.<br>4a. Hệ thống chưa có ván đối kháng nào nên bảng xếp hạng rỗng. |
 
 ### b. Kịch bản cho modul chơi với máy
@@ -41,7 +41,7 @@ Dữ liệu mẫu dùng chung: người chơi Hoàng Nam (tên đăng nhập `ho
 
 ### a. Bước 1: Mô tả hệ thống trong một đoạn văn
 
-Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị Android, gồm một server và nhiều client. Người chơi đăng ký tài khoản gồm tên đăng nhập, mật khẩu và tên hiển thị, rồi đăng nhập từ một máy client. Sau khi đăng nhập, người chơi xem danh sách người chơi đang online với tên, tổng điểm và trạng thái rỗi hoặc bận; có thể thách đấu một người chơi đang rỗi. Người được mời chấp nhận hoặc từ chối lời mời. Khi chấp nhận, server tạo một ván đấu, sinh một đề bài là bàn chơi 10x10 ô hình và gửi cho cả hai người chơi. Mỗi người chơi xóa các cặp ô cùng hình nối được bằng tối đa 3 đoạn thẳng; ai xóa hết ô trước thì thắng, hết giờ mà chưa ai xong thì hòa. Server lưu kết quả của từng người trong ván gồm thắng, hòa hay thua, điểm nhận được và thời gian hoàn thành, rồi hỏi hai người có muốn tiếp tục không. Người chơi cũng có thể chơi với máy theo độ khó đã chọn trên một đề bài do hệ thống sinh, kết quả không được lưu. Người chơi xem bảng xếp hạng của toàn bộ người chơi theo tổng điểm, trung bình điểm của các đối thủ đã gặp và trung bình thời gian hoàn thành các ván thắng.
+Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị Android, gồm một server và nhiều client. Người chơi đăng ký tài khoản gồm tên đăng nhập, mật khẩu và tên hiển thị, rồi đăng nhập từ một máy client. Sau khi đăng nhập, người chơi xem danh sách người chơi đang online với tên, tổng điểm và trạng thái rỗi, luyện tập hoặc bận; có thể thách đấu một người chơi không bận. Người được mời chấp nhận hoặc từ chối lời mời. Khi chấp nhận, server tạo một ván đấu, sinh một đề bài là bàn chơi 10x10 ô hình và gửi cho cả hai người chơi. Mỗi người chơi xóa các cặp ô cùng hình nối được bằng tối đa 3 đoạn thẳng trên bàn chơi của riêng mình, bắt đầu từ cùng đề bài; ai xóa hết ô trước thì thắng, hết giờ mà chưa ai xong thì hòa. Server lưu kết quả của từng người trong ván gồm thắng, hòa hay thua, điểm nhận được và thời gian hoàn thành, rồi hỏi hai người có muốn tiếp tục không. Người chơi cũng có thể chơi với máy theo độ khó đã chọn trên một đề bài do hệ thống sinh, kết quả không được lưu. Người chơi xem bảng xếp hạng của toàn bộ người chơi theo tổng điểm, trung bình điểm của các đối thủ đã gặp và trung bình thời gian hoàn thành các ván thắng.
 
 ### b. Bước 2: Trích các danh từ xuất hiện trong đoạn văn
 
@@ -52,20 +52,21 @@ Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị An
 ### c. Bước 3: Đánh giá và lựa chọn các danh từ làm lớp thực thể hoặc thuộc tính
 
 - Các danh từ trừu tượng hoặc thuộc về hạ tầng: hệ thống, thiết bị Android, server, client → **loại**.
-- Người chơi → lớp `Player`: tên đăng nhập, tên hiển thị, mật khẩu, trạng thái. *Tài khoản* không tách thành lớp riêng vì mỗi người chơi có đúng một tài khoản. *Trạng thái* (rỗi, bận) chỉ có ý nghĩa khi người chơi đang online, nhưng vẫn là thông tin của người chơi nên đặt làm thuộc tính.
+- Người chơi → lớp `Player`: tên đăng nhập, tên hiển thị, mật khẩu, trạng thái. *Tài khoản* không tách thành lớp riêng vì mỗi người chơi có đúng một tài khoản. *Trạng thái* (rỗi, luyện tập, bận) chỉ có ý nghĩa khi người chơi đang online, nhưng vẫn là thông tin của người chơi nên đặt làm thuộc tính.
 - *Đối thủ* là vai trò của một người chơi trong ván, không đề xuất lớp. *Máy* là một phần xử lý của hệ thống, không có dữ liệu cần quản lý nên không đề xuất lớp; *độ khó* chỉ là lựa chọn của người chơi cho ván với máy.
 - Ván đấu → lớp `Match`: thời điểm bắt đầu, thời điểm kết thúc, thời gian giới hạn.
 - Kết quả → lớp `MatchResult`: kết quả (thắng, hòa, thua), điểm nhận được, thời gian hoàn thành. Kết quả tách thành lớp riêng thay vì đặt trên `Match` vì mỗi ván có hai người chơi, mỗi người một kết quả, một số điểm và một thời gian hoàn thành riêng.
-- Đề bài, bàn chơi → lớp `Board`: số hàng, số cột, các ô hình. *Ô hình* là phần tử của bàn chơi nên là thuộc tính `tiles` của `Board`. *Đường nối* được tính ra mỗi lần người chơi chọn hai ô, không lưu nên không đề xuất lớp.
+- Đề bài, bàn chơi → lớp `Board`: số hàng, số cột, các ô hình. Đề bài và bàn chơi riêng của mỗi người có cùng cấu trúc nên dùng chung một lớp: đề bài là bàn lúc bắt đầu ván, bàn chơi riêng là bản của từng người, khác nhau ngay sau nước đi đầu tiên. *Ô hình* là phần tử của bàn chơi nên là thuộc tính `tiles` của `Board`. *Đường nối* được tính ra mỗi lần người chơi chọn hai ô, không lưu nên không đề xuất lớp.
 - *Lời mời* chỉ tồn tại trong lúc chờ người được mời trả lời, không cần lưu, nên không đề xuất lớp.
 - *Danh sách người chơi online* là tập các `Player` đang online, không đề xuất lớp.
-- *Tổng điểm*, *trung bình điểm đối thủ*, *trung bình thời gian thắng* là thông tin dẫn xuất, tính ra từ các kết quả ván, nên đề xuất thành thuộc tính của lớp thống kê `PlayerRanking`: tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng.
+- *Tổng điểm*, *trung bình điểm đối thủ*, *trung bình thời gian thắng* là thông tin dẫn xuất của một người chơi, tính ra từ các kết quả ván, nên đề xuất lớp thống kê `PlayerRanking` kế thừa `Player`, thêm ba thuộc tính: tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng.
 
 ### d. Bước 4: Quan hệ số lượng giữa các thực thể
 
 - Một người chơi có nhiều kết quả ở các ván khác nhau, mỗi kết quả thuộc đúng một người chơi → `Player` - `MatchResult` là 1-n.
 - Một ván có đúng hai kết quả, mỗi kết quả thuộc đúng một ván → `Match` - `MatchResult` là 1-2. Hai quan hệ này đồng thời tách quan hệ n-n giữa `Player` và `Match`: `MatchResult` là lớp trung gian xác định một người chơi trong một ván.
 - Một ván đấu dùng đúng một đề bài; một đề bài thuộc tối đa một ván đấu được lưu, vì đề bài của ván với máy không gắn với ván nào → `Board` - `Match` là 1-0..1.
+- Mỗi kết quả gắn với đúng một bàn chơi riêng của người chơi đó trong ván; một bàn chơi thuộc tối đa một kết quả, vì đề bài của ván và bàn của ván với máy không phải bàn của kết quả nào → `Board` - `MatchResult` là 1-0..1.
 
 ### e. Bước 5: Quan hệ đối tượng giữa các thực thể
 
@@ -73,7 +74,8 @@ Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị An
 - Hợp thành (aggregation):
   - `MatchResult` ◇ `Player`: kết quả được ghép từ người chơi, nhưng người chơi tồn tại độc lập với từng ván.
   - `Match` ◇ `Board`: ván đấu được chơi trên một đề bài, nhưng đề bài cũng được dùng ở ván với máy mà không có ván đấu nào.
-- Phụ thuộc dẫn xuất `<<derive>>`: `PlayerRanking` không phải là một người chơi mà là kết quả tính toán trên các `MatchResult` của người chơi đó và của các đối thủ trong cùng ván, nên chỉ phụ thuộc `MatchResult`.
+  - `MatchResult` ◇ `Board`: kết quả của một người được ghép với bàn chơi riêng của người đó, vì mỗi người xóa cặp trên bản riêng và server chỉ xáo bàn của người bị bế tắc, nên hai bàn trong cùng ván khác nhau. Số ô còn lại báo trong kết quả (ví dụ "Bạn còn 18 ô") lấy từ bàn này.
+- Kế thừa: `PlayerRanking` ▷ `Player`. Mỗi dòng của bảng xếp hạng là một người chơi kèm ba chỉ số thống kê, nên `PlayerRanking` thừa hưởng thông tin người chơi (tên hiển thị để hiện trên bảng) và chỉ thêm ba thuộc tính thống kê. Đây là cách giáo trình dùng cho lớp thống kê (lớp thống kê kế thừa lớp thực thể được thống kê). Ba thuộc tính này vẫn tính ra từ các `MatchResult` của người chơi và của các đối thủ trong cùng ván, không nhập trực tiếp.
 
 Kết quả thu được biểu đồ lớp thực thể pha phân tích của toàn hệ thống như Hình 2.1.
 
@@ -83,11 +85,11 @@ Kết quả thu được biểu đồ lớp thực thể pha phân tích của t
 
 | Lớp | Thuộc tính |
 |---|---|
-| `Player` | username, password, name, status (rỗi, bận) |
+| `Player` | username, password, name, status (rỗi/idle, luyện tập/training, bận/busy) |
 | `Match` | startTime, endTime, timeLimit |
 | `MatchResult` | result (thắng, hòa, thua), point, finishTime (rỗng nếu chưa xóa hết ô) |
 | `Board` | rowCount, columnCount, tiles |
-| `PlayerRanking` | totalPoint, avgOpponentPoint, avgWinTime |
+| `PlayerRanking` (kế thừa `Player`) | totalPoint, avgOpponentPoint, avgWinTime |
 
 ## 3. Biểu đồ lớp pha phân tích cho ba modul
 

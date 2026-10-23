@@ -1,0 +1,64 @@
+@startuml activity-m2
+title Biểu đồ hoạt động - Modul Play With Bot
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam activity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam partition {
+  BorderColor #9E9E9E
+}
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #9E9E9E
+}
+
+start
+partition "Xử lí tại MainActivity" {
+  :Hiển thị giao diện chính;
+}
+->[click chơi với máy];
+partition "Xử lí tại DifficultyActivity" {
+  :Hiển thị lựa chọn độ khó;
+  :Nhận độ khó;
+}
+->[click bắt đầu];
+partition "Xử lí tại BotGameActivity" {
+  :Sinh đề bài;
+  note right: BoardGenerator:\ngenerateBoard()
+  :Tạo bàn của máy và khởi tạo máy;
+  note right: Board: copy()\nBot: Bot()
+  :Hiển thị bàn chơi, bắt đầu đồng hồ;
+  repeat
+    if (Sự kiện?) then ([người chơi click hai ô])
+      :Kiểm tra đường nối;
+      note right: PathFinder:\ncheckPath()
+      if (Nối được?) then ([có])
+        :Xóa hai ô, vẽ đường nối;
+        note right: Board:\nremovePair()
+        :Kiểm tra bế tắc, xáo nếu cần;
+        note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
+      else ([không])
+        :Bỏ chọn hai ô;
+      endif
+    else ([đến lượt máy])
+      :Lấy nước đi của máy;
+      note right: Bot:\nnextMove()
+      :Xóa cặp trên bàn của máy;
+      note right: Board:\nremovePair()
+    endif
+  repeat while (Một bên xóa hết ô hoặc hết giờ?) is ([chưa]) not ([rồi])
+  :Dừng đồng hồ, xác định kết quả;
+}
+partition "Xử lí tại BotResultDialog" {
+  :Hiển thị kết quả;
+}
+->[click OK];
+partition "Xử lí tại MainActivity " {
+  :Hiển thị giao diện chính;
+}
+stop
+@enduml

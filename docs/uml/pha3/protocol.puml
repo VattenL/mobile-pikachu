@@ -1,0 +1,59 @@
+@startuml protocol
+title Luồng message giữa hai client và server
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+skinparam ArrowColor #4A4A4A
+skinparam sequence {
+  LifeLineBorderColor #4A4A4A
+  ParticipantBorderColor #4A4A4A
+  ParticipantBackgroundColor #F7F7F7
+}
+
+participant "Client A" as A
+participant "Server" as S
+participant "Client B" as B
+
+== Đăng nhập ==
+A -> S : LOGIN {username, password}
+S --> A : LOGIN_RESULT {ok, player}
+S --> A : ONLINE_LIST
+S --> B : ONLINE_LIST (A vừa online)
+
+== Thách đấu ==
+A -> S : INVITE {to: B}
+S -> B : INVITE_RECEIVED {from: A}
+alt B chấp nhận
+  B -> S : INVITE_REPLY {from: A, accept: true}
+  S -> A : MATCH_START {matchId, tiles, timeLimitSec, opponent}
+  S -> B : MATCH_START {matchId, tiles, timeLimitSec, opponent}
+else B từ chối, B bận hoặc mất kết nối
+  B -> S : INVITE_REPLY {accept: false}
+  S --> A : INVITE_RESULT {accepted: false, reason}
+end
+
+== Chơi ván (A và B chơi song song) ==
+loop đến khi một người xóa hết ô, hết giờ hoặc có người thoát
+  A -> S : MOVE {matchId, a, b}
+  S --> A : MOVE_RESULT {ok, path, remaining}
+  S -> B : OPPONENT_PROGRESS {remaining}
+  opt bàn của A bế tắc
+    S -> A : BOARD_SHUFFLED {tiles}
+  end
+end
+S -> A : MATCH_END {result, point, finishTime, remaining, reason}
+S -> B : MATCH_END {result, point, finishTime, remaining, reason}
+
+== Sau ván ==
+A -> S : REMATCH_REPLY {matchId, accept}
+B -> S : REMATCH_REPLY {matchId, accept}
+alt cả hai tiếp tục
+  S -> A : MATCH_START (ván mới)
+  S -> B : MATCH_START (ván mới)
+else một người dừng (ví dụ A)
+  S -> B : OPPONENT_LEFT
+  S --> A : ONLINE_LIST
+  S --> B : ONLINE_LIST
+end
+@enduml

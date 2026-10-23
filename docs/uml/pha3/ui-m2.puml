@@ -1,0 +1,131 @@
+@startuml ui-m2
+title Thiết kế giao diện - Modul Play With Bot (màn hình ngang, kèm chế độ solo)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Main [
+{{salt
+{+
+  { {+
+      <b>Hoàng Nam
+      11 điểm
+      .
+      .
+      [ Chơi với máy ] | [ Chơi solo ]
+      [ Xếp hạng ] | [ Đăng xuất ]
+    } | {+
+      <b>Người chơi online
+      {#
+        Minh Anh | 12.5 | Rỗi | [Thách đấu]
+        Quốc Bảo | 10.5 | Luyện tập | [Thách đấu]
+      }
+    } }
+}
+}}
+]
+
+rectangle Difficulty [
+{{salt
+{+
+  <b>Chọn độ khó
+  .
+  { {+ (Togepi)
+       <b>Dễ } | {+ (Pikachu)
+       <b>Trung bình } | {+ (Charizard)
+       <b>Khó } }
+  .
+  [ Quay lại ] | [ Bắt đầu ]
+}
+}}
+]
+
+rectangle Game [
+{{salt
+{+
+  { {+
+      <b>Đấu máy · Trung bình
+      09:12
+      .
+      <b>Bạn
+      98 ô
+      .
+      [ Thoát ]
+    } | {#
+      A | B | C | D | E | F
+      G | A | . | H | B | C
+      D | . | E | F | G | H
+      B | C | A | . | D | E
+      F | G | H | A | . | B
+      C | D | E | F | G | A
+    } | {+
+      <b>Máy · 96 ô
+      {#
+        A | B | . | D | E | F
+        G | A | . | H | B | C
+        D | . | E | F | . | H
+        B | C | A | . | D | E
+        . | G | H | A | . | B
+        C | D | E | F | G | A
+      }
+      <i>(bàn của máy, chỉ xem)
+    } }
+}
+}}
+]
+
+rectangle Solo [
+{{salt
+{+
+  { {+
+      <b>Chơi solo
+      09:40
+      .
+      <b>Bạn
+      94 ô
+      .
+      [ Thoát ]
+    } | {#
+      A | B | C | D | E | F
+      G | . | . | H | B | C
+      D | . | E | F | G | H
+      B | C | A | . | D | E
+      F | G | H | A | . | B
+      C | D | E | . | G | A
+    } | {+
+      (Pikachu)
+      <b>Chơi solo
+      Xóa hết bàn
+      trước khi hết giờ
+    } }
+}
+}}
+]
+
+rectangle Result [
+{{salt
+{+
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 07:15.
+  Máy còn 12 ô.
+  .
+  [ OK ]
+}
+}}
+]
+
+Main -right-> Difficulty : chơi với máy
+Difficulty -left-> Main : quay lại
+Difficulty -down-> Game : bắt đầu
+Main -down-> Solo : chơi solo
+Game -right-> Result : kết thúc ván
+Solo -right-> Result : xóa hết bàn\nhoặc hết giờ
+Game -up-> Main : thoát
+Result -up-> Main : OK
+@enduml

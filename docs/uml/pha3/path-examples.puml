@@ -1,0 +1,96 @@
+@startuml path-examples
+title Các dạng đường nối hai ô (dấu chấm là ô trống, hàng và cột ngoài cùng là viền)
+
+scale 1.6
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle I [
+{{salt
+{+
+  <b>a. Đường thẳng (0 lần rẽ)
+  {#
+     · | · | · | · | · | · 
+     · | B | C | D | E | · 
+     · | A | ─ | ─ | A | · 
+     · | F | G | H | B | · 
+     · | C | D | E | F | · 
+     · | · | · | · | · | · 
+  }
+}
+}}
+]
+
+rectangle L [
+{{salt
+{+
+  <b>b. Chữ L (1 lần rẽ)
+  {#
+     · | · | · | · | · | · 
+     · | A | ─ | ┐ | B | · 
+     · | C | D | │ | E | · 
+     · | F | G | A | H | · 
+     · | B | C | D | E | · 
+     · | · | · | · | · | · 
+  }
+}
+}}
+]
+
+rectangle Z [
+{{salt
+{+
+  <b>c. Chữ Z (2 lần rẽ)
+  {#
+     · | · | · | · | · | · 
+     · | A | ─ | ┐ | B | · 
+     · | C | D | │ | E | · 
+     · | F | G | └ | A | · 
+     · | B | C | D | E | · 
+     · | · | · | · | · | · 
+  }
+}
+}}
+]
+
+rectangle U [
+{{salt
+{+
+  <b>d. Chữ U qua viền (2 lần rẽ)
+  {#
+     · | ┌ | ─ | ─ | ┐ | · 
+     · | A | B | C | A | · 
+     · | D | E | F | G | · 
+     · | H | B | C | D | · 
+     · | E | F | G | H | · 
+     · | · | · | · | · | · 
+  }
+}
+}}
+]
+
+rectangle X [
+{{salt
+{+
+  <b>e. Không hợp lệ (3 lần rẽ)
+  {#
+     · | · | · | · | · | · 
+     · | A | B | C | D | · 
+     · | └ | ─ | ┐ | E | · 
+     · | F | G | └ | A | · 
+     · | B | C | D | E | · 
+     · | · | · | · | · | · 
+  }
+}
+}}
+]
+
+I -[hidden]right- L
+L -[hidden]right- Z
+I -[hidden]down- U
+U -[hidden]right- X
+@enduml
