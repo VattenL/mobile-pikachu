@@ -1,5 +1,5 @@
 @startuml seq-m1
-title Biểu đồ tuần tự - Modul View Ranking
+title Biểu đồ tuần tự - Modul Manage Account
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -16,20 +16,35 @@ skinparam sequence {
 autonumber "<b>0:"
 
 actor "Người chơi" as Player
+boundary "Register\nActivity" as RegisterActivity
 boundary LoginActivity
 boundary MainActivity
-boundary RankingActivity
-control ServerConnection
-control ClientHandler
-control LoginController
-control OnlinePlayerManager
-control RankingController
+control "Server\nConnection" as ServerConnection
+control "Client\nHandler" as ClientHandler
+control "Login\nController" as LoginController
+control "OnlinePlayer\nManager" as OnlinePlayerManager
+control "Challenge\nController" as ChallengeController
 control PlayerDAO
-control PlayerRankingDAO
-entity "Player\nRanking" as PlayerRanking
 entity "Player" as PlayerE
 
-Player -> LoginActivity : nhập, click đăng nhập
+Player -> LoginActivity : click đăng ký
+LoginActivity -> RegisterActivity : gọi
+RegisterActivity -> Player : hiển thị
+Player -> RegisterActivity : nhập, click đăng ký
+RegisterActivity -> ServerConnection : send(REGISTER)
+ServerConnection -> ClientHandler : REGISTER (TCP)
+ClientHandler -> LoginController : handleRegister()
+LoginController -> PlayerDAO : gọi
+PlayerDAO -> PlayerDAO : addPlayer()
+activate PlayerDAO
+PlayerDAO --> LoginController : trả về
+deactivate PlayerDAO
+LoginController -> ClientHandler : send(REGISTER_RESULT)
+ClientHandler -> ServerConnection : REGISTER_RESULT (TCP)
+ServerConnection -> RegisterActivity : onMessage()
+RegisterActivity -> LoginActivity : gọi
+LoginActivity -> Player : hiển thị
+Player -> LoginActivity : nhập mật khẩu, click đăng nhập
 LoginActivity -> ServerConnection : send(LOGIN)
 ServerConnection -> ClientHandler : LOGIN (TCP)
 ClientHandler -> LoginController : handleLogin()
@@ -53,26 +68,16 @@ ClientHandler -> ServerConnection : LOGIN_RESULT (TCP)
 ServerConnection -> LoginActivity : onMessage()
 LoginActivity -> MainActivity : gọi
 MainActivity -> Player : hiển thị
-Player -> MainActivity : click xem bảng xếp hạng
-MainActivity -> RankingActivity : gọi
-RankingActivity -> ServerConnection : send(GET_RANKING)
-ServerConnection -> ClientHandler : GET_RANKING (TCP)
-ClientHandler -> RankingController : handleGetRanking()
-RankingController -> PlayerRankingDAO : gọi
-PlayerRankingDAO -> PlayerRankingDAO : getRanking()
-activate PlayerRankingDAO
-PlayerRankingDAO -> PlayerRanking : gọi
-PlayerRanking -> PlayerRanking : PlayerRanking()
-activate PlayerRanking
-PlayerRanking --> PlayerRankingDAO : trả về
-deactivate PlayerRanking
-PlayerRankingDAO --> RankingController : trả về
-deactivate PlayerRankingDAO
-RankingController -> ClientHandler : send(RANKING)
-ClientHandler -> ServerConnection : RANKING (TCP)
-ServerConnection -> RankingActivity : onMessage()
-RankingActivity -> Player : hiển thị
-Player -> RankingActivity : click quay lại
-RankingActivity -> MainActivity : gọi
-MainActivity -> Player : hiển thị
+Player -> MainActivity : click đăng xuất
+MainActivity -> ServerConnection : send(LOGOUT)
+MainActivity -> LoginActivity : gọi
+LoginActivity -> Player : hiển thị
+ServerConnection -> ClientHandler : LOGOUT (TCP)
+ClientHandler -> LoginController : handleLogout()
+LoginController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : removeOnlinePlayer()
+activate OnlinePlayerManager
+OnlinePlayerManager --> LoginController : trả về
+deactivate OnlinePlayerManager
+LoginController -> ChallengeController : broadcastOnlineList()
 @enduml

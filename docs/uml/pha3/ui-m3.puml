@@ -1,5 +1,5 @@
 @startuml ui-m3
-title Thiết kế giao diện - Modul Play Online Match (màn hình ngang)
+title Thiết kế giao diện - Modul Play With Bot (màn hình ngang)
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -16,7 +16,7 @@ rectangle Main [
       <b>Hoàng Nam
       11 điểm
       .
-      <color:blue>Đang chờ Minh Anh trả lời...
+      .
       [ Xem bảng xếp hạng ]
       [   Chơi với máy    ]
       [     Đăng xuất     ]
@@ -26,43 +26,34 @@ rectangle Main [
         <b>Tên | <b>Tổng điểm | <b>Trạng thái
         Minh Anh | 12.5 | Rỗi
         Quốc Bảo | 10.5 | Bận
-        Thu Hà | 7.5 | Luyện tập
+        Thu Hà | 7.5 | Rỗi
       }
     } }
 }
 }}
 ]
 
-rectangle Confirm [
+rectangle Difficulty [
 {{salt
 {+
-  <b>Xác nhận thách đấu
+  <b>Chọn độ khó
   .
-  Bạn muốn thách đấu Minh Anh?
+  { {+ (Togepi)
+       <b>Dễ } | {+ (Pikachu)
+       <b>Trung bình } | {+ (Charizard)
+       <b>Khó } }
   .
-  [ Hủy ] | [ Xác nhận ]
+  [ Quay lại ] | [ Bắt đầu ]
 }
 }}
 ]
 
-rectangle Invite [
-{{salt
-{+
-  <b>Thách đấu!
-  .
-  Hoàng Nam muốn thách đấu bạn
-  .
-  [ Reject ] | [ OK ]
-}
-}}
-]
-
-rectangle Match [
+rectangle Game [
 {{salt
 {+
   { {+
-      <b>Đấu với Minh Anh
-      08:30
+      <b>Đấu máy · Trung bình
+      09:12
       .
       <b>Bạn
       98 ô
@@ -76,16 +67,16 @@ rectangle Match [
       F | G | H | A | . | B
       C | D | E | F | G | A
     } | {+
-      <b>Minh Anh · 92 ô
+      <b>Máy · 96 ô
       {#
-        A | . | C | D | . | F
+        A | B | . | D | E | F
         G | A | . | H | B | C
-        . | . | E | F | G | H
-        B | C | . | . | D | E
-        F | G | H | A | . | B
-        C | . | E | F | G | .
+        D | . | E | F | . | H
+        B | C | A | . | D | E
+        . | G | H | A | . | B
+        C | D | E | F | G | A
       }
-      <i>(bàn của đối thủ, chỉ xem)
+      <i>(bàn của máy, chỉ xem)
     } }
 }
 }}
@@ -96,22 +87,18 @@ rectangle Result [
 {+
   <b>Chiến thắng!
   .
-  Bạn thắng. Thời gian hoàn thành 06:42.
-  Bạn có muốn tiếp tục không?
+  Bạn thắng. Thời gian hoàn thành 07:15.
+  Máy còn 12 ô.
   .
-  [ Dừng ] | [ Tiếp tục ]
+  [ OK ]
 }
 }}
 ]
 
-Main -left-> Confirm : click tên đối thủ
-Confirm -right-> Main : hủy, hoặc xác nhận\n(gửi lời mời, hiện "Đang chờ")
-Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
-Invite -left-> Main : Reject
-Invite -down-> Match : OK
-Main -down-> Match : đối thủ chấp nhận
-Match -right-> Result : kết thúc ván
-Result -up-> Match : cả hai tiếp tục
-Result -up-> Main : dừng
-Match -up-> Main : thoát
+Main -right-> Difficulty : chơi với máy
+Difficulty -left-> Main : quay lại
+Difficulty -down-> Game : bắt đầu
+Game -right-> Result : kết thúc ván
+Game -up-> Main : thoát
+Result -up-> Main : OK
 @enduml

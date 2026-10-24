@@ -1,0 +1,106 @@
+@startuml seq-m3
+title Biểu đồ tuần tự - Modul Play With Bot
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam ArrowColor #4A4A4A
+skinparam sequence {
+  LifeLineBorderColor #4A4A4A
+  ParticipantBorderColor #4A4A4A
+  ParticipantBackgroundColor #F7F7F7
+  ActorBorderColor #4A4A4A
+  ActorBackgroundColor #F7F7F7
+}
+autonumber "<b>0:"
+
+actor "Người chơi" as Player
+boundary MainActivity
+boundary "Difficulty\nActivity" as DifficultyActivity
+boundary "BotGame\nActivity" as BotGameActivity
+boundary BoardView
+boundary "BotResult\nDialog" as BotResultDialog
+control "Server\nConnection" as ServerConnection
+control BoardGenerator
+control PathFinder
+control Bot
+entity Board
+
+Player -> MainActivity : click chơi với máy
+MainActivity -> DifficultyActivity : gọi
+DifficultyActivity -> Player : hiển thị
+Player -> DifficultyActivity : chọn độ khó, click bắt đầu
+DifficultyActivity -> BotGameActivity : gọi
+BotGameActivity -> BoardGenerator : gọi
+BoardGenerator -> BoardGenerator : generateBoard()
+activate BoardGenerator
+BoardGenerator -> Board : gọi
+Board -> Board : Board()
+activate Board
+Board --> BoardGenerator : trả về
+deactivate Board
+BoardGenerator --> BotGameActivity : trả về
+deactivate BoardGenerator
+BotGameActivity -> Board : gọi
+Board -> Board : copy()
+activate Board
+Board --> BotGameActivity : trả về
+deactivate Board
+BotGameActivity -> Bot : gọi
+Bot -> Bot : Bot()
+activate Bot
+Bot --> BotGameActivity : trả về
+deactivate Bot
+BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
+BotGameActivity -> BoardView : setBoard()
+BoardView -> Player : hiển thị
+loop lặp đến khi một bên xóa hết ô hoặc hết giờ
+Player -> BoardView : click hai ô
+BoardView -> BotGameActivity : onCellClick()
+BotGameActivity -> PathFinder : gọi
+PathFinder -> PathFinder : checkPath()
+activate PathFinder
+PathFinder --> BotGameActivity : trả về
+deactivate PathFinder
+BotGameActivity -> Board : gọi
+Board -> Board : removePair()
+activate Board
+Board --> BotGameActivity : trả về
+deactivate Board
+BotGameActivity -> Board : gọi
+Board -> Board : isCleared()
+activate Board
+Board --> BotGameActivity : trả về
+deactivate Board
+BotGameActivity -> PathFinder : gọi
+PathFinder -> PathFinder : findAvailablePair()
+activate PathFinder
+PathFinder --> BotGameActivity : trả về
+deactivate PathFinder
+BotGameActivity -> BoardView : showPath()
+BoardView -> Player : hiển thị
+BotGameActivity -> Bot : gọi
+Bot -> Bot : nextMove()
+activate Bot
+Bot -> PathFinder : gọi
+PathFinder -> PathFinder : findAvailablePair()
+activate PathFinder
+PathFinder --> Bot : trả về
+deactivate PathFinder
+Bot --> BotGameActivity : trả về
+deactivate Bot
+BotGameActivity -> Board : gọi
+Board -> Board : removePair()
+activate Board
+Board --> BotGameActivity : trả về
+deactivate Board
+BotGameActivity -> Player : hiển thị
+end
+BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
+BotGameActivity -> BotResultDialog : gọi
+BotResultDialog -> Player : hiển thị
+Player -> BotResultDialog : click OK
+BotResultDialog -> MainActivity : gọi
+MainActivity -> Player : hiển thị
+@enduml

@@ -1,5 +1,5 @@
 @startuml seq-m2
-title Biểu đồ tuần tự - Modul Play With Bot
+title Biểu đồ tuần tự - Modul View Ranking
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -16,91 +16,63 @@ skinparam sequence {
 autonumber "<b>0:"
 
 actor "Người chơi" as Player
+boundary LoginActivity
 boundary MainActivity
-boundary "Difficulty\nActivity" as DifficultyActivity
-boundary "BotGame\nActivity" as BotGameActivity
-boundary BoardView
-boundary "BotResult\nDialog" as BotResultDialog
-control "Server\nConnection" as ServerConnection
-control BoardGenerator
-control PathFinder
-control Bot
-entity Board
+boundary RankingActivity
+control ServerConnection
+control ClientHandler
+control LoginController
+control OnlinePlayerManager
+control RankingController
+control PlayerDAO
+control PlayerRankingDAO
+entity "Player\nRanking" as PlayerRanking
+entity "Player" as PlayerE
 
-Player -> MainActivity : click chơi với máy
-MainActivity -> DifficultyActivity : gọi
-DifficultyActivity -> Player : hiển thị
-Player -> DifficultyActivity : chọn độ khó, click bắt đầu
-DifficultyActivity -> BotGameActivity : gọi
-BotGameActivity -> BoardGenerator : gọi
-BoardGenerator -> BoardGenerator : generateBoard()
-activate BoardGenerator
-BoardGenerator -> Board : gọi
-Board -> Board : Board()
-activate Board
-Board --> BoardGenerator : trả về
-deactivate Board
-BoardGenerator --> BotGameActivity : trả về
-deactivate BoardGenerator
-BotGameActivity -> Board : gọi
-Board -> Board : copy()
-activate Board
-Board --> BotGameActivity : trả về
-deactivate Board
-BotGameActivity -> Bot : gọi
-Bot -> Bot : Bot()
-activate Bot
-Bot --> BotGameActivity : trả về
-deactivate Bot
-BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
-BotGameActivity -> BoardView : setBoard()
-BoardView -> Player : hiển thị
-loop lặp đến khi một bên xóa hết ô hoặc hết giờ
-Player -> BoardView : click hai ô
-BoardView -> BotGameActivity : onCellClick()
-BotGameActivity -> PathFinder : gọi
-PathFinder -> PathFinder : checkPath()
-activate PathFinder
-PathFinder --> BotGameActivity : trả về
-deactivate PathFinder
-BotGameActivity -> Board : gọi
-Board -> Board : removePair()
-activate Board
-Board --> BotGameActivity : trả về
-deactivate Board
-BotGameActivity -> Board : gọi
-Board -> Board : isCleared()
-activate Board
-Board --> BotGameActivity : trả về
-deactivate Board
-BotGameActivity -> PathFinder : gọi
-PathFinder -> PathFinder : findAvailablePair()
-activate PathFinder
-PathFinder --> BotGameActivity : trả về
-deactivate PathFinder
-BotGameActivity -> BoardView : showPath()
-BoardView -> Player : hiển thị
-BotGameActivity -> Bot : gọi
-Bot -> Bot : nextMove()
-activate Bot
-Bot -> PathFinder : gọi
-PathFinder -> PathFinder : findAvailablePair()
-activate PathFinder
-PathFinder --> Bot : trả về
-deactivate PathFinder
-Bot --> BotGameActivity : trả về
-deactivate Bot
-BotGameActivity -> Board : gọi
-Board -> Board : removePair()
-activate Board
-Board --> BotGameActivity : trả về
-deactivate Board
-BotGameActivity -> Player : hiển thị
-end
-BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
-BotGameActivity -> BotResultDialog : gọi
-BotResultDialog -> Player : hiển thị
-Player -> BotResultDialog : click OK
-BotResultDialog -> MainActivity : gọi
+Player -> LoginActivity : nhập, click đăng nhập
+LoginActivity -> ServerConnection : send(LOGIN)
+ServerConnection -> ClientHandler : LOGIN (TCP)
+ClientHandler -> LoginController : handleLogin()
+LoginController -> PlayerDAO : gọi
+PlayerDAO -> PlayerDAO : checkLogin()
+activate PlayerDAO
+PlayerDAO -> PlayerE : gọi
+PlayerE -> PlayerE : Player()
+activate PlayerE
+PlayerE --> PlayerDAO : trả về
+deactivate PlayerE
+PlayerDAO --> LoginController : trả về
+deactivate PlayerDAO
+LoginController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : addOnlinePlayer()
+activate OnlinePlayerManager
+OnlinePlayerManager --> LoginController : trả về
+deactivate OnlinePlayerManager
+LoginController -> ClientHandler : send(LOGIN_RESULT)
+ClientHandler -> ServerConnection : LOGIN_RESULT (TCP)
+ServerConnection -> LoginActivity : onMessage()
+LoginActivity -> MainActivity : gọi
+MainActivity -> Player : hiển thị
+Player -> MainActivity : click xem bảng xếp hạng
+MainActivity -> RankingActivity : gọi
+RankingActivity -> ServerConnection : send(GET_RANKING)
+ServerConnection -> ClientHandler : GET_RANKING (TCP)
+ClientHandler -> RankingController : handleGetRanking()
+RankingController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getRanking()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> RankingController : trả về
+deactivate PlayerRankingDAO
+RankingController -> ClientHandler : send(RANKING)
+ClientHandler -> ServerConnection : RANKING (TCP)
+ServerConnection -> RankingActivity : onMessage()
+RankingActivity -> Player : hiển thị
+Player -> RankingActivity : click quay lại
+RankingActivity -> MainActivity : gọi
 MainActivity -> Player : hiển thị
 @enduml

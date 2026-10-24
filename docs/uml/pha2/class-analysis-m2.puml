@@ -1,10 +1,10 @@
 @startuml class-analysis-m2
-title Biểu đồ lớp pha phân tích - Modul Play With Bot
+title Biểu đồ lớp pha phân tích - Modul View Ranking
 
 hide circle
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 50
+skinparam nodesep 60
 skinparam ranksep 70
 skinparam classFontSize 14
 skinparam classAttributeFontSize 12
@@ -16,48 +16,41 @@ skinparam class {
 }
 
 ' ===== Tang 1: lop bien =====
-class MainScreen {
-  - subPlayWithBot
+class LoginScreen {
+  - inUsername
+  - inPassword
+  - outMessage
+  - subLogin
 }
 
-class DifficultyScreen {
-  - inDifficulty
-  - subStart
+class MainScreen {
+  - subViewRanking
+}
+
+class RankingScreen {
+  - outRanking
   - subBack
 }
 
-class BotGameScreen {
-  - outBoard
-  - outRemainingTime
-  - outPlayerTileCount
-  - outBotTileCount
-  - inTile
-  - subQuit
-}
-
-class BotResultDialog {
-  - outResult
-  - subOK
-}
-
 ' ===== Tang 2: lop thuc the =====
-class Board {
-  - rowCount
-  - columnCount
-  - tiles
-  + generateBoard()
-  + checkPath()
-  + removePair()
-  + isCleared()
-  + findAvailablePair()
-  + shuffle()
+class Player {
+  - username
+  - password
+  - name
+  - status
+  + checkLogin()
 }
 
-MainScreen -right- DifficultyScreen
-DifficultyScreen -right- BotGameScreen
-BotGameScreen -right- BotResultDialog
-BotResultDialog -[norank]- MainScreen
+class PlayerRanking {
+  - totalPoint
+  - avgOpponentPoint
+  - avgWinTime
+  + getRanking()
+}
 
-DifficultyScreen -down- Board
-BotGameScreen -down- Board
+LoginScreen -right- MainScreen
+MainScreen -right- RankingScreen
+
+LoginScreen -down- Player
+RankingScreen -down- PlayerRanking
 @enduml

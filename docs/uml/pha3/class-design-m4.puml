@@ -1,12 +1,12 @@
 @startuml class-design-m4
-title Biểu đồ lớp thiết kế - Modul Manage Account
+title Biểu đồ lớp thiết kế - Modul Play Online Match
 
 hide circle
 hide empty members
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 40
-skinparam ranksep 60
+skinparam nodesep 30
+skinparam ranksep 55
 skinparam classFontSize 13
 skinparam classAttributeFontSize 11
 skinparam class {
@@ -16,35 +16,62 @@ skinparam class {
 }
 
 ' ===== Client Android: tang giao dien =====
-class RegisterActivity #E3F2FD {
-  - edtUsername : EditText
-  - edtPassword : EditText
-  - edtConfirmPassword : EditText
-  - edtName : EditText
-  - tvError : TextView
-  - btnRegister : Button
-  - btnBack : Button
-  + onRegisterClick(v : View) : void
-  + onBackClick(v : View) : void
-  + onMessage(msg : Message) : void
+class ChallengeConfirmDialog #E3F2FD {
+  - tvOpponent : TextView
+  - btnConfirm : Button
+  - btnCancel : Button
+  - opponent : Player
+  + onConfirmClick(v : View) : void
+  + onCancelClick(v : View) : void
 }
 
-class LoginActivity #E3F2FD {
-  - edtUsername : EditText
-  - edtPassword : EditText
-  - tvError : TextView
-  - btnLogin : Button
-  - btnRegister : Button
-  + onLoginClick(v : View) : void
-  + onRegisterClick(v : View) : void
+abstract class BaseActivity #E3F2FD {
   + onMessage(msg : Message) : void
 }
 
 class MainActivity #E3F2FD {
-  - tvPlayer : TextView
-  - btnLogout : Button
+  - rvOnlinePlayers : RecyclerView
+  - tvMessage : TextView
   - player : Player
-  + onLogoutClick(v : View) : void
+  - onlinePlayers : ArrayList<Player>
+  + onPlayerClick(opponent : Player) : void
+  + onMessage(msg : Message) : void
+}
+
+class InvitationDialog #E3F2FD {
+  - tvChallenger : TextView
+  - btnOk : Button
+  - btnReject : Button
+  - challenger : String
+  + onOkClick(v : View) : void
+  + onRejectClick(v : View) : void
+}
+
+class MatchActivity #E3F2FD {
+  - boardView : BoardView
+  - opponentBoardView : BoardView
+  - tvTimer : TextView
+  - tvMyRemaining : TextView
+  - tvOpponentRemaining : TextView
+  - btnQuit : Button
+  - board : Board
+  - opponentBoard : Board
+  - matchId : int
+  - opponent : Player
+  - firstCell : Cell
+  + onCellClick(cell : Cell) : void
+  + onMessage(msg : Message) : void
+  + onQuitClick(v : View) : void
+}
+
+class ResultDialog #E3F2FD {
+  - tvResult : TextView
+  - btnContinue : Button
+  - btnStop : Button
+  - matchId : int
+  + onContinueClick(v : View) : void
+  + onStopClick(v : View) : void
+  + onMessage(msg : Message) : void
 }
 
 ' ===== Client Android: tang mang =====
@@ -54,16 +81,10 @@ class ServerConnection #EDE7F6 {
   + getInstance() : ServerConnection
   + send(msg : Message) : void
   + addListener(l : MessageListener) : void
-  + removeListener(l : MessageListener) : void
 }
 
 interface MessageListener #EDE7F6 {
   + onMessage(msg : Message) : void
-}
-
-class ClientSession #EDE7F6 {
-  + player : Player
-  + clear() : void
 }
 
 ' ===== Server: tang dieu khien =====
@@ -74,21 +95,55 @@ class ClientHandler #E8F5E9 {
   + send(msg : Message) : void
 }
 
-class LoginController #E8F5E9 {
-  + handleRegister(handler : ClientHandler, msg : Message) : void
-  + handleLogin(handler : ClientHandler, msg : Message) : void
-  + handleLogout(handler : ClientHandler, msg : Message) : void
+class ChallengeController #E8F5E9 {
+  + handleInvite(handler : ClientHandler, msg : Message) : void
+  + handleInviteReply(handler : ClientHandler, msg : Message) : void
+  + handleUpdateStatus(handler : ClientHandler, msg : Message) : void
+  + broadcastOnlineList() : void
+}
+
+class MatchController #E8F5E9 {
+  + handleMove(handler : ClientHandler, msg : Message) : void
+  + handleLeaveMatch(handler : ClientHandler, msg : Message) : void
+  + handleRematchReply(handler : ClientHandler, msg : Message) : void
+  + onTimeout(room : MatchRoom) : void
+  - endMatch(room : MatchRoom, reason : String) : void
 }
 
 class OnlinePlayerManager #E8F5E9 {
   - onlineHandlers : HashMap<String, ClientHandler>
   + getInstance() : OnlinePlayerManager
-  + addOnlinePlayer(handler : ClientHandler) : boolean
-  + removeOnlinePlayer(handler : ClientHandler) : void
+  + getOnlinePlayers() : ArrayList<Player>
+  + sendInvitation(from : Player, to : Player) : boolean
+  + updateStatus(listPlayer : ArrayList<Player>, status : String) : boolean
 }
 
-class ChallengeController #E8F5E9 {
-  + broadcastOnlineList() : void
+class MatchManager #E8F5E9 {
+  - rooms : HashMap<Integer, MatchRoom>
+  + getInstance() : MatchManager
+  + createMatch(a : ClientHandler, b : ClientHandler, board : Board) : MatchRoom
+  + getRoom(matchId : int) : MatchRoom
+}
+
+class MatchRoom #E8F5E9 {
+  - match : Match
+  - handlers : ClientHandler[]
+  - boards : Board[]
+  - startMillis : long
+  - timer : Timer
+  - rematchReplies : Boolean[]
+  + getBoard(handler : ClientHandler) : Board
+  + getOpponent(handler : ClientHandler) : ClientHandler
+}
+
+class BoardGenerator #E8F5E9 {
+  + generateBoard(rows : int, cols : int, iconTypes : int, seed : long) : Board
+  + shuffle(board : Board, seed : long) : Board
+}
+
+class PathFinder #E8F5E9 {
+  + checkPath(board : Board, a : Cell, b : Cell) : ArrayList<Cell>
+  + findAvailablePair(board : Board) : Cell[]
 }
 
 ' ===== Server: tang DAO =====
@@ -97,53 +152,108 @@ class DAO #FFF8E1 {
   + DAO()
 }
 
-class PlayerDAO #FFF8E1 {
-  + PlayerDAO()
-  + addPlayer(player : Player) : boolean
-  + checkLogin(username : String, password : String) : Player
+class MatchDAO #FFF8E1 {
+  + MatchDAO()
+  + saveMatch(match : Match) : boolean
 }
 
-' ===== core: lop thuc the va message =====
-class Message #FFF3E0 {
-  - type : String
-  - data : JsonObject
-  + toJson() : String
-  + fromJson(line : String) : Message
+class PlayerRankingDAO #FFF8E1 {
+  + PlayerRankingDAO()
+  + getTotalPoints(listPlayer : ArrayList<Player>) : ArrayList<PlayerRanking>
 }
 
+' ===== core: lop thuc the =====
 class Player #FFF3E0 {
   - id : int
   - username : String
-  - password : String
   - name : String
   - status : String
 }
 
+class PlayerRanking #FFF3E0 {
+  - totalPoint : float
+}
+
+class Match #FFF3E0 {
+  - id : int
+  - startTime : Date
+  - endTime : Date
+  - timeLimit : int
+  - board : Board
+  - results : MatchResult[]
+}
+
+class MatchResult #FFF3E0 {
+  - id : int
+  - player : Player
+  - board : Board
+  - result : String
+  - point : float
+  - finishTime : Integer
+}
+
+class Board #FFF3E0 {
+  - id : int
+  - rowCount : int
+  - columnCount : int
+  - tiles : int[][]
+  + removePair(a : Cell, b : Cell) : void
+  + isCleared() : boolean
+  + countRemaining() : int
+}
+
 ' giao dien
-RegisterActivity -right- LoginActivity
-LoginActivity -right- MainActivity
-RegisterActivity ..|> MessageListener
-LoginActivity ..|> MessageListener
+MainActivity -left- ChallengeConfirmDialog
+BaseActivity -right- InvitationDialog
+InvitationDialog -right- MatchActivity
+MatchActivity -right- ResultDialog
+ResultDialog -[norank]- MainActivity
+MainActivity -up-|> BaseActivity
+BaseActivity ..|> MessageListener
+MatchActivity ..|> MessageListener
+ResultDialog ..|> MessageListener
+BaseActivity -[norank]- MatchActivity
 
 ' giao dien - mang
-RegisterActivity -down- ServerConnection
-LoginActivity -down- ServerConnection
 MainActivity -down- ServerConnection
-LoginActivity -down- ClientSession
-MainActivity -down- ClientSession
+InvitationDialog -down- ServerConnection
+MatchActivity -down- ServerConnection
+ResultDialog -down- ServerConnection
 ServerConnection -right- MessageListener
 
-' mang client - server (TCP)
+' client - server
 ServerConnection -down- ClientHandler : TCP
-ClientHandler -right- LoginController
-LoginController -right- OnlinePlayerManager
-LoginController -right- ChallengeController
+ClientHandler -down- ChallengeController
+ClientHandler -down- MatchController
+ChallengeController -down- OnlinePlayerManager
+ChallengeController -down- MatchManager
+ChallengeController -down- BoardGenerator
+MatchController -down- MatchManager
+MatchController -down- PathFinder
+MatchController -down- BoardGenerator
+MatchController -[norank]- OnlinePlayerManager
+MatchController -[norank]- ChallengeController
+OnlinePlayerManager -[norank]- ClientHandler
+MatchController -[norank]- Board
+MatchManager -[norank]- Match
+BoardGenerator -[norank]- Board
+MatchManager *-down- MatchRoom
 
 ' dieu khien - DAO
-LoginController -down- PlayerDAO
-DAO <|-down- PlayerDAO
+ChallengeController -[norank]- PlayerRankingDAO
+MatchController -[norank]- MatchDAO
+DAO <|-down- MatchDAO
+DAO <|-down- PlayerRankingDAO
 
 ' DAO - thuc the
-PlayerDAO -down- Player
-ClientHandler -[norank]- Message
+MatchDAO -down- Match
+PlayerRankingDAO -down- PlayerRanking
+MatchRoom o-down- Match
+MatchRoom o-down- Board
+Match *-right- MatchResult
+MatchResult o-right- Player
+PlayerRanking -down-|> Player
+Match o-down- Board
+MatchResult o-[norank]- Board
+PathFinder -[norank]- Board
 @enduml

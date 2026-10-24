@@ -1,11 +1,11 @@
 @startuml class-analysis-m4
-title Biểu đồ lớp pha phân tích - Modul Manage Account
+title Biểu đồ lớp pha phân tích - Modul Play Online Match
 
 hide circle
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 60
-skinparam ranksep 70
+skinparam nodesep 80
+skinparam ranksep 80
 skinparam classFontSize 14
 skinparam classAttributeFontSize 12
 skinparam class {
@@ -16,26 +16,36 @@ skinparam class {
 }
 
 ' ===== Tang 1: lop bien =====
-class RegisterScreen {
-  - inUsername
-  - inPassword
-  - inConfirmPassword
-  - inName
-  - outMessage
-  - subRegister
-  - subBack
-}
-
-class LoginScreen {
-  - inUsername
-  - inPassword
-  - outMessage
-  - subLogin
-  - subRegister
-}
-
 class MainScreen {
-  - subLogout
+  - outOnlinePlayerList
+  - outMessage
+  - subSelectOpponent
+}
+
+class ChallengeConfirmDialog {
+  - outOpponent
+  - subConfirm
+  - subCancel
+}
+
+class InvitationDialog {
+  - outChallenger
+  - subAccept
+  - subReject
+}
+
+class MatchScreen {
+  - outBoard
+  - outRemainingTime
+  - outOpponentTileCount
+  - inTile
+  - subQuit
+}
+
+class ResultDialog {
+  - outResult
+  - subContinue
+  - subStop
 }
 
 ' ===== Tang 2: lop thuc the =====
@@ -44,16 +54,62 @@ class Player {
   - password
   - name
   - status
-  + addPlayer()
-  + checkLogin()
-  + addOnlinePlayer()
-  + removeOnlinePlayer()
+  + getOnlinePlayers()
+  + sendInvitation()
+  + updateStatus()
 }
 
-RegisterScreen -right- LoginScreen
-LoginScreen -right- MainScreen
+class PlayerRanking {
+  - totalPoint
+  - avgOpponentPoint
+  - avgWinTime
+  + getTotalPoints()
+}
 
-RegisterScreen -down- Player
-LoginScreen -down- Player
+class Board {
+  - rowCount
+  - columnCount
+  - tiles
+  + generateBoard()
+  + checkPath()
+  + removePair()
+  + isCleared()
+  + findAvailablePair()
+  + shuffle()
+}
+
+class Match {
+  - startTime
+  - endTime
+  - timeLimit
+  + createMatch()
+  + saveMatch()
+}
+
+class MatchResult {
+  - result
+  - point
+  - finishTime
+}
+
+MainScreen -left- ChallengeConfirmDialog
+MainScreen -right- InvitationDialog
+InvitationDialog -right- MatchScreen
+MatchScreen -right- ResultDialog
+ResultDialog -[norank]- MainScreen
+
 MainScreen -down- Player
+MainScreen -down- PlayerRanking
+InvitationDialog -down- Board
+InvitationDialog -down- Match
+InvitationDialog -down- Player
+MatchScreen -down- Board
+MatchScreen -down- Match
+ResultDialog -down- Player
+
+Player "1" -[norank]-o "0..*" MatchResult
+Match "1" *-down- "2" MatchResult
+Match "0..1" o-right- "1" Board
+MatchResult "0..1" o-[norank]- "1" Board
+PlayerRanking -[norank]-|> Player
 @enduml

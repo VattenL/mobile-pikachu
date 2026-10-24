@@ -1,5 +1,5 @@
 @startuml activity-m2
-title Biểu đồ hoạt động - Modul Play With Bot
+title Biểu đồ hoạt động - Modul View Ranking
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -17,50 +17,42 @@ skinparam note {
 }
 
 start
+repeat
+  partition "Xử lí tại LoginActivity" {
+    :Nhận tên đăng nhập, mật khẩu;
+    :Gửi message LOGIN;
+  }
+  partition "Xử lí tại server: LoginController.handleLogin()" {
+    :Kiểm tra tài khoản;
+    note right: PlayerDAO:\ncheckLogin()
+    if (Đúng tài khoản?) then ([đúng])
+      :Thêm vào danh sách online;
+      note right: OnlinePlayerManager:\naddOnlinePlayer()
+    else ([sai])
+    endif
+    :Gửi LOGIN_RESULT;
+  }
+repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
+->[đăng nhập thành công];
+partition "Xử lí tại LoginActivity " {
+  :Lưu người chơi vào ClientSession;
+}
 partition "Xử lí tại MainActivity" {
   :Hiển thị giao diện chính;
 }
-->[click chơi với máy];
-partition "Xử lí tại DifficultyActivity" {
-  :Hiển thị lựa chọn độ khó;
-  :Nhận độ khó;
+->[click xem bảng xếp hạng];
+partition "Xử lí tại RankingActivity" {
+  :Gửi message GET_RANKING;
 }
-->[click bắt đầu];
-partition "Xử lí tại BotGameActivity" {
-  :Sinh đề bài;
-  note right: BoardGenerator:\ngenerateBoard()
-  :Tạo bàn của máy và khởi tạo máy;
-  note right: Board: copy()\nBot: Bot()
-  :Báo trạng thái luyện tập;
-  note right: ServerConnection:\nsend(UPDATE_STATUS)
-  :Hiển thị bàn chơi, bắt đầu đồng hồ;
-  repeat
-    if (Sự kiện?) then ([người chơi click hai ô])
-      :Kiểm tra đường nối;
-      note right: PathFinder:\ncheckPath()
-      if (Nối được?) then ([có])
-        :Xóa hai ô, vẽ đường nối;
-        note right: Board:\nremovePair()
-        :Kiểm tra bế tắc, xáo nếu cần;
-        note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
-      else ([không])
-        :Bỏ chọn hai ô;
-      endif
-    else ([đến lượt máy])
-      :Lấy nước đi của máy;
-      note right: Bot:\nnextMove()
-      :Xóa cặp trên bàn của máy;
-      note right: Board:\nremovePair()
-    endif
-  repeat while (Một bên xóa hết ô hoặc hết giờ?) is ([chưa]) not ([rồi])
-  :Dừng đồng hồ, xác định kết quả;
-  :Báo trạng thái rỗi;
-  note right: ServerConnection:\nsend(UPDATE_STATUS)
+partition "Xử lí tại server: RankingController.handleGetRanking()" {
+  :Lấy bảng xếp hạng;
+  note right: PlayerRankingDAO:\ngetRanking()
+  :Gửi message RANKING;
 }
-partition "Xử lí tại BotResultDialog" {
-  :Hiển thị kết quả;
+partition "Xử lí tại RankingActivity " {
+  :Hiển thị bảng xếp hạng;
 }
-->[click OK];
+->[click quay lại];
 partition "Xử lí tại MainActivity " {
   :Hiển thị giao diện chính;
 }

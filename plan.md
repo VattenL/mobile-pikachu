@@ -17,14 +17,14 @@ Tài liệu đi theo quy trình phát triển hướng đối tượng của bà
 
 ## Các modul của hệ thống
 
-Lấy theo các chức năng của đề. Dòng Dễ của đề (quản lí thông tin người chơi, xem BXH) tách thành hai modul M1 và M4, để mỗi người trong nhóm có một chức năng dễ. Mã modul dùng xuyên suốt tài liệu.
+Lấy theo các chức năng của đề. Dòng Dễ của đề (quản lí thông tin người chơi, xem BXH) tách thành hai modul M1 và M2, để mỗi người trong nhóm có một chức năng dễ. Mã modul dùng xuyên suốt tài liệu.
 
 | Mã | Modul | Mức | Nội dung |
 | --- | --- | --- | --- |
-| M1 | Xem bảng xếp hạng | Dễ | Đăng nhập, xem bảng xếp hạng theo ba tiêu chí |
-| M2 | Thi đấu với máy | Trung bình | Chọn độ khó, đua với bot trên cùng một đề, xem kết quả |
-| M3 | Thách đấu và đấu đối kháng | Khó | Xem danh sách online, thách đấu, trả lời lời mời, chơi ván đối kháng, chọn tiếp tục / dừng |
-| M4 | Quản lý tài khoản | Dễ | Đăng ký, đăng nhập, đăng xuất |
+| M1 | Quản lý tài khoản | Dễ | Đăng ký, đăng nhập, đăng xuất |
+| M2 | Xem bảng xếp hạng | Dễ | Đăng nhập, xem bảng xếp hạng theo ba tiêu chí |
+| M3 | Thi đấu với máy | Trung bình | Chọn độ khó, đua với bot trên cùng một đề, xem kết quả |
+| M4 | Thách đấu và đấu đối kháng | Khó | Xem danh sách online, thách đấu, trả lời lời mời, chơi ván đối kháng, chọn tiếp tục / dừng |
 
 Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use case tổng quan, lớp thực thể, CSDL) làm một lần. Từ kịch bản trở đi, mỗi modul làm riêng một bộ.
 
@@ -60,8 +60,8 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
   - Bước 1, actor: `Người chơi`; người bị thách đấu là actor gián tiếp của use case thách đấu.
   - Bước 2, mỗi chức năng ở §1.2 thành một use case.
   - Bước 3, mịn hóa: gộp các use case trùng nhau, dùng use case trừu tượng nếu cần.
-- **Use case chi tiết cho từng modul M1 đến M4:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
-- Ví dụ use case con: `Nối cặp ô` được cả M2 và M3 include; `Trả lời lời mời` (M3).
+- **Use case chi tiết cho từng modul M2 đến M1:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
+- Ví dụ use case con: `Nối cặp ô` được cả M3 và M4 include; `Trả lời lời mời` (M4).
 - Quy tắc: tên use case là động từ chỉ hành động của actor; mỗi use case có đường đi tới ít nhất một actor; mã use case (UC01, UC02...) giữ nguyên từ biểu đồ tổng quan sang biểu đồ chi tiết.
 
 ### 1.4. Yêu cầu phi chức năng *(bổ sung)*
@@ -91,9 +91,9 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 ### 2.3. Trích lớp biên và lớp điều khiển, biểu đồ lớp phân tích (§3.2.3)
 
 - **Bước 1:** mỗi giao diện thành một lớp biên. Giao diện dự kiến:
-  - M1: đăng nhập, đăng ký, trang chính, bảng xếp hạng.
-  - M2: chọn độ khó, bàn chơi, kết quả.
-  - M3: sảnh (danh sách online), dialog lời mời, bàn chơi, dialog kết quả và hỏi tiếp tục.
+  - M2: đăng nhập, đăng ký, trang chính, bảng xếp hạng.
+  - M3: chọn độ khó, bàn chơi, kết quả.
+  - M4: sảnh (danh sách online), dialog lời mời, bàn chơi, dialog kết quả và hỏi tiếp tục.
 - **Bước 2:** mỗi thành phần giao diện thành một thuộc tính, tiền tố `in` (nhận dữ liệu vào), `out` (hiện dữ liệu ra), `sub` (submit).
 - **Bước 3:** mỗi xử lý phía dưới giao diện thành một phương thức: tên gợi nhớ, tham số vào/ra, gán cho lớp thực thể theo tham số ra, nếu không thì theo tham số vào.
 - Vẽ một biểu đồ lớp phân tích cho mỗi modul. Quan hệ giữa các lớp thực thể giữ đúng như biểu đồ §2.2.
@@ -181,7 +181,7 @@ Mỗi thuật toán có mã giả và hình minh họa.
 
 ### 4.2. Cài đặt các modul (§5.2)
 
-- Mỗi modul M1 đến M4: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
+- Mỗi modul M2 đến M1: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
 
 ### 4.3. Kiểm thử đơn vị (§5.3)
 
@@ -242,15 +242,15 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 
 | Mức | Dev 1 | Dev 2 |
 | --- | --- | --- |
-| Dễ | Quản lý tài khoản: đăng ký, đăng nhập, đăng xuất (M4) | Xem bảng xếp hạng (M1) |
-| Trung bình | Thi đấu với máy (M2), gồm engine `core` | Thách đấu và trả lời lời mời (thuộc M3) |
-| Khó | Đấu đối kháng online: chơi ván và trọng tài (thuộc M3) | Kết thúc ván và tái đấu (thuộc M3) |
+| Dễ | Quản lý tài khoản: đăng ký, đăng nhập, đăng xuất (M1) | Xem bảng xếp hạng (M2) |
+| Trung bình | Thi đấu với máy (M3), gồm engine `core` | Thách đấu và trả lời lời mời (thuộc M4) |
+| Khó | Đấu đối kháng online: chơi ván và trọng tài (thuộc M4) | Kết thúc ván và tái đấu (thuộc M4) |
 
 - **Hạ tầng chung do Dev 2 dựng trước:** `GameServer`, `ClientHandler`, `ServerConnection`, `MessageListener`, `Message`, lớp `DAO`, script tạo CSDL và dữ liệu mẫu. Dev 1 đã nhận phần thuật toán nặng nhất (`core`, bot, trọng tài) nên không nhận thêm hạ tầng.
 - **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
   - Dev 1: `handleMove()`, `MatchManager`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
   - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `MatchDAO`, `ResultDialog`.
-  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.8, kịch bản v3 và biểu đồ tuần tự M3 cho khớp.
+  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.10, kịch bản v3 và biểu đồ tuần tự M4 cho khớp.
 - `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
 - Mỗi người chỉ sửa code thuộc phần mình; thay đổi interface dùng chung (mục 5) phải báo người kia.
 - Đề yêu cầu "server lưu toàn bộ thông tin", nên CSDL và tài khoản nằm trên server ngay từ Phase 1, không làm bản offline rồi bỏ.
@@ -396,12 +396,12 @@ Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong m�
 | Phần tài liệu | Người làm |
 | --- | --- |
 | Phần dùng chung: §1.1, §1.2, use case tổng quan §1.3, §1.4, lớp thực thể §2.2, §3.1, CSDL §3.2 | Cả hai, làm trước khi tách modul |
-| M4 (quản lý tài khoản), từ use case chi tiết đến kiểm thử | Dev 1 |
-| M1 (xem bảng xếp hạng), từ use case chi tiết đến kiểm thử | Dev 2 |
-| M2 (thi đấu với máy), từ use case chi tiết đến kiểm thử; thuật toán §3.5 | Dev 1 |
-| M3, phần thách đấu và trả lời lời mời (kịch bản bước 1–6 và các ngoại lệ 4a–6a) | Dev 2 |
-| M3, phần chơi ván (kịch bản bước 7–9, ngoại lệ 8a, 8b) | Dev 1 |
-| M3, phần kết thúc ván và tái đấu (kịch bản bước 10–12, ngoại lệ 6b, 10a, 10b, 12a) | Dev 2 |
+| M1 (quản lý tài khoản), từ use case chi tiết đến kiểm thử | Dev 1 |
+| M2 (xem bảng xếp hạng), từ use case chi tiết đến kiểm thử | Dev 2 |
+| M3 (thi đấu với máy), từ use case chi tiết đến kiểm thử; thuật toán §3.5 | Dev 1 |
+| M4, phần thách đấu và trả lời lời mời (kịch bản bước 1–6 và các ngoại lệ 4a–6a) | Dev 2 |
+| M4, phần chơi ván (kịch bản bước 7–9, ngoại lệ 8a, 8b) | Dev 1 |
+| M4, phần kết thúc ván và tái đấu (kịch bản bước 10–12, ngoại lệ 6b, 10a, 10b, 12a) | Dev 2 |
 | Giao thức §3.4 | Dev 2 |
 | Thiết kế triển khai §3.3.3, tổ chức dự án §4.1, rà soát §5.1 | Cả hai |
 
@@ -419,7 +419,7 @@ Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong m�
 - [x] **Cách tính điểm:** theo đề, thắng 1, hòa 0.5, thua 0 (`de_bai.md` là nguồn quyết định). Điểm suy ra từ `result` nên CSDL không lưu cột điểm.
 - [x] **Lưu bàn chơi:** CSDL lưu đề bài ban đầu (`tblMatch.tiles`) và bàn của từng người lúc ván kết thúc (`tblMatchResult.tiles`), theo quan hệ `Match` ◇ `Board` và `MatchResult` ◇ `Board` ở biểu đồ lớp thực thể.
 - [ ] **AWT với ván thắng do đối thủ bỏ cuộc:** đề xuất không tính vào AWT (người thắng chưa xóa hết ô nên không có `finishTime`).
-- [ ] **Một tài khoản đăng nhập ở 2 máy:** đề xuất từ chối lần đăng nhập sau (`LOGIN_RESULT` báo "tài khoản đang đăng nhập ở máy khác"), khớp ngoại lệ 2b của kịch bản M1.
+- [ ] **Một tài khoản đăng nhập ở 2 máy:** đề xuất từ chối lần đăng nhập sau (`LOGIN_RESULT` báo "tài khoản đang đăng nhập ở máy khác"), khớp ngoại lệ 2b của kịch bản M2.
 - [ ] **Mất kết nối ngoài ván:** đề xuất: đang có lời mời chờ thì server coi như từ chối (`INVITE_RESULT` với `OFFLINE`); đang ở dialog tiếp tục thì coi như chọn Dừng (`OPPONENT_LEFT`).
 - [ ] **Trạng thái trong lúc ở dialog tiếp tục:** đề xuất vẫn là bận cho đến khi cả hai trả lời, để không ai mời chen vào.
 - [ ] **Số loại icon** trên bàn 10x10: đề xuất 25 loại, mỗi loại 4 ô.

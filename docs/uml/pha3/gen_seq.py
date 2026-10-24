@@ -33,8 +33,8 @@ skinparam sequence {
 autonumber "<b>0:"
 """
 
-# ---------------------------------------------------------------- M1
-M1_PARTS = [
+# ---------------------------------------------------------------- M2
+M2_PARTS = [
     ("actor", "Player", "Người chơi"),
     ("boundary", "LoginActivity", None),
     ("boundary", "MainActivity", None),
@@ -49,7 +49,7 @@ M1_PARTS = [
     ("entity", "PlayerRanking", "Player\\nRanking"),
     ("entity", "PlayerE", "Player"),
 ]
-M1 = [
+M2 = [
     ("msg", "Player", "LoginActivity", "nhập, click đăng nhập", "Tại giao diện `LoginActivity`, người chơi nhập tên đăng nhập, mật khẩu và click nút Đăng nhập."),
     ("call", "LoginActivity", "ServerConnection", "send(LOGIN)", "Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`."),
     ("msg", "ServerConnection", "ClientHandler", "LOGIN (TCP)", "Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server."),
@@ -88,8 +88,8 @@ M1 = [
     ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi."),
 ]
 
-# ---------------------------------------------------------------- M2
-M2_PARTS = [
+# ---------------------------------------------------------------- M3
+M3_PARTS = [
     ("actor", "Player", "Người chơi"),
     ("boundary", "MainActivity", None),
     ("boundary", "DifficultyActivity", "Difficulty\\nActivity"),
@@ -102,7 +102,7 @@ M2_PARTS = [
     ("control", "Bot", None),
     ("entity", "Board", None),
 ]
-M2 = [
+M3 = [
     ("msg", "Player", "MainActivity", "click chơi với máy", "Tại giao diện chính, người chơi click nút Chơi với máy."),
     ("call", "MainActivity", "DifficultyActivity", "gọi", "Lớp `MainActivity` gọi lớp `DifficultyActivity`."),
     ("msg", "DifficultyActivity", "Player", "hiển thị", "Lớp `DifficultyActivity` hiển thị các lựa chọn độ khó cho người chơi."),
@@ -158,10 +158,10 @@ M2 = [
     ("call", "BotResultDialog", "MainActivity", "gọi", "Lớp `BotResultDialog` gọi lại lớp `MainActivity`."),
     ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi."),
 ]
-M2_LOOP_NOTE = "(Lặp lại các bước {a} đến {b} cho đến khi một bên xóa hết ô hoặc hết giờ.)"
+M3_LOOP_NOTE = "(Lặp lại các bước {a} đến {b} cho đến khi một bên xóa hết ô hoặc hết giờ.)"
 
 # ---------------------------------------------------------------- M3
-M3A_PARTS = [
+M4A_PARTS = [
     ("actor", "A", "Người chơi A"),
     ("boundary", "MainActivity", None),
     ("boundary", "ChallengeConfirmDialog", "ChallengeConfirm\\nDialog"),
@@ -177,7 +177,7 @@ M3A_PARTS = [
     ("entity", "Match", None),
     ("actor", "B", "Người chơi B"),
 ]
-M3A = [
+M4A = [
     ("msg", "A", "MainActivity", "click tên B", "Tại giao diện chính, người chơi A click vào tên người chơi B (không bận: rỗi hoặc luyện tập)."),
     ("call", "MainActivity", "ChallengeConfirmDialog", "gọi", "Lớp `MainActivity` gọi lớp `ChallengeConfirmDialog`."),
     ("msg", "ChallengeConfirmDialog", "A", "hiển thị", "Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A."),
@@ -221,7 +221,7 @@ M3A = [
     ("msg", "MatchActivity", "A", "hiển thị", "Lớp `MatchActivity` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B."),
 ]
 
-M3B_PARTS = [
+M4B_PARTS = [
     ("actor", "A", "Người chơi A"),
     ("boundary", "MainActivity", None),
     ("boundary", "MatchActivity", None),
@@ -238,7 +238,7 @@ M3B_PARTS = [
     ("entity", "Board", None),
     ("entity", "PlayerRanking", "Player\\nRanking"),
 ]
-M3B = [
+M4B = [
     ("loop", "lặp đến khi một người xóa hết ô"),
     ("msg", "A", "MatchActivity", "click hai ô", "A click lần lượt hai ô cùng hình."),
     ("call", "MatchActivity", "ServerConnection", "send(MOVE)", "Lớp `MatchActivity` gọi lớp `ServerConnection` yêu cầu gửi message `MOVE`."),
@@ -303,8 +303,8 @@ M3B = [
     ("msg", "MainActivity", "A", "hiển thị", "Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo \"A đã dừng chơi\" cho B."),
 ]
 
-# ---------------------------------------------------------------- M4
-M4_PARTS = [
+# ---------------------------------------------------------------- M1
+M1_PARTS = [
     ("actor", "Player", "Người chơi"),
     ("boundary", "RegisterActivity", "Register\\nActivity"),
     ("boundary", "LoginActivity", None),
@@ -317,7 +317,7 @@ M4_PARTS = [
     ("control", "PlayerDAO", None),
     ("entity", "PlayerE", "Player"),
 ]
-M4 = [
+M1 = [
     ("msg", "Player", "LoginActivity", "click đăng ký", "Tại giao diện `LoginActivity`, người chơi click nút Đăng ký."),
     ("call", "LoginActivity", "RegisterActivity", "gọi", "Lớp `LoginActivity` gọi lớp `RegisterActivity`."),
     ("msg", "RegisterActivity", "Player", "hiển thị", "Lớp `RegisterActivity` hiển thị giao diện đăng ký cho người chơi."),
@@ -424,25 +424,25 @@ def count(steps):
 
 
 def main():
-    m3b_start = count(M3A) + 1
+    m4b_start = count(M4A) + 1
     diagrams = [
-        ("seq-m1", "Biểu đồ tuần tự - Modul View Ranking", M1_PARTS, M1, 1),
-        ("seq-m2", "Biểu đồ tuần tự - Modul Play With Bot", M2_PARTS, M2, 1),
-        ("seq-m3-1", "Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)", M3A_PARTS, M3A, 1),
-        ("seq-m3-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi và kết thúc ván)", M3B_PARTS, M3B, m3b_start),
-        ("seq-m4", "Biểu đồ tuần tự - Modul Manage Account", M4_PARTS, M4, 1),
+        ("seq-m2", "Biểu đồ tuần tự - Modul View Ranking", M2_PARTS, M2, 1),
+        ("seq-m3", "Biểu đồ tuần tự - Modul Play With Bot", M3_PARTS, M3, 1),
+        ("seq-m4-1", "Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)", M4A_PARTS, M4A, 1),
+        ("seq-m4-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi và kết thúc ván)", M4B_PARTS, M4B, m4b_start),
+        ("seq-m1", "Biểu đồ tuần tự - Modul Manage Account", M1_PARTS, M1, 1),
     ]
     for name, title, parts, steps, start in diagrams:
         (HERE / f"{name}.puml").write_text(puml(name, title, parts, steps, start), encoding="utf-8")
 
-    real = [s for s in M3B if s[0] not in ("loop", "end", "deact")]
-    cleared = m3b_start + next(i for i, s in enumerate(real) if s[0] == "ret" and "isCleared()" in s[4])
-    m3_note = f"(Lặp lại các bước {{a}} đến {{b}} cho đến khi bước {cleared} trả về bàn của A đã hết ô; B chơi song song theo cùng các bước trên máy của mình.)"
+    real = [s for s in M4B if s[0] not in ("loop", "end", "deact")]
+    cleared = m4b_start + next(i for i, s in enumerate(real) if s[0] == "ret" and "isCleared()" in s[4])
+    m4_note = f"(Lặp lại các bước {{a}} đến {{b}} cho đến khi bước {cleared} trả về bàn của A đã hết ô; B chơi song song theo cùng các bước trên máy của mình.)"
     blocks = {
+        "v3-m2": v3(M2)[0],
+        "v3-m3": v3(M3, loop_note=M3_LOOP_NOTE)[0],
+        "v3-m4": v3(M4A)[0] + v3(M4B, m4b_start, m4_note)[0],
         "v3-m1": v3(M1)[0],
-        "v3-m2": v3(M2, loop_note=M2_LOOP_NOTE)[0],
-        "v3-m3": v3(M3A)[0] + v3(M3B, m3b_start, m3_note)[0],
-        "v3-m4": v3(M4)[0],
     }
     text = DOC.read_text(encoding="utf-8")
     for key, lines in blocks.items():

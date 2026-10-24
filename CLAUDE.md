@@ -8,12 +8,12 @@ Course project (PTIT): an online head-to-head Pikachu (Onet / connect-pair) game
 
 - `de_bai.md`: the original assignment spec. It is the source of truth for game rules and scoring.
 - `CREDITS.md`: sources and licences of every external resource (libraries, images, fonts, sounds, borrowed code, reference documents), kept in its own file (user request). When adding any such resource, add a row there in the same change.
-- `plan.md`: Part I is the software specification outline, following the phases of the course textbook (requirements → analysis → design → implementation → testing) over 3 functional modules M1/M2/M3. Part II is the implementation plan: module architecture, the split of work between 2 devs, the `core` interface, the JSON message protocol, doc ownership (§7), and open questions still to be decided (§8). Read it before designing anything.
+- `plan.md`: Part I is the software specification outline, following the phases of the course textbook (requirements → analysis → design → implementation → testing) over 4 functional modules M1–M4. Part II is the implementation plan: module architecture, the split of work between 2 devs, the `core` interface, the JSON message protocol, doc ownership (§7), and open questions still to be decided (§8). Read it before designing anything.
 - Course textbook and a fully worked reference project (same method, different domain) live outside the repo at `D:\Stud Mats\Kỳ 1 năm 4\httt` (`tham-khao/BG HP TTTN 2 CNPM 2020 final.pdf`, extracts in `tham-khao/trich-bai-giang/`). Follow its step-by-step method and artifact formats when writing spec sections.
 
 ## Analysis & design documents
 
-- `docs/pha1-thu-thap-yeu-cau.md` (requirements) and `docs/pha2-phan-tich.md` (analysis), one file per phase. Drafts (written before any code exists): `docs/pha3-thiet-ke.md` (design), `docs/pha4-cai-dat.md` (implementation: project layout, schema, per-class behaviour, unit test cases), `docs/pha5-ra-soat-kiem-thu.md` (review checklists, functional test cases). Modules: M1 View Ranking, M2 Play With Bot, M3 Play Online Match, M4 Manage Account (register, login, logout). Use case and class names are English; all prose is Vietnamese. Figures are numbered per phase (Hình 1.x, 2.x, 3.x).
+- `docs/pha1-thu-thap-yeu-cau.md` (requirements) and `docs/pha2-phan-tich.md` (analysis), one file per phase. Drafts (written before any code exists): `docs/pha3-thiet-ke.md` (design), `docs/pha4-cai-dat.md` (implementation: project layout, schema, per-class behaviour, unit test cases), `docs/pha5-ra-soat-kiem-thu.md` (review checklists, functional test cases). Modules: M1 Manage Account (register, login, logout), M2 View Ranking, M3 Play With Bot, M4 Play Online Match. Use case and class names are English; all prose is Vietnamese. Figures are numbered per phase (Hình 1.x, 2.x, 3.x).
 - Phase 3 kịch bản v3 and the sequence diagrams `seq-*.puml` are generated from one step list by `docs/uml/pha3/gen_seq.py` (it rewrites the `<!-- BEGIN v3-xx -->` blocks in `pha3-thiet-ke.md`). Edit the generator, never the lists or `seq-*.puml` by hand. Every call in a sequence diagram must travel along a link in the matching `class-design-m*.puml`.
 - UI wireframes (`ui-m*.puml`) embed salt with `rectangle X [ {{salt ... }} ]`; the `{{salt` form is required (a bare `{{` + `salt` line fails on the current server).
 - Never write `.puml` content containing `\n` through a bash heredoc: a hook turns it into a real newline. Use the Write/Edit tools.
@@ -23,7 +23,7 @@ Course project (PTIT): an online head-to-head Pikachu (Onet / connect-pair) game
 
 ## Pending requirements
 
-- M1 also includes viewing and editing the player's own profile (user decision). It is deliberately kept out of `plan.md` for now. Do not add it to the module table, use cases or screens until the user says to.
+- M1 (Manage Account) also includes viewing and editing the player's own profile (user decision). It is deliberately kept out of `plan.md` for now. Do not add it to the module table, use cases or screens until the user says to.
 
 ## Code layout
 
@@ -41,7 +41,7 @@ Key design constraints:
 - Accounts, match results and the leaderboard live in the server DB. There is no local client DB. Player status and pending invitations are in server memory only. Statuses (UI label / constant): Rỗi `IDLE`, Luyện tập `TRAINING` (playing the bot: still invitable), Bận `BUSY` (in a match; set only by the server). Docs that define the statuses also give the English word (idle, training, busy).
 - The DB stores the initial puzzle (`tblMatch.tiles`) and each player's board at match end (`tblMatchResult.tiles`). Match facts and points are kept apart: the DB holds results, points and rankings are computed by query.
 - Protocol: newline-delimited JSON with a `type` field (`plan.md` §5.2).
-- Ownership is split by function (`plan.md` Part II §2), each dev with one easy, one medium and one hard function. Dev 1: register/login/logout, the bot game (M2) with the `core` engine, and online match play (`MatchActivity`, `MatchManager`, `MatchRoom`, `MatchController.handleMove()`). Dev 2: the shared server/network/DB infrastructure, ranking (M1), lobby and the challenge/invitation flow, and match end and rematch (`endMatch()`, timer, quit, disconnect, `MatchDAO`, `ResultDialog`, `handleRematchReply()`).
+- Ownership is split by function (`plan.md` Part II §2), each dev with one easy, one medium and one hard function. Dev 1: register/login/logout, the bot game (M3) with the `core` engine, and online match play (`MatchActivity`, `MatchManager`, `MatchRoom`, `MatchController.handleMove()`). Dev 2: the shared server/network/DB infrastructure, ranking (M2), lobby and the challenge/invitation flow, and match end and rematch (`endMatch()`, timer, quit, disconnect, `MatchDAO`, `ResultDialog`, `handleRematchReply()`).
 
 ## UI decisions (for when coding starts)
 

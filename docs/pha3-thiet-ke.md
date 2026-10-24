@@ -120,13 +120,34 @@ Tên phương thức được giữ nguyên như pha phân tích để truy vế
 
 Màu trong các biểu đồ lớp thiết kế: xanh dương là tầng giao diện client, tím là tầng mạng client, xanh lá là tầng điều khiển (trên server, hoặc lớp xử lý của `core`), vàng là tầng DAO, cam là lớp thực thể và lớp message của `core`. Thuộc tính của lớp giao diện là các thành phần giao diện Android (`EditText`, `TextView`, `Button`, `RecyclerView`...) và các thuộc tính ẩn giữ dữ liệu cần cho xử lý.
 
-### a. Modul xem bảng xếp hạng
+### a. Modul quản lý tài khoản
 
-Giao diện gồm ba màn hình, nối theo luồng như Hình 3.3.
+Giao diện như Hình 3.3.
 
-![Hình 3.3: Thiết kế giao diện modul xem bảng xếp hạng](uml/pha3/ui-m1.png)
+![Hình 3.3: Thiết kế giao diện modul quản lý tài khoản](uml/pha3/ui-m1.png)
 
-*Hình 3.3: Thiết kế giao diện modul xem bảng xếp hạng*
+*Hình 3.3: Thiết kế giao diện modul quản lý tài khoản*
+
+- `RegisterScreen` → `RegisterActivity`: bốn `EditText` (tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị), `TextView` báo lỗi, nút Đăng ký, nút Quay lại. Ô rỗng và mật khẩu nhập lại được kiểm tra ngay trên client trước khi gửi `REGISTER`. Khi nhận `REGISTER_RESULT` thành công thì quay lại `LoginActivity` kèm tên đăng nhập.
+- `LoginScreen` → `LoginActivity`: như modul xem bảng xếp hạng, thêm nút Đăng ký mở `RegisterActivity`; khi quay về sau khi đăng ký thì điền sẵn tên đăng nhập.
+- `MainScreen` → `MainActivity`: nút Đăng xuất. `onLogoutClick()` gửi `LOGOUT`, xóa người chơi khỏi `ClientSession` và về `LoginActivity` ngay, không chờ server trả lời.
+- Trên server, `LoginController` gồm ba hàm:
+  - `handleRegister()`: kiểm tra ba trường không rỗng, băm mật khẩu SHA-256, gọi `PlayerDAO.addPlayer()`; tên đăng nhập trùng thì CSDL báo vi phạm ràng buộc duy nhất và hàm trả về sai.
+  - `handleLogin()`: như modul xem bảng xếp hạng.
+  - `handleLogout()`: gọi `OnlinePlayerManager.removeOnlinePlayer()` rồi `ChallengeController.broadcastOnlineList()` để những người chơi khác thấy danh sách mới. Khi client mất kết nối, `ClientHandler` cũng gọi `removeOnlinePlayer()`.
+- `PlayerDAO.addPlayer()` dùng chung kết nối của lớp `DAO` với `checkLogin()`.
+
+![Hình 3.4: Biểu đồ lớp thiết kế modul quản lý tài khoản](uml/pha3/class-design-m1.png)
+
+*Hình 3.4: Biểu đồ lớp thiết kế modul quản lý tài khoản*
+
+### b. Modul xem bảng xếp hạng
+
+Giao diện gồm ba màn hình, nối theo luồng như Hình 3.5.
+
+![Hình 3.5: Thiết kế giao diện modul xem bảng xếp hạng](uml/pha3/ui-m2.png)
+
+*Hình 3.5: Thiết kế giao diện modul xem bảng xếp hạng*
 
 - `LoginScreen` → `LoginActivity`: hai `EditText` nhập tên đăng nhập và mật khẩu, `TextView` báo lỗi, nút Đăng nhập. `LoginActivity` cài đặt `MessageListener` để nhận `LOGIN_RESULT`.
 - `MainScreen` → `MainActivity`: `RecyclerView` danh sách người chơi online, các nút Xem bảng xếp hạng, Chơi với máy, Đăng xuất; thuộc tính ẩn `player` là người chơi đang đăng nhập, lấy từ `ClientSession`.
@@ -134,34 +155,34 @@ Giao diện gồm ba màn hình, nối theo luồng như Hình 3.3.
 - Trên server, `LoginController.handleLogin()` gọi `PlayerDAO.checkLogin()` rồi `OnlinePlayerManager.addOnlinePlayer()`; hàm này trả về sai nếu tài khoản đang online ở máy khác (ngoại lệ 2b của kịch bản xem bảng xếp hạng). `RankingController.handleGetRanking()` gọi `PlayerRankingDAO.getRanking()`.
 - `PlayerDAO`, `PlayerRankingDAO` kế thừa lớp `DAO` để dùng chung một kết nối CSDL.
 
-![Hình 3.4: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](uml/pha3/class-design-m1.png)
+![Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](uml/pha3/class-design-m2.png)
 
-*Hình 3.4: Biểu đồ lớp thiết kế modul xem bảng xếp hạng*
+*Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng*
 
-### b. Modul chơi với máy
+### c. Modul chơi với máy
 
-Ván với máy chạy hoàn toàn trên client và không lưu kết quả; client chỉ báo server trạng thái luyện tập để người khác vẫn thấy mình online và vẫn mời được: khi bắt đầu ván, `BotGameActivity` gửi `UPDATE_STATUS` với trạng thái luyện tập qua `ServerConnection`; khi ván kết thúc hoặc người chơi thoát thì gửi trạng thái rỗi. Phía server, `ChallengeController.handleUpdateStatus()` cập nhật trạng thái trong `OnlinePlayerManager` rồi gửi lại danh sách online (mục 4c). Giao diện như Hình 3.5 (màn hình ngang).
+Ván với máy chạy hoàn toàn trên client và không lưu kết quả; client chỉ báo server trạng thái luyện tập để người khác vẫn thấy mình online và vẫn mời được: khi bắt đầu ván, `BotGameActivity` gửi `UPDATE_STATUS` với trạng thái luyện tập qua `ServerConnection`; khi ván kết thúc hoặc người chơi thoát thì gửi trạng thái rỗi. Phía server, `ChallengeController.handleUpdateStatus()` cập nhật trạng thái trong `OnlinePlayerManager` rồi gửi lại danh sách online (mục 4d). Giao diện như Hình 3.7 (màn hình ngang).
 
-![Hình 3.5: Thiết kế giao diện modul chơi với máy](uml/pha3/ui-m2.png)
+![Hình 3.7: Thiết kế giao diện modul chơi với máy](uml/pha3/ui-m3.png)
 
-*Hình 3.5: Thiết kế giao diện modul chơi với máy*
+*Hình 3.7: Thiết kế giao diện modul chơi với máy*
 
 - `DifficultyScreen` → `DifficultyActivity`: nhóm ba thẻ chọn độ khó `rgDifficulty` (mỗi thẻ có hình và tên độ khó, chỉ chọn được một), nút Bắt đầu, nút Quay lại.
 - `BotGameScreen` → `BotGameActivity` và lớp vẽ `BoardView`. `BoardView` là một `View` tự vẽ: vẽ các ô hình, ô đang chọn và đường nối, nhận sự kiện chạm rồi gọi `BotGameActivity.onCellClick()`. `BotGameActivity` giữ các thuộc tính ẩn: bàn của người chơi `board`, bàn của máy `botBoard` (bản sao cùng đề), đối tượng `bot`, ô đã chọn trước `firstCell`, đồng hồ `timer` và `handler` để hẹn lượt của máy. Màn chơi có hai `BoardView`: bàn của người chơi ở giữa, bàn của máy thu nhỏ ở bên phải (`botBoardView`, chỉ để xem, `setInteractive(false)`); mỗi nước của máy được vẽ lên bàn thu nhỏ cùng hiệu ứng nối cặp.
 - `BotResultDialog`: `TextView` kết quả, nút OK.
 - Lớp xử lý trong `core`: `BoardGenerator` (sinh đề, xáo bàn), `PathFinder` (kiểm tra đường nối, tìm cặp còn nối được), `Bot` (chọn nước đi, thời gian chờ theo độ khó).
 
-![Hình 3.6: Biểu đồ lớp thiết kế modul chơi với máy](uml/pha3/class-design-m2.png)
+![Hình 3.8: Biểu đồ lớp thiết kế modul chơi với máy](uml/pha3/class-design-m3.png)
 
-*Hình 3.6: Biểu đồ lớp thiết kế modul chơi với máy*
+*Hình 3.8: Biểu đồ lớp thiết kế modul chơi với máy*
 
-### c. Modul thách đấu và đấu đối kháng
+### d. Modul thách đấu và đấu đối kháng
 
-Giao diện như Hình 3.7. Dialog xác nhận thách đấu hiện trên máy người thách đấu, dialog lời mời hiện trên máy người được mời; các màn hình còn lại hiện trên cả hai máy.
+Giao diện như Hình 3.9. Dialog xác nhận thách đấu hiện trên máy người thách đấu, dialog lời mời hiện trên máy người được mời; các màn hình còn lại hiện trên cả hai máy.
 
-![Hình 3.7: Thiết kế giao diện modul thách đấu và đấu đối kháng](uml/pha3/ui-m3.png)
+![Hình 3.9: Thiết kế giao diện modul thách đấu và đấu đối kháng](uml/pha3/ui-m4.png)
 
-*Hình 3.7: Thiết kế giao diện modul thách đấu và đấu đối kháng*
+*Hình 3.9: Thiết kế giao diện modul thách đấu và đấu đối kháng*
 
 - `MainScreen` → `MainActivity`: thêm `TextView` thông báo (đang chờ, bị từ chối, đối thủ đã dừng) và xử lý click vào một người chơi trong danh sách: mở `ChallengeConfirmDialog`, chỉ gửi lời mời khi người chơi xác nhận. `MainActivity` nhận `ONLINE_LIST`, `INVITE_RESULT`; hai message `INVITE_RECEIVED`, `MATCH_START` do lớp cha `BaseActivity` xử lý.
 - `BaseActivity`: lớp cha trừu tượng của các Activity sau khi đăng nhập (`MainActivity`, `RankingActivity`, `DifficultyActivity`, `BotGameActivity`; trừ `MatchActivity` vì người đang đấu không nhận lời mời), cài đặt `MessageListener`. `onMessage()` xử lý chung hai message: `INVITE_RECEIVED` thì mở `InvitationDialog` ngay trên màn hình đang mở, nên người được mời nhận lời mời ở bất kỳ màn hình nào, kể cả khi đang chơi với máy; `MATCH_START` thì đóng màn hình hiện tại và mở `MatchActivity`. Nếu màn hình đó là `BotGameActivity` thì ván với máy dừng (hủy đồng hồ và lượt của máy, không lưu).
@@ -176,44 +197,81 @@ Giao diện như Hình 3.7. Dialog xác nhận thách đấu hiện trên máy n
   - `OnlinePlayerManager` giữ ánh xạ tên đăng nhập → `ClientHandler` của người đang online và trạng thái (rỗi, luyện tập, bận).
 - Các thao tác trên `MatchRoom` được đồng bộ (`synchronized`) vì hai luồng `ClientHandler` của hai người chơi cùng truy cập một phòng; ai hoàn thành trước được xác định theo thứ tự server xử lý message.
 
-![Hình 3.8: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](uml/pha3/class-design-m3.png)
+![Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](uml/pha3/class-design-m4.png)
 
-*Hình 3.8: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
-
-### d. Modul quản lý tài khoản
-
-Giao diện như Hình 3.9.
-
-![Hình 3.9: Thiết kế giao diện modul quản lý tài khoản](uml/pha3/ui-m4.png)
-
-*Hình 3.9: Thiết kế giao diện modul quản lý tài khoản*
-
-- `RegisterScreen` → `RegisterActivity`: bốn `EditText` (tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị), `TextView` báo lỗi, nút Đăng ký, nút Quay lại. Ô rỗng và mật khẩu nhập lại được kiểm tra ngay trên client trước khi gửi `REGISTER`. Khi nhận `REGISTER_RESULT` thành công thì quay lại `LoginActivity` kèm tên đăng nhập.
-- `LoginScreen` → `LoginActivity`: như modul xem bảng xếp hạng, thêm nút Đăng ký mở `RegisterActivity`; khi quay về sau khi đăng ký thì điền sẵn tên đăng nhập.
-- `MainScreen` → `MainActivity`: nút Đăng xuất. `onLogoutClick()` gửi `LOGOUT`, xóa người chơi khỏi `ClientSession` và về `LoginActivity` ngay, không chờ server trả lời.
-- Trên server, `LoginController` gồm ba hàm:
-  - `handleRegister()`: kiểm tra ba trường không rỗng, băm mật khẩu SHA-256, gọi `PlayerDAO.addPlayer()`; tên đăng nhập trùng thì CSDL báo vi phạm ràng buộc duy nhất và hàm trả về sai.
-  - `handleLogin()`: như modul xem bảng xếp hạng.
-  - `handleLogout()`: gọi `OnlinePlayerManager.removeOnlinePlayer()` rồi `ChallengeController.broadcastOnlineList()` để những người chơi khác thấy danh sách mới. Khi client mất kết nối, `ClientHandler` cũng gọi `removeOnlinePlayer()`.
-- `PlayerDAO.addPlayer()` dùng chung kết nối của lớp `DAO` với `checkLogin()`.
-
-![Hình 3.10: Biểu đồ lớp thiết kế modul quản lý tài khoản](uml/pha3/class-design-m4.png)
-
-*Hình 3.10: Biểu đồ lớp thiết kế modul quản lý tài khoản*
+*Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
 
 ## 5. Thiết kế hoạt động cho bốn modul
 
 Mỗi hành động trong biểu đồ hoạt động ứng với một phương thức đã thiết kế ở mục 4; phương thức của lớp DAO, lớp quản lý và lớp xử lý được ghi ở ghi chú bên cạnh. Trong kịch bản phiên bản 3 và biểu đồ tuần tự, các bước gán từng thuộc tính khi đóng gói lớp thực thể được lược bỏ cho gọn. Tên hành động là tên phương thức đã thiết kế; khung kích hoạt thể hiện phạm vi hoạt động của từng phương thức.
 
-### a. Modul xem bảng xếp hạng
+### a. Modul quản lý tài khoản
 
-![Hình 3.11: Biểu đồ hoạt động modul xem bảng xếp hạng](uml/pha3/activity-m1.png)
+![Hình 3.11: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m1.png)
 
-*Hình 3.11: Biểu đồ hoạt động modul xem bảng xếp hạng*
+*Hình 3.11: Biểu đồ hoạt động modul quản lý tài khoản*
 
 Kịch bản phiên bản 3:
 
 <!-- BEGIN v3-m1 -->
+1. Tại giao diện `LoginActivity`, người chơi click nút Đăng ký.
+2. Lớp `LoginActivity` gọi lớp `RegisterActivity`.
+3. Lớp `RegisterActivity` hiển thị giao diện đăng ký cho người chơi.
+4. Người chơi nhập tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị và click nút Đăng ký.
+5. Lớp `RegisterActivity` kiểm tra không ô nào rỗng và mật khẩu nhập lại khớp, rồi gọi lớp `ServerConnection` yêu cầu gửi message `REGISTER`.
+6. Lớp `ServerConnection` gửi message `REGISTER` qua TCP tới lớp `ClientHandler` trên server.
+7. Lớp `ClientHandler` gọi hàm `handleRegister()` của lớp `LoginController`.
+8. Lớp `LoginController` băm mật khẩu và gọi lớp `PlayerDAO` yêu cầu thêm người chơi mới.
+9. Lớp `PlayerDAO` gọi hàm `addPlayer()`.
+10. Hàm `addPlayer()` trả kết quả cho lớp `LoginController` (sai nếu tên đăng nhập đã tồn tại).
+11. Lớp `LoginController` gọi lớp `ClientHandler` gửi message `REGISTER_RESULT`.
+12. Lớp `ClientHandler` gửi message `REGISTER_RESULT` qua TCP tới lớp `ServerConnection`.
+13. Lớp `ServerConnection` chuyển message cho lớp `RegisterActivity`.
+14. Lớp `RegisterActivity` gọi lại lớp `LoginActivity`, kèm tên đăng nhập vừa đăng ký.
+15. Lớp `LoginActivity` hiển thị thông báo đăng ký thành công, ô tên đăng nhập đã điền sẵn.
+16. Người chơi nhập mật khẩu và click nút Đăng nhập.
+17. Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`.
+18. Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server.
+19. Lớp `ClientHandler` gọi hàm `handleLogin()` của lớp `LoginController`.
+20. Lớp `LoginController` gọi lớp `PlayerDAO` yêu cầu kiểm tra đăng nhập.
+21. Lớp `PlayerDAO` gọi hàm `checkLogin()`.
+22. Hàm `checkLogin()` gọi lớp `Player` để đóng gói thông tin.
+23. Lớp `Player` đóng gói thông tin thực thể.
+24. Lớp `Player` trả kết quả cho hàm `checkLogin()`.
+25. Hàm `checkLogin()` trả kết quả cho lớp `LoginController`.
+26. Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu thêm người chơi vào danh sách online.
+27. Lớp `OnlinePlayerManager` gọi hàm `addOnlinePlayer()`.
+28. Hàm `addOnlinePlayer()` trả kết quả cho lớp `LoginController` (sai nếu tài khoản đang online ở máy khác).
+29. Lớp `LoginController` gọi lớp `ClientHandler` gửi message `LOGIN_RESULT`.
+30. Lớp `ClientHandler` gửi message `LOGIN_RESULT` qua TCP tới lớp `ServerConnection`.
+31. Lớp `ServerConnection` chuyển message cho lớp `LoginActivity`.
+32. Lớp `LoginActivity` lưu người chơi vào `ClientSession` và gọi lớp `MainActivity`.
+33. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
+34. Người chơi click nút Đăng xuất.
+35. Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGOUT`.
+36. Lớp `MainActivity` xóa người chơi khỏi `ClientSession` và gọi lại lớp `LoginActivity`.
+37. Lớp `LoginActivity` hiển thị giao diện đăng nhập cho người chơi.
+38. Lớp `ServerConnection` gửi message `LOGOUT` qua TCP tới lớp `ClientHandler` trên server.
+39. Lớp `ClientHandler` gọi hàm `handleLogout()` của lớp `LoginController`.
+40. Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu xóa người chơi khỏi danh sách online.
+41. Lớp `OnlinePlayerManager` gọi hàm `removeOnlinePlayer()`.
+42. Hàm `removeOnlinePlayer()` trả kết quả cho lớp `LoginController`.
+43. Lớp `LoginController` gọi hàm `broadcastOnlineList()` của lớp `ChallengeController` để gửi lại danh sách online cho những người chơi khác.
+<!-- END v3-m1 -->
+
+![Hình 3.12: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m1.png)
+
+*Hình 3.12: Biểu đồ tuần tự modul quản lý tài khoản*
+
+### b. Modul xem bảng xếp hạng
+
+![Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng](uml/pha3/activity-m2.png)
+
+*Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng*
+
+Kịch bản phiên bản 3:
+
+<!-- BEGIN v3-m2 -->
 1. Tại giao diện `LoginActivity`, người chơi nhập tên đăng nhập, mật khẩu và click nút Đăng nhập.
 2. Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`.
 3. Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server.
@@ -250,21 +308,21 @@ Kịch bản phiên bản 3:
 34. Người chơi click nút Quay lại.
 35. Lớp `RankingActivity` gọi lại lớp `MainActivity`.
 36. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
-<!-- END v3-m1 -->
+<!-- END v3-m2 -->
 
-![Hình 3.12: Biểu đồ tuần tự modul xem bảng xếp hạng](uml/pha3/seq-m1.png)
+![Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng](uml/pha3/seq-m2.png)
 
-*Hình 3.12: Biểu đồ tuần tự modul xem bảng xếp hạng*
+*Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng*
 
-### b. Modul chơi với máy
+### c. Modul chơi với máy
 
-![Hình 3.13: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m2.png)
+![Hình 3.15: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
 
-*Hình 3.13: Biểu đồ hoạt động modul chơi với máy*
+*Hình 3.15: Biểu đồ hoạt động modul chơi với máy*
 
 Kịch bản phiên bản 3:
 
-<!-- BEGIN v3-m2 -->
+<!-- BEGIN v3-m3 -->
 1. Tại giao diện chính, người chơi click nút Chơi với máy.
 2. Lớp `MainActivity` gọi lớp `DifficultyActivity`.
 3. Lớp `DifficultyActivity` hiển thị các lựa chọn độ khó cho người chơi.
@@ -318,21 +376,21 @@ Kịch bản phiên bản 3:
 50. Người chơi click nút OK.
 51. Lớp `BotResultDialog` gọi lại lớp `MainActivity`.
 52. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
-<!-- END v3-m2 -->
+<!-- END v3-m3 -->
 
-![Hình 3.14: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m2.png)
+![Hình 3.16: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
 
-*Hình 3.14: Biểu đồ tuần tự modul chơi với máy*
+*Hình 3.16: Biểu đồ tuần tự modul chơi với máy*
 
-### c. Modul thách đấu và đấu đối kháng
+### d. Modul thách đấu và đấu đối kháng
 
-![Hình 3.15: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](uml/pha3/activity-m3.png)
+![Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](uml/pha3/activity-m4.png)
 
-*Hình 3.15: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
+*Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
 
 Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; mỗi lớp giao diện và `ServerConnection` có một bản trên mỗi máy, mỗi người chơi có một `ClientHandler` riêng trên server):
 
-<!-- BEGIN v3-m3 -->
+<!-- BEGIN v3-m4 -->
 1. Tại giao diện chính, người chơi A click vào tên người chơi B (không bận: rỗi hoặc luyện tập).
 2. Lớp `MainActivity` gọi lớp `ChallengeConfirmDialog`.
 3. Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A.
@@ -433,75 +491,17 @@ Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; m�
 97. Lớp `ResultDialog` gọi lớp `MainActivity` trên máy B.
 98. Lớp `ServerConnection` chuyển message `ONLINE_LIST` cho lớp `MainActivity` trên hai máy.
 99. Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
-<!-- END v3-m3 -->
-
-Biểu đồ tuần tự được chia làm hai phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.16), phần 2 từ lúc chơi tới khi về giao diện chính (Hình 3.17).
-
-![Hình 3.16: Biểu đồ tuần tự modul thách đấu, phần 1](uml/pha3/seq-m3-1.png)
-
-*Hình 3.16: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1*
-
-![Hình 3.17: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m3-2.png)
-
-*Hình 3.17: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2*
-
-### d. Modul quản lý tài khoản
-
-![Hình 3.18: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m4.png)
-
-*Hình 3.18: Biểu đồ hoạt động modul quản lý tài khoản*
-
-Kịch bản phiên bản 3:
-
-<!-- BEGIN v3-m4 -->
-1. Tại giao diện `LoginActivity`, người chơi click nút Đăng ký.
-2. Lớp `LoginActivity` gọi lớp `RegisterActivity`.
-3. Lớp `RegisterActivity` hiển thị giao diện đăng ký cho người chơi.
-4. Người chơi nhập tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị và click nút Đăng ký.
-5. Lớp `RegisterActivity` kiểm tra không ô nào rỗng và mật khẩu nhập lại khớp, rồi gọi lớp `ServerConnection` yêu cầu gửi message `REGISTER`.
-6. Lớp `ServerConnection` gửi message `REGISTER` qua TCP tới lớp `ClientHandler` trên server.
-7. Lớp `ClientHandler` gọi hàm `handleRegister()` của lớp `LoginController`.
-8. Lớp `LoginController` băm mật khẩu và gọi lớp `PlayerDAO` yêu cầu thêm người chơi mới.
-9. Lớp `PlayerDAO` gọi hàm `addPlayer()`.
-10. Hàm `addPlayer()` trả kết quả cho lớp `LoginController` (sai nếu tên đăng nhập đã tồn tại).
-11. Lớp `LoginController` gọi lớp `ClientHandler` gửi message `REGISTER_RESULT`.
-12. Lớp `ClientHandler` gửi message `REGISTER_RESULT` qua TCP tới lớp `ServerConnection`.
-13. Lớp `ServerConnection` chuyển message cho lớp `RegisterActivity`.
-14. Lớp `RegisterActivity` gọi lại lớp `LoginActivity`, kèm tên đăng nhập vừa đăng ký.
-15. Lớp `LoginActivity` hiển thị thông báo đăng ký thành công, ô tên đăng nhập đã điền sẵn.
-16. Người chơi nhập mật khẩu và click nút Đăng nhập.
-17. Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`.
-18. Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server.
-19. Lớp `ClientHandler` gọi hàm `handleLogin()` của lớp `LoginController`.
-20. Lớp `LoginController` gọi lớp `PlayerDAO` yêu cầu kiểm tra đăng nhập.
-21. Lớp `PlayerDAO` gọi hàm `checkLogin()`.
-22. Hàm `checkLogin()` gọi lớp `Player` để đóng gói thông tin.
-23. Lớp `Player` đóng gói thông tin thực thể.
-24. Lớp `Player` trả kết quả cho hàm `checkLogin()`.
-25. Hàm `checkLogin()` trả kết quả cho lớp `LoginController`.
-26. Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu thêm người chơi vào danh sách online.
-27. Lớp `OnlinePlayerManager` gọi hàm `addOnlinePlayer()`.
-28. Hàm `addOnlinePlayer()` trả kết quả cho lớp `LoginController` (sai nếu tài khoản đang online ở máy khác).
-29. Lớp `LoginController` gọi lớp `ClientHandler` gửi message `LOGIN_RESULT`.
-30. Lớp `ClientHandler` gửi message `LOGIN_RESULT` qua TCP tới lớp `ServerConnection`.
-31. Lớp `ServerConnection` chuyển message cho lớp `LoginActivity`.
-32. Lớp `LoginActivity` lưu người chơi vào `ClientSession` và gọi lớp `MainActivity`.
-33. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
-34. Người chơi click nút Đăng xuất.
-35. Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGOUT`.
-36. Lớp `MainActivity` xóa người chơi khỏi `ClientSession` và gọi lại lớp `LoginActivity`.
-37. Lớp `LoginActivity` hiển thị giao diện đăng nhập cho người chơi.
-38. Lớp `ServerConnection` gửi message `LOGOUT` qua TCP tới lớp `ClientHandler` trên server.
-39. Lớp `ClientHandler` gọi hàm `handleLogout()` của lớp `LoginController`.
-40. Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu xóa người chơi khỏi danh sách online.
-41. Lớp `OnlinePlayerManager` gọi hàm `removeOnlinePlayer()`.
-42. Hàm `removeOnlinePlayer()` trả kết quả cho lớp `LoginController`.
-43. Lớp `LoginController` gọi hàm `broadcastOnlineList()` của lớp `ChallengeController` để gửi lại danh sách online cho những người chơi khác.
 <!-- END v3-m4 -->
 
-![Hình 3.19: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m4.png)
+Biểu đồ tuần tự được chia làm hai phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.18), phần 2 từ lúc chơi tới khi về giao diện chính (Hình 3.19).
 
-*Hình 3.19: Biểu đồ tuần tự modul quản lý tài khoản*
+![Hình 3.18: Biểu đồ tuần tự modul thách đấu, phần 1](uml/pha3/seq-m4-1.png)
+
+*Hình 3.18: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1*
+
+![Hình 3.19: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
+
+*Hình 3.19: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2*
 
 ## 6. Thiết kế triển khai
 

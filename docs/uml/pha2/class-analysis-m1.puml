@@ -1,5 +1,5 @@
 @startuml class-analysis-m1
-title Biểu đồ lớp pha phân tích - Modul View Ranking
+title Biểu đồ lớp pha phân tích - Modul Manage Account
 
 hide circle
 skinparam shadowing false
@@ -16,20 +16,26 @@ skinparam class {
 }
 
 ' ===== Tang 1: lop bien =====
+class RegisterScreen {
+  - inUsername
+  - inPassword
+  - inConfirmPassword
+  - inName
+  - outMessage
+  - subRegister
+  - subBack
+}
+
 class LoginScreen {
   - inUsername
   - inPassword
   - outMessage
   - subLogin
+  - subRegister
 }
 
 class MainScreen {
-  - subViewRanking
-}
-
-class RankingScreen {
-  - outRanking
-  - subBack
+  - subLogout
 }
 
 ' ===== Tang 2: lop thuc the =====
@@ -38,19 +44,16 @@ class Player {
   - password
   - name
   - status
+  + addPlayer()
   + checkLogin()
+  + addOnlinePlayer()
+  + removeOnlinePlayer()
 }
 
-class PlayerRanking {
-  - totalPoint
-  - avgOpponentPoint
-  - avgWinTime
-  + getRanking()
-}
-
+RegisterScreen -right- LoginScreen
 LoginScreen -right- MainScreen
-MainScreen -right- RankingScreen
 
+RegisterScreen -down- Player
 LoginScreen -down- Player
-RankingScreen -down- PlayerRanking
+MainScreen -down- Player
 @enduml

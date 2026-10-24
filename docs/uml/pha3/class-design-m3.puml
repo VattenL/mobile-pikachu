@@ -1,12 +1,12 @@
 @startuml class-design-m3
-title Biểu đồ lớp thiết kế - Modul Play Online Match
+title Biểu đồ lớp thiết kế - Modul Play With Bot
 
 hide circle
 hide empty members
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 30
-skinparam ranksep 55
+skinparam nodesep 40
+skinparam ranksep 60
 skinparam classFontSize 13
 skinparam classAttributeFontSize 11
 skinparam class {
@@ -16,126 +16,61 @@ skinparam class {
 }
 
 ' ===== Client Android: tang giao dien =====
-class ChallengeConfirmDialog #E3F2FD {
-  - tvOpponent : TextView
-  - btnConfirm : Button
-  - btnCancel : Button
-  - opponent : Player
-  + onConfirmClick(v : View) : void
-  + onCancelClick(v : View) : void
-}
-
-abstract class BaseActivity #E3F2FD {
-  + onMessage(msg : Message) : void
-}
-
 class MainActivity #E3F2FD {
-  - rvOnlinePlayers : RecyclerView
-  - tvMessage : TextView
+  - btnPlayWithBot : Button
   - player : Player
-  - onlinePlayers : ArrayList<Player>
-  + onPlayerClick(opponent : Player) : void
-  + onMessage(msg : Message) : void
+  + onPlayWithBotClick(v : View) : void
 }
 
-class InvitationDialog #E3F2FD {
-  - tvChallenger : TextView
-  - btnOk : Button
-  - btnReject : Button
-  - challenger : String
-  + onOkClick(v : View) : void
-  + onRejectClick(v : View) : void
+class DifficultyActivity #E3F2FD {
+  - rgDifficulty : RadioGroup
+  - btnStart : Button
+  - btnBack : Button
+  + onStartClick(v : View) : void
+  + onBackClick(v : View) : void
 }
 
-class MatchActivity #E3F2FD {
+class BotGameActivity #E3F2FD {
   - boardView : BoardView
-  - opponentBoardView : BoardView
+  - botBoardView : BoardView
   - tvTimer : TextView
-  - tvMyRemaining : TextView
-  - tvOpponentRemaining : TextView
+  - tvPlayerRemaining : TextView
+  - tvBotRemaining : TextView
   - btnQuit : Button
   - board : Board
-  - opponentBoard : Board
-  - matchId : int
-  - opponent : Player
+  - botBoard : Board
+  - bot : Bot
   - firstCell : Cell
+  - timer : CountDownTimer
+  - handler : Handler
   + onCellClick(cell : Cell) : void
-  + onMessage(msg : Message) : void
+  + onBotTurn() : void
   + onQuitClick(v : View) : void
+  - endGame(result : String) : void
 }
 
-class ResultDialog #E3F2FD {
+class BotResultDialog #E3F2FD {
   - tvResult : TextView
-  - btnContinue : Button
-  - btnStop : Button
-  - matchId : int
-  + onContinueClick(v : View) : void
-  + onStopClick(v : View) : void
-  + onMessage(msg : Message) : void
+  - btnOk : Button
+  + onOkClick(v : View) : void
 }
 
-' ===== Client Android: tang mang =====
 class ServerConnection #EDE7F6 {
-  - socket : Socket
-  - listeners : ArrayList<MessageListener>
   + getInstance() : ServerConnection
   + send(msg : Message) : void
-  + addListener(l : MessageListener) : void
 }
 
-interface MessageListener #EDE7F6 {
-  + onMessage(msg : Message) : void
+class BoardView #E3F2FD {
+  - board : Board
+  - path : ArrayList<Cell>
+  + setBoard(board : Board) : void
+  + setInteractive(b : boolean) : void
+  + showPath(path : ArrayList<Cell>) : void
+  # onDraw(canvas : Canvas) : void
+  + onTouchEvent(e : MotionEvent) : boolean
 }
 
-' ===== Server: tang dieu khien =====
-class ClientHandler #E8F5E9 {
-  - socket : Socket
-  - player : Player
-  + run() : void
-  + send(msg : Message) : void
-}
-
-class ChallengeController #E8F5E9 {
-  + handleInvite(handler : ClientHandler, msg : Message) : void
-  + handleInviteReply(handler : ClientHandler, msg : Message) : void
-  + handleUpdateStatus(handler : ClientHandler, msg : Message) : void
-  + broadcastOnlineList() : void
-}
-
-class MatchController #E8F5E9 {
-  + handleMove(handler : ClientHandler, msg : Message) : void
-  + handleLeaveMatch(handler : ClientHandler, msg : Message) : void
-  + handleRematchReply(handler : ClientHandler, msg : Message) : void
-  + onTimeout(room : MatchRoom) : void
-  - endMatch(room : MatchRoom, reason : String) : void
-}
-
-class OnlinePlayerManager #E8F5E9 {
-  - onlineHandlers : HashMap<String, ClientHandler>
-  + getInstance() : OnlinePlayerManager
-  + getOnlinePlayers() : ArrayList<Player>
-  + sendInvitation(from : Player, to : Player) : boolean
-  + updateStatus(listPlayer : ArrayList<Player>, status : String) : boolean
-}
-
-class MatchManager #E8F5E9 {
-  - rooms : HashMap<Integer, MatchRoom>
-  + getInstance() : MatchManager
-  + createMatch(a : ClientHandler, b : ClientHandler, board : Board) : MatchRoom
-  + getRoom(matchId : int) : MatchRoom
-}
-
-class MatchRoom #E8F5E9 {
-  - match : Match
-  - handlers : ClientHandler[]
-  - boards : Board[]
-  - startMillis : long
-  - timer : Timer
-  - rematchReplies : Boolean[]
-  + getBoard(handler : ClientHandler) : Board
-  + getOpponent(handler : ClientHandler) : ClientHandler
-}
-
+' ===== core: xu ly ban choi =====
 class BoardGenerator #E8F5E9 {
   + generateBoard(rows : int, cols : int, iconTypes : int, seed : long) : Board
   + shuffle(board : Board, seed : long) : Board
@@ -146,52 +81,20 @@ class PathFinder #E8F5E9 {
   + findAvailablePair(board : Board) : Cell[]
 }
 
-' ===== Server: tang DAO =====
-class DAO #FFF8E1 {
-  # con : Connection
-  + DAO()
+class Bot #E8F5E9 {
+  - difficulty : Difficulty
+  + Bot(difficulty : Difficulty)
+  + getDelayMs() : long
+  + nextMove(board : Board) : Cell[]
 }
 
-class MatchDAO #FFF8E1 {
-  + MatchDAO()
-  + saveMatch(match : Match) : boolean
-}
-
-class PlayerRankingDAO #FFF8E1 {
-  + PlayerRankingDAO()
-  + getTotalPoints(listPlayer : ArrayList<Player>) : ArrayList<PlayerRanking>
+enum Difficulty #E8F5E9 {
+  EASY
+  MEDIUM
+  HARD
 }
 
 ' ===== core: lop thuc the =====
-class Player #FFF3E0 {
-  - id : int
-  - username : String
-  - name : String
-  - status : String
-}
-
-class PlayerRanking #FFF3E0 {
-  - totalPoint : float
-}
-
-class Match #FFF3E0 {
-  - id : int
-  - startTime : Date
-  - endTime : Date
-  - timeLimit : int
-  - board : Board
-  - results : MatchResult[]
-}
-
-class MatchResult #FFF3E0 {
-  - id : int
-  - player : Player
-  - board : Board
-  - result : String
-  - point : float
-  - finishTime : Integer
-}
-
 class Board #FFF3E0 {
   - id : int
   - rowCount : int
@@ -200,60 +103,29 @@ class Board #FFF3E0 {
   + removePair(a : Cell, b : Cell) : void
   + isCleared() : boolean
   + countRemaining() : int
+  + copy() : Board
 }
 
-' giao dien
-MainActivity -left- ChallengeConfirmDialog
-BaseActivity -right- InvitationDialog
-InvitationDialog -right- MatchActivity
-MatchActivity -right- ResultDialog
-ResultDialog -[norank]- MainActivity
-MainActivity -up-|> BaseActivity
-BaseActivity ..|> MessageListener
-MatchActivity ..|> MessageListener
-ResultDialog ..|> MessageListener
-BaseActivity -[norank]- MatchActivity
+class Cell #FFF3E0 {
+  - row : int
+  - col : int
+}
 
-' giao dien - mang
-MainActivity -down- ServerConnection
-InvitationDialog -down- ServerConnection
-MatchActivity -down- ServerConnection
-ResultDialog -down- ServerConnection
-ServerConnection -right- MessageListener
+MainActivity -right- DifficultyActivity
+DifficultyActivity -right- BotGameActivity
+BotGameActivity -right- BotResultDialog
+BotResultDialog -[norank]- MainActivity
+BotGameActivity *-down- BoardView
+BotGameActivity -down- ServerConnection
 
-' client - server
-ServerConnection -down- ClientHandler : TCP
-ClientHandler -down- ChallengeController
-ClientHandler -down- MatchController
-ChallengeController -down- OnlinePlayerManager
-ChallengeController -down- MatchManager
-ChallengeController -down- BoardGenerator
-MatchController -down- MatchManager
-MatchController -down- PathFinder
-MatchController -down- BoardGenerator
-MatchController -[norank]- OnlinePlayerManager
-MatchController -[norank]- ChallengeController
-OnlinePlayerManager -[norank]- ClientHandler
-MatchController -[norank]- Board
-MatchManager -[norank]- Match
-BoardGenerator -[norank]- Board
-MatchManager *-down- MatchRoom
+BotGameActivity -down- BoardGenerator
+BotGameActivity -down- PathFinder
+BotGameActivity -down- Bot
+Bot -right- Difficulty
+Bot -left- PathFinder
 
-' dieu khien - DAO
-ChallengeController -[norank]- PlayerRankingDAO
-MatchController -[norank]- MatchDAO
-DAO <|-down- MatchDAO
-DAO <|-down- PlayerRankingDAO
-
-' DAO - thuc the
-MatchDAO -down- Match
-PlayerRankingDAO -down- PlayerRanking
-MatchRoom o-down- Match
-MatchRoom o-down- Board
-Match *-right- MatchResult
-MatchResult o-right- Player
-PlayerRanking -down-|> Player
-Match o-down- Board
-MatchResult o-[norank]- Board
-PathFinder -[norank]- Board
+BoardGenerator -down- Board
+PathFinder -down- Board
+BotGameActivity -[norank]- Board
+Board -right- Cell
 @enduml

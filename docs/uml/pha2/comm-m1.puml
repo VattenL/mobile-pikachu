@@ -1,5 +1,5 @@
 @startuml comm-m1
-title Biểu đồ giao tiếp - Modul View Ranking
+title Biểu đồ giao tiếp - Modul Manage Account
 
 skinparam shadowing false
 skinparam linetype polyline
@@ -22,20 +22,19 @@ skinparam entity {
 
 actor "Người chơi" as Actor
 
+boundary RegisterScreen
 boundary LoginScreen
 boundary MainScreen
-boundary RankingScreen
 
 entity Player
-entity PlayerRanking
 
-Actor -down- LoginScreen : "1: nhập tài khoản, click đăng nhập ↓"
-Actor -down- MainScreen : "6: hiển thị ↑\n7: click xem bảng xếp hạng ↓\n15: hiển thị ↑"
-Actor -down- RankingScreen : "12: hiển thị ↑\n13: click quay lại ↓"
-LoginScreen -right- MainScreen : "5: gọi →"
-MainScreen -right- RankingScreen : "8: gọi →\n14: gọi ←"
-LoginScreen -down- Player : "2: gọi ↓\n4: trả về ↑"
-Player -right- Player : "3: checkLogin()"
-RankingScreen -down- PlayerRanking : "9: gọi ↓\n11: trả về ↑"
-PlayerRanking -right- PlayerRanking : "10: getRanking()"
+Actor -down- LoginScreen : "1: click đăng ký ↓\n9: hiển thị ↑\n10: nhập mật khẩu, click đăng nhập ↓\n24: hiển thị ↑"
+Actor -down- RegisterScreen : "3: hiển thị ↑\n4: nhập thông tin, click đăng ký ↓"
+Actor -down- MainScreen : "18: hiển thị ↑\n19: click đăng xuất ↓"
+RegisterScreen -right- LoginScreen : "2: gọi ←\n8: gọi →"
+LoginScreen -right- MainScreen : "17: gọi →\n23: gọi ←"
+RegisterScreen -down- Player : "5: gọi ↓\n7: trả về ↑"
+LoginScreen -down- Player : "11: gọi ↓\n13: trả về ↑\n14: gọi ↓\n16: trả về ↑"
+MainScreen -down- Player : "20: gọi ↓\n22: trả về ↑"
+Player -right- Player : "6: addPlayer()\n12: checkLogin()\n15: addOnlinePlayer()\n21: removeOnlinePlayer()"
 @enduml

@@ -1,5 +1,5 @@
 @startuml state-m2
-title Biểu đồ trạng thái - Modul Play With Bot
+title Biểu đồ trạng thái - Modul View Ranking
 
 skinparam shadowing false
 skinparam linetype polyline
@@ -13,17 +13,13 @@ skinparam state {
   FontColor #1A1A1A
 }
 
+state "Hiển thị LoginScreen" as Login
 state "Hiển thị MainScreen" as Main
-state "Hiển thị DifficultyScreen" as Difficulty
-state "Hiển thị BotGameScreen" as Game
-state "Hiển thị BotResultDialog" as Result
+state "Hiển thị RankingScreen" as Ranking
 
-[*] --> Main
-Main --> Difficulty : [click chơi với máy]
-Difficulty --> Main : [click quay lại]
-Difficulty --> Game : [click bắt đầu]
-Game --> Game : [click hai ô]
-Game --> Main : [click thoát]
-Game --> Result : [một bên xóa hết ô\nhoặc hết giờ]
-Result --> Main : [click OK]
+[*] --> Login
+Login --> Login : [click đăng nhập, sai tài khoản]
+Login --> Main : [click đăng nhập, đúng tài khoản]
+Main --> Ranking : [click xem bảng xếp hạng]
+Ranking --> Main : [click quay lại]
 @enduml

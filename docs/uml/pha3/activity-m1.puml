@@ -1,5 +1,5 @@
 @startuml activity-m1
-title Biểu đồ hoạt động - Modul View Ranking
+title Biểu đồ hoạt động - Modul Manage Account
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -17,44 +17,56 @@ skinparam note {
 }
 
 start
+partition "Xử lí tại LoginActivity" {
+  :Hiển thị giao diện đăng nhập;
+}
+->[click đăng ký];
 repeat
-  partition "Xử lí tại LoginActivity" {
-    :Nhận tên đăng nhập, mật khẩu;
-    :Gửi message LOGIN;
+  partition "Xử lí tại RegisterActivity" {
+    :Nhận tên đăng nhập, mật khẩu,\nmật khẩu nhập lại, tên hiển thị;
+    :Kiểm tra không ô nào rỗng,\nmật khẩu nhập lại khớp;
+    :Gửi message REGISTER;
+  }
+  partition "Xử lí tại server: LoginController.handleRegister()" {
+    :Băm mật khẩu, thêm người chơi mới;
+    note right: PlayerDAO:\naddPlayer()
+    :Gửi REGISTER_RESULT;
+  }
+repeat while () is ([tên đăng nhập đã tồn tại])
+->[đăng ký thành công];
+repeat
+  partition "Xử lí tại LoginActivity " {
+    :Hiển thị tên đăng nhập vừa đăng ký;
+    :Nhận mật khẩu, gửi message LOGIN;
   }
   partition "Xử lí tại server: LoginController.handleLogin()" {
     :Kiểm tra tài khoản;
     note right: PlayerDAO:\ncheckLogin()
-    if (Đúng tài khoản?) then ([đúng])
-      :Thêm vào danh sách online;
-      note right: OnlinePlayerManager:\naddOnlinePlayer()
-    else ([sai])
-    endif
+    :Thêm vào danh sách online;
+    note right: OnlinePlayerManager:\naddOnlinePlayer()
     :Gửi LOGIN_RESULT;
   }
 repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
 ->[đăng nhập thành công];
-partition "Xử lí tại LoginActivity " {
+partition "Xử lí tại LoginActivity  " {
   :Lưu người chơi vào ClientSession;
 }
 partition "Xử lí tại MainActivity" {
   :Hiển thị giao diện chính;
 }
-->[click xem bảng xếp hạng];
-partition "Xử lí tại RankingActivity" {
-  :Gửi message GET_RANKING;
-}
-partition "Xử lí tại server: RankingController.handleGetRanking()" {
-  :Lấy bảng xếp hạng;
-  note right: PlayerRankingDAO:\ngetRanking()
-  :Gửi message RANKING;
-}
-partition "Xử lí tại RankingActivity " {
-  :Hiển thị bảng xếp hạng;
-}
-->[click quay lại];
+->[click đăng xuất];
 partition "Xử lí tại MainActivity " {
-  :Hiển thị giao diện chính;
+  :Gửi message LOGOUT;
+  :Xóa người chơi khỏi ClientSession;
+}
+partition "Xử lí tại server: LoginController.handleLogout()" {
+  :Xóa khỏi danh sách online;
+  note right: OnlinePlayerManager:\nremoveOnlinePlayer()
+  :Gửi lại danh sách online cho người khác;
+  note right: ChallengeController:\nbroadcastOnlineList()
+}
+partition "Xử lí tại LoginActivity   " {
+  :Hiển thị giao diện đăng nhập;
 }
 stop
 @enduml

@@ -1,5 +1,5 @@
 @startuml ui-m1
-title Thiết kế giao diện - Modul View Ranking
+title Thiết kế giao diện - Modul Manage Account (màn hình ngang)
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -9,16 +9,36 @@ skinparam rectangle {
   BorderColor #9E9E9E
 }
 
+rectangle Register [
+{{salt
+{+
+  <b>Đăng ký tài khoản
+  .
+  Tên đăng nhập
+  "thanhtung       "
+  Mật khẩu
+  "********        "
+  Nhập lại mật khẩu
+  "********        "
+  Tên hiển thị
+  "Thanh Tùng      "
+  <color:red>Tên đăng nhập đã tồn tại
+  .
+  [ Quay lại ] | [ Đăng ký ]
+}
+}}
+]
+
 rectangle Login [
 {{salt
 {+
   <b>Đăng nhập
   .
+  <color:green>Đăng ký thành công, mời đăng nhập
   Tên đăng nhập
-  "hoangnam        "
+  "thanhtung       "
   Mật khẩu
   "********        "
-  <color:red>Sai tên đăng nhập hoặc mật khẩu
   .
   [   Đăng nhập   ]
   [    Đăng ký    ]
@@ -30,8 +50,8 @@ rectangle Main [
 {{salt
 {+
   { {+
-      <b>Hoàng Nam
-      11 điểm
+      <b>Thanh Tùng
+      0 điểm
       .
       .
       [ Xem bảng xếp hạng ]
@@ -50,26 +70,8 @@ rectangle Main [
 }}
 ]
 
-rectangle Ranking [
-{{salt
-{+
-  <b>Bảng xếp hạng
-  .
-  {#
-    <b>Hạng | <b>Tên | <b>Tổng điểm | <b>TB điểm đối thủ | <b>TB thời gian thắng
-    1 | Minh Anh | 12.5 | 9.2 | 05:48
-    2 | Hoàng Nam | 11 | 10.1 | 06:10
-    3 | Quốc Bảo | 10.5 | 9.5 | 06:31
-    4 | Thu Hà | 7.5 | 11.0 | 07:02
-    5 | Đức Long | 7.5 | 8.4 | 06:55
-  }
-  .
-  [ Quay lại ]
-}
-}}
-]
-
+Login -left-> Register : đăng ký
+Register -right-> Login : quay lại, hoặc\nđăng ký thành công
 Login -right-> Main : đăng nhập\nthành công
-Main -right-> Ranking : xem bảng\nxếp hạng
-Ranking -left-> Main : quay lại
+Main -left-> Login : đăng xuất
 @enduml

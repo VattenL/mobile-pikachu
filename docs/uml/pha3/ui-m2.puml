@@ -1,5 +1,5 @@
 @startuml ui-m2
-title Thiết kế giao diện - Modul Play With Bot (màn hình ngang)
+title Thiết kế giao diện - Modul View Ranking
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -8,6 +8,23 @@ skinparam rectangle {
   BackgroundColor #F7F7F7
   BorderColor #9E9E9E
 }
+
+rectangle Login [
+{{salt
+{+
+  <b>Đăng nhập
+  .
+  Tên đăng nhập
+  "hoangnam        "
+  Mật khẩu
+  "********        "
+  <color:red>Sai tên đăng nhập hoặc mật khẩu
+  .
+  [   Đăng nhập   ]
+  [    Đăng ký    ]
+}
+}}
+]
 
 rectangle Main [
 {{salt
@@ -33,72 +50,26 @@ rectangle Main [
 }}
 ]
 
-rectangle Difficulty [
+rectangle Ranking [
 {{salt
 {+
-  <b>Chọn độ khó
+  <b>Bảng xếp hạng
   .
-  { {+ (Togepi)
-       <b>Dễ } | {+ (Pikachu)
-       <b>Trung bình } | {+ (Charizard)
-       <b>Khó } }
+  {#
+    <b>Hạng | <b>Tên | <b>Tổng điểm | <b>TB điểm đối thủ | <b>TB thời gian thắng
+    1 | Minh Anh | 12.5 | 9.2 | 05:48
+    2 | Hoàng Nam | 11 | 10.1 | 06:10
+    3 | Quốc Bảo | 10.5 | 9.5 | 06:31
+    4 | Thu Hà | 7.5 | 11.0 | 07:02
+    5 | Đức Long | 7.5 | 8.4 | 06:55
+  }
   .
-  [ Quay lại ] | [ Bắt đầu ]
+  [ Quay lại ]
 }
 }}
 ]
 
-rectangle Game [
-{{salt
-{+
-  { {+
-      <b>Đấu máy · Trung bình
-      09:12
-      .
-      <b>Bạn
-      98 ô
-      .
-      [ Thoát ]
-    } | {#
-      A | B | C | D | E | F
-      G | A | . | H | B | C
-      D | . | E | F | G | H
-      B | C | A | . | D | E
-      F | G | H | A | . | B
-      C | D | E | F | G | A
-    } | {+
-      <b>Máy · 96 ô
-      {#
-        A | B | . | D | E | F
-        G | A | . | H | B | C
-        D | . | E | F | . | H
-        B | C | A | . | D | E
-        . | G | H | A | . | B
-        C | D | E | F | G | A
-      }
-      <i>(bàn của máy, chỉ xem)
-    } }
-}
-}}
-]
-
-rectangle Result [
-{{salt
-{+
-  <b>Chiến thắng!
-  .
-  Bạn thắng. Thời gian hoàn thành 07:15.
-  Máy còn 12 ô.
-  .
-  [ OK ]
-}
-}}
-]
-
-Main -right-> Difficulty : chơi với máy
-Difficulty -left-> Main : quay lại
-Difficulty -down-> Game : bắt đầu
-Game -right-> Result : kết thúc ván
-Game -up-> Main : thoát
-Result -up-> Main : OK
+Login -right-> Main : đăng nhập\nthành công
+Main -right-> Ranking : xem bảng\nxếp hạng
+Ranking -left-> Main : quay lại
 @enduml

@@ -1,10 +1,10 @@
 @startuml comm-m2
-title Biểu đồ giao tiếp - Modul Play With Bot
+title Biểu đồ giao tiếp - Modul View Ranking
 
 skinparam shadowing false
 skinparam linetype polyline
 skinparam nodesep 70
-skinparam ranksep 100
+skinparam ranksep 90
 skinparam defaultFontSize 12
 skinparam ArrowColor #4A4A4A
 skinparam actor {
@@ -22,22 +22,20 @@ skinparam entity {
 
 actor "Người chơi" as Actor
 
+boundary LoginScreen
 boundary MainScreen
-boundary DifficultyScreen
-boundary BotGameScreen
-boundary BotResultDialog
+boundary RankingScreen
 
-entity Board
+entity Player
+entity PlayerRanking
 
-Actor -down- MainScreen : "1: click chơi với máy ↓\n32: hiển thị ↑"
-Actor -down- DifficultyScreen : "3: hiển thị ↑\n4: chọn độ khó, click bắt đầu ↓"
-Actor -down- BotGameScreen : "9: hiển thị ↑\n<U+002A>10: click hai ô ↓\n<U+002A>20: hiển thị ↑\n<U+002A>27: hiển thị ↑"
-Actor -down- BotResultDialog : "29: hiển thị ↑\n30: click OK ↓"
-MainScreen -right- DifficultyScreen : "2: gọi →"
-DifficultyScreen -right- BotGameScreen : "8: gọi →"
-BotGameScreen -right- BotResultDialog : "28: gọi →"
-BotResultDialog -[norank]- MainScreen : "31: gọi ←"
-DifficultyScreen -down- Board : "5: gọi ↓\n7: trả về ↑"
-BotGameScreen -down- Board : "<U+002A>11: gọi ↓\n<U+002A>13: trả về ↑\n<U+002A>14: gọi ↓\n<U+002A>16: trả về ↑\n<U+002A>17: gọi ↓\n<U+002A>19: trả về ↑\n<U+002A>21: gọi ↓\n<U+002A>23: trả về ↑\n<U+002A>24: gọi ↓\n<U+002A>26: trả về ↑"
-Board -right- Board : "6: generateBoard()\n<U+002A>12: checkPath()\n<U+002A>15: removePair()\n<U+002A>18: isCleared()\n<U+002A>22: findAvailablePair()\n<U+002A>25: removePair()"
+Actor -down- LoginScreen : "1: nhập tài khoản, click đăng nhập ↓"
+Actor -down- MainScreen : "6: hiển thị ↑\n7: click xem bảng xếp hạng ↓\n15: hiển thị ↑"
+Actor -down- RankingScreen : "12: hiển thị ↑\n13: click quay lại ↓"
+LoginScreen -right- MainScreen : "5: gọi →"
+MainScreen -right- RankingScreen : "8: gọi →\n14: gọi ←"
+LoginScreen -down- Player : "2: gọi ↓\n4: trả về ↑"
+Player -right- Player : "3: checkLogin()"
+RankingScreen -down- PlayerRanking : "9: gọi ↓\n11: trả về ↑"
+PlayerRanking -right- PlayerRanking : "10: getRanking()"
 @enduml

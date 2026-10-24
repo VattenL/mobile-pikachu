@@ -1,11 +1,11 @@
 @startuml state-m4
-title Biểu đồ trạng thái - Modul Manage Account
+title Biểu đồ trạng thái - Modul Play Online Match
 
 skinparam shadowing false
 skinparam linetype polyline
 skinparam defaultFontSize 13
 skinparam nodesep 120
-skinparam ranksep 90
+skinparam ranksep 110
 skinparam state {
   BackgroundColor #F7F7F7
   BorderColor #4A4A4A
@@ -13,15 +13,23 @@ skinparam state {
   FontColor #1A1A1A
 }
 
-state "Hiển thị LoginScreen" as Login
-state "Hiển thị RegisterScreen" as Register
 state "Hiển thị MainScreen" as Main
+state "Hiển thị ChallengeConfirmDialog" as Confirm
+state "Hiển thị InvitationDialog" as Invitation
+state "Hiển thị MatchScreen" as Match
+state "Hiển thị ResultDialog" as Result
 
-[*] --> Login
-Login --> Register : [click đăng ký]
-Register --> Register : [click đăng ký, thiếu thông tin\nhoặc tên đăng nhập đã tồn tại]
-Register --> Login : [click quay lại]\n[click đăng ký, thành công]
-Login --> Login : [click đăng nhập, sai tài khoản]
-Login --> Main : [click đăng nhập, đúng tài khoản]
-Main --> Login : [click đăng xuất]
+[*] --> Main
+Main --> Confirm : [click tên đối thủ rỗi]
+Confirm --> Main : [click hủy]\n[click xác nhận]
+Main --> Main : [đối thủ từ chối]
+Main --> Invitation : [nhận lời mời]
+Invitation --> Main : [click reject]
+Invitation --> Match : [click OK]
+Main --> Match : [đối thủ chấp nhận]
+Match --> Match : [click hai ô]
+Match --> Main : [click thoát]
+Match --> Result : [một bên xóa hết ô,\nhết giờ hoặc\nđối thủ thoát]
+Result --> Match : [cả hai click\ntiếp tục]
+Result --> Main : [click dừng hoặc\nđối thủ dừng]
 @enduml

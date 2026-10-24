@@ -1,5 +1,5 @@
-@startuml uc-m4-manage-account
-title Biểu đồ use case chi tiết - Modul Manage Account
+@startuml uc-m2-view-ranking
+title Biểu đồ use case chi tiết - Modul View Ranking
 
 left to right direction
 skinparam linetype polyline
@@ -19,14 +19,11 @@ skinparam actor {
 
 actor "Player" as Player
 
-rectangle "Modul: Manage Account" {
-  usecase "Register Account" as UC01
+rectangle "Modul: View Ranking" {
+  usecase "View Ranking" as UC04
   usecase "Login" as UC02
-  usecase "Logout" as UC03
 }
 
-Player --> UC01
-Player --> UC02
-Player --> UC03
-UC03 ..> UC02 : <<include>>
+Player --> UC04
+UC04 ..> UC02 : <<include>>
 @enduml

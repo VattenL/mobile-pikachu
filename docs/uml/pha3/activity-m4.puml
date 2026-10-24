@@ -1,5 +1,5 @@
 @startuml activity-m4
-title Biểu đồ hoạt động - Modul Manage Account
+title Biểu đồ hoạt động - Modul Play Online Match
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -17,56 +17,65 @@ skinparam note {
 }
 
 start
-partition "Xử lí tại LoginActivity" {
-  :Hiển thị giao diện đăng nhập;
+partition "Xử lí tại MainActivity (máy A)" {
+  :Hiển thị danh sách người chơi online;
 }
-->[click đăng ký];
+->[click tên B đang rỗi];
+partition "Xử lí tại ChallengeConfirmDialog (máy A)" {
+  :Hiển thị dialog xác nhận thách đấu B;
+}
+->[A click xác nhận];
+partition "Xử lí tại server: ChallengeController.handleInvite()" {
+  :Gửi lời mời tới B;
+  note right: OnlinePlayerManager:\nsendInvitation()
+}
+partition "Xử lí tại InvitationDialog (máy B)" {
+  :Hiển thị lời mời;
+}
+->[B click OK];
+partition "Xử lí tại server: ChallengeController.handleInviteReply()" {
+  :Sinh đề bài;
+  note right: BoardGenerator:\ngenerateBoard()
+  :Tạo ván đấu;
+  note right: MatchManager:\ncreateMatch()
+  :Chuyển A, B sang bận;
+  note right: OnlinePlayerManager:\nupdateStatus()
+  :Gửi MATCH_START cho A và B;
+}
 repeat
-  partition "Xử lí tại RegisterActivity" {
-    :Nhận tên đăng nhập, mật khẩu,\nmật khẩu nhập lại, tên hiển thị;
-    :Kiểm tra không ô nào rỗng,\nmật khẩu nhập lại khớp;
-    :Gửi message REGISTER;
+  partition "Xử lí tại MatchActivity (A, B)" {
+    :Hiển thị bàn chơi, đồng hồ;
+    :Nhận hai ô được click, gửi MOVE;
   }
-  partition "Xử lí tại server: LoginController.handleRegister()" {
-    :Băm mật khẩu, thêm người chơi mới;
-    note right: PlayerDAO:\naddPlayer()
-    :Gửi REGISTER_RESULT;
+  partition "Xử lí tại server: MatchController.handleMove()" {
+    :Kiểm tra đường nối trên bàn của người gửi;
+    note right: PathFinder:\ncheckPath()
+    :Xóa hai ô, kiểm tra hết ô;
+    note right: Board: removePair()\nBoard: isCleared()
+    :Kiểm tra bế tắc, xáo riêng bàn đó nếu cần;
+    note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
+    :Gửi MOVE_RESULT cho người gửi,\nOPPONENT_PROGRESS cho đối thủ;
   }
-repeat while () is ([tên đăng nhập đã tồn tại])
-->[đăng ký thành công];
-repeat
-  partition "Xử lí tại LoginActivity " {
-    :Hiển thị tên đăng nhập vừa đăng ký;
-    :Nhận mật khẩu, gửi message LOGIN;
-  }
-  partition "Xử lí tại server: LoginController.handleLogin()" {
-    :Kiểm tra tài khoản;
-    note right: PlayerDAO:\ncheckLogin()
-    :Thêm vào danh sách online;
-    note right: OnlinePlayerManager:\naddOnlinePlayer()
-    :Gửi LOGIN_RESULT;
-  }
-repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
-->[đăng nhập thành công];
-partition "Xử lí tại LoginActivity  " {
-  :Lưu người chơi vào ClientSession;
+repeat while (Có người xóa hết ô, hết giờ hoặc thoát?) is ([chưa]) not ([rồi])
+partition "Xử lí tại server: MatchController.endMatch()" {
+  :Tính kết quả và điểm;
+  :Lưu ván đấu và hai kết quả;
+  note right: MatchDAO:\nsaveMatch()
+  :Gửi MATCH_END cho A và B;
 }
-partition "Xử lí tại MainActivity" {
-  :Hiển thị giao diện chính;
+partition "Xử lí tại ResultDialog (A, B)" {
+  :Hiển thị kết quả, hỏi tiếp tục;
 }
-->[click đăng xuất];
-partition "Xử lí tại MainActivity " {
-  :Gửi message LOGOUT;
-  :Xóa người chơi khỏi ClientSession;
+->[A click dừng];
+partition "Xử lí tại server: MatchController.handleRematchReply()" {
+  :Chuyển A, B về rỗi;
+  note right: OnlinePlayerManager:\nupdateStatus()
+  :Gửi OPPONENT_LEFT cho B;
+  :Gửi danh sách online mới;
+  note right: OnlinePlayerManager: getOnlinePlayers()\nPlayerRankingDAO: getTotalPoints()
 }
-partition "Xử lí tại server: LoginController.handleLogout()" {
-  :Xóa khỏi danh sách online;
-  note right: OnlinePlayerManager:\nremoveOnlinePlayer()
-  :Gửi lại danh sách online cho người khác;
-  note right: ChallengeController:\nbroadcastOnlineList()
-}
-partition "Xử lí tại LoginActivity   " {
-  :Hiển thị giao diện đăng nhập;
+partition "Xử lí tại MainActivity (A, B)" {
+  :Hiển thị danh sách online đã cập nhật;
 }
 stop
 @enduml

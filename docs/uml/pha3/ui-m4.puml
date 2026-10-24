@@ -1,5 +1,5 @@
 @startuml ui-m4
-title Thiết kế giao diện - Modul Manage Account (màn hình ngang)
+title Thiết kế giao diện - Modul Play Online Match (màn hình ngang)
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -9,51 +9,14 @@ skinparam rectangle {
   BorderColor #9E9E9E
 }
 
-rectangle Register [
-{{salt
-{+
-  <b>Đăng ký tài khoản
-  .
-  Tên đăng nhập
-  "thanhtung       "
-  Mật khẩu
-  "********        "
-  Nhập lại mật khẩu
-  "********        "
-  Tên hiển thị
-  "Thanh Tùng      "
-  <color:red>Tên đăng nhập đã tồn tại
-  .
-  [ Quay lại ] | [ Đăng ký ]
-}
-}}
-]
-
-rectangle Login [
-{{salt
-{+
-  <b>Đăng nhập
-  .
-  <color:green>Đăng ký thành công, mời đăng nhập
-  Tên đăng nhập
-  "thanhtung       "
-  Mật khẩu
-  "********        "
-  .
-  [   Đăng nhập   ]
-  [    Đăng ký    ]
-}
-}}
-]
-
 rectangle Main [
 {{salt
 {+
   { {+
-      <b>Thanh Tùng
-      0 điểm
+      <b>Hoàng Nam
+      11 điểm
       .
-      .
+      <color:blue>Đang chờ Minh Anh trả lời...
       [ Xem bảng xếp hạng ]
       [   Chơi với máy    ]
       [     Đăng xuất     ]
@@ -63,15 +26,92 @@ rectangle Main [
         <b>Tên | <b>Tổng điểm | <b>Trạng thái
         Minh Anh | 12.5 | Rỗi
         Quốc Bảo | 10.5 | Bận
-        Thu Hà | 7.5 | Rỗi
+        Thu Hà | 7.5 | Luyện tập
       }
     } }
 }
 }}
 ]
 
-Login -left-> Register : đăng ký
-Register -right-> Login : quay lại, hoặc\nđăng ký thành công
-Login -right-> Main : đăng nhập\nthành công
-Main -left-> Login : đăng xuất
+rectangle Confirm [
+{{salt
+{+
+  <b>Xác nhận thách đấu
+  .
+  Bạn muốn thách đấu Minh Anh?
+  .
+  [ Hủy ] | [ Xác nhận ]
+}
+}}
+]
+
+rectangle Invite [
+{{salt
+{+
+  <b>Thách đấu!
+  .
+  Hoàng Nam muốn thách đấu bạn
+  .
+  [ Reject ] | [ OK ]
+}
+}}
+]
+
+rectangle Match [
+{{salt
+{+
+  { {+
+      <b>Đấu với Minh Anh
+      08:30
+      .
+      <b>Bạn
+      98 ô
+      .
+      [ Thoát ]
+    } | {#
+      A | B | C | D | E | F
+      G | A | . | H | B | C
+      D | . | E | F | G | H
+      B | C | A | . | D | E
+      F | G | H | A | . | B
+      C | D | E | F | G | A
+    } | {+
+      <b>Minh Anh · 92 ô
+      {#
+        A | . | C | D | . | F
+        G | A | . | H | B | C
+        . | . | E | F | G | H
+        B | C | . | . | D | E
+        F | G | H | A | . | B
+        C | . | E | F | G | .
+      }
+      <i>(bàn của đối thủ, chỉ xem)
+    } }
+}
+}}
+]
+
+rectangle Result [
+{{salt
+{+
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 06:42.
+  Bạn có muốn tiếp tục không?
+  .
+  [ Dừng ] | [ Tiếp tục ]
+}
+}}
+]
+
+Main -left-> Confirm : click tên đối thủ
+Confirm -right-> Main : hủy, hoặc xác nhận\n(gửi lời mời, hiện "Đang chờ")
+Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
+Invite -left-> Main : Reject
+Invite -down-> Match : OK
+Main -down-> Match : đối thủ chấp nhận
+Match -right-> Result : kết thúc ván
+Result -up-> Match : cả hai tiếp tục
+Result -up-> Main : dừng
+Match -up-> Main : thoát
 @enduml

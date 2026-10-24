@@ -1,5 +1,5 @@
 @startuml activity-m3
-title Biểu đồ hoạt động - Modul Play Online Match
+title Biểu đồ hoạt động - Modul Play With Bot
 
 skinparam shadowing false
 skinparam defaultFontSize 12
@@ -17,65 +17,52 @@ skinparam note {
 }
 
 start
-partition "Xử lí tại MainActivity (máy A)" {
-  :Hiển thị danh sách người chơi online;
+partition "Xử lí tại MainActivity" {
+  :Hiển thị giao diện chính;
 }
-->[click tên B đang rỗi];
-partition "Xử lí tại ChallengeConfirmDialog (máy A)" {
-  :Hiển thị dialog xác nhận thách đấu B;
+->[click chơi với máy];
+partition "Xử lí tại DifficultyActivity" {
+  :Hiển thị lựa chọn độ khó;
+  :Nhận độ khó;
 }
-->[A click xác nhận];
-partition "Xử lí tại server: ChallengeController.handleInvite()" {
-  :Gửi lời mời tới B;
-  note right: OnlinePlayerManager:\nsendInvitation()
-}
-partition "Xử lí tại InvitationDialog (máy B)" {
-  :Hiển thị lời mời;
-}
-->[B click OK];
-partition "Xử lí tại server: ChallengeController.handleInviteReply()" {
+->[click bắt đầu];
+partition "Xử lí tại BotGameActivity" {
   :Sinh đề bài;
   note right: BoardGenerator:\ngenerateBoard()
-  :Tạo ván đấu;
-  note right: MatchManager:\ncreateMatch()
-  :Chuyển A, B sang bận;
-  note right: OnlinePlayerManager:\nupdateStatus()
-  :Gửi MATCH_START cho A và B;
+  :Tạo bàn của máy và khởi tạo máy;
+  note right: Board: copy()\nBot: Bot()
+  :Báo trạng thái luyện tập;
+  note right: ServerConnection:\nsend(UPDATE_STATUS)
+  :Hiển thị bàn chơi, bắt đầu đồng hồ;
+  repeat
+    if (Sự kiện?) then ([người chơi click hai ô])
+      :Kiểm tra đường nối;
+      note right: PathFinder:\ncheckPath()
+      if (Nối được?) then ([có])
+        :Xóa hai ô, vẽ đường nối;
+        note right: Board:\nremovePair()
+        :Kiểm tra bế tắc, xáo nếu cần;
+        note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
+      else ([không])
+        :Bỏ chọn hai ô;
+      endif
+    else ([đến lượt máy])
+      :Lấy nước đi của máy;
+      note right: Bot:\nnextMove()
+      :Xóa cặp trên bàn của máy;
+      note right: Board:\nremovePair()
+    endif
+  repeat while (Một bên xóa hết ô hoặc hết giờ?) is ([chưa]) not ([rồi])
+  :Dừng đồng hồ, xác định kết quả;
+  :Báo trạng thái rỗi;
+  note right: ServerConnection:\nsend(UPDATE_STATUS)
 }
-repeat
-  partition "Xử lí tại MatchActivity (A, B)" {
-    :Hiển thị bàn chơi, đồng hồ;
-    :Nhận hai ô được click, gửi MOVE;
-  }
-  partition "Xử lí tại server: MatchController.handleMove()" {
-    :Kiểm tra đường nối trên bàn của người gửi;
-    note right: PathFinder:\ncheckPath()
-    :Xóa hai ô, kiểm tra hết ô;
-    note right: Board: removePair()\nBoard: isCleared()
-    :Kiểm tra bế tắc, xáo riêng bàn đó nếu cần;
-    note right: PathFinder: findAvailablePair()\nBoardGenerator: shuffle()
-    :Gửi MOVE_RESULT cho người gửi,\nOPPONENT_PROGRESS cho đối thủ;
-  }
-repeat while (Có người xóa hết ô, hết giờ hoặc thoát?) is ([chưa]) not ([rồi])
-partition "Xử lí tại server: MatchController.endMatch()" {
-  :Tính kết quả và điểm;
-  :Lưu ván đấu và hai kết quả;
-  note right: MatchDAO:\nsaveMatch()
-  :Gửi MATCH_END cho A và B;
+partition "Xử lí tại BotResultDialog" {
+  :Hiển thị kết quả;
 }
-partition "Xử lí tại ResultDialog (A, B)" {
-  :Hiển thị kết quả, hỏi tiếp tục;
-}
-->[A click dừng];
-partition "Xử lí tại server: MatchController.handleRematchReply()" {
-  :Chuyển A, B về rỗi;
-  note right: OnlinePlayerManager:\nupdateStatus()
-  :Gửi OPPONENT_LEFT cho B;
-  :Gửi danh sách online mới;
-  note right: OnlinePlayerManager: getOnlinePlayers()\nPlayerRankingDAO: getTotalPoints()
-}
-partition "Xử lí tại MainActivity (A, B)" {
-  :Hiển thị danh sách online đã cập nhật;
+->[click OK];
+partition "Xử lí tại MainActivity " {
+  :Hiển thị giao diện chính;
 }
 stop
 @enduml

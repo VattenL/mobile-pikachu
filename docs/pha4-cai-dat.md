@@ -123,7 +123,21 @@ public abstract class DAO {
 - `ClientHandler.run()`: vòng lặp đọc từng dòng từ socket, `Message.fromJson()`, rồi chuyển theo `type` cho hàm xử lý tương ứng của lớp điều khiển. Khi đọc gặp lỗi hoặc hết luồng (client mất kết nối), gọi `OnlinePlayerManager` gỡ người chơi khỏi danh sách online và báo `MatchController` nếu người đó đang trong ván. `send(msg)` ghi `msg.toJson()` kèm xuống dòng, được đồng bộ để hai luồng không ghi xen vào nhau.
 - `ServerConnection`: một đối tượng duy nhất trong ứng dụng; `connect()` mở socket trên luồng nền; một luồng đọc riêng nhận từng dòng, dựng `Message` và dùng `Handler` của luồng chính để gọi `onMessage()` của các `MessageListener` đang đăng ký. Mỗi `Activity` đăng ký trong `onStart()` và hủy trong `onStop()`.
 
-### b. Modul xem bảng xếp hạng
+### b. Modul quản lý tài khoản
+
+| Lớp | Phương thức | Cách hoạt động |
+|---|---|---|
+| `LoginActivity` | `onRegisterClick()` | mở `RegisterActivity`; khi quay về kèm tên đăng nhập vừa đăng ký thì điền sẵn và hiện "Đăng ký thành công, mời đăng nhập" |
+| `RegisterActivity` | `onRegisterClick()` | kiểm tra bốn ô không rỗng và mật khẩu nhập lại khớp; hợp lệ thì gửi `REGISTER` |
+| | `onMessage()` | `REGISTER_RESULT`: thành công thì trả tên đăng nhập về `LoginActivity` và đóng màn; thất bại thì hiện lỗi, xóa hai ô mật khẩu |
+| | `onBackClick()` | đóng màn, về `LoginActivity`, không gửi gì |
+| `MainActivity` | `onLogoutClick()` | gửi `LOGOUT`, `ClientSession.clear()`, mở `LoginActivity` và đóng các màn hình phía sau |
+| `LoginController` | `handleRegister()` | kiểm tra ba trường không rỗng, băm mật khẩu, gọi `PlayerDAO.addPlayer()`, gửi `REGISTER_RESULT` (`ok`, hoặc `error` "tên đăng nhập đã tồn tại") |
+| | `handleLogout()` | `OnlinePlayerManager.removeOnlinePlayer()`, đặt người chơi của `ClientHandler` về rỗng, `ChallengeController.broadcastOnlineList()` |
+| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password, name) VALUES (?, ?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
+| `OnlinePlayerManager` | `removeOnlinePlayer()` | xóa ánh xạ tên đăng nhập → `ClientHandler`; `ClientHandler` cũng gọi hàm này khi client mất kết nối |
+
+### c. Modul xem bảng xếp hạng
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
@@ -135,7 +149,7 @@ public abstract class DAO {
 | `RankingController` | `handleGetRanking()` | gọi `PlayerRankingDAO.getRanking()`, đánh số hạng theo thứ tự trả về (trùng cả ba tiêu chí thì cùng hạng, kiểu 1, 2, 2, 4), gửi `RANKING` |
 | `PlayerRankingDAO` | `getRanking()` | chạy truy vấn ở pha 3, mục 8d, mỗi dòng đóng gói một `PlayerRanking` (kế thừa `Player`: `id`, `username`, `name`; thêm ba chỉ số) |
 
-### c. Modul chơi với máy
+### d. Modul chơi với máy
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
@@ -147,7 +161,7 @@ public abstract class DAO {
 | `BoardView` | `onDraw()`, `onTouchEvent()` | chia khung vẽ thành lưới 12x12, vẽ ảnh nhân vật theo mã hình, viền ô đang chọn, đường nối trong khoảng 300 ms; đổi toạ độ chạm thành `Cell` |
 | `PathFinder`, `BoardGenerator`, `Bot` | | theo thuật toán ở pha 3, mục 8 |
 
-### d. Modul thách đấu và đấu đối kháng
+### e. Modul thách đấu và đấu đối kháng
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
@@ -168,20 +182,6 @@ public abstract class DAO {
 | | `handleRematchReply()` | ghi lựa chọn; cả hai tiếp tục thì sinh đề mới và gửi `MATCH_START`; một người dừng thì `updateStatus(..., IDLE)`, gửi `OPPONENT_LEFT` cho người kia, `broadcastOnlineList()` |
 | `MatchDAO` | `saveMatch()` | trong một giao dịch: thêm dòng `tblMatch` (kèm đề bài), lấy khóa sinh ra, thêm hai dòng `tblMatchResult` (kết quả, thời gian hoàn thành, bàn lúc kết thúc của từng người; điểm không lưu); lỗi thì `rollback` và trả `false`. Hàm chỉ tự `commit` khi được gọi lúc `autoCommit` đang bật, nên test đơn vị tắt `autoCommit` trước khi gọi thì `rollback` được toàn bộ |
 | `PlayerRankingDAO` | `getTotalPoints()` | `SELECT playerId, SUM(CASE result WHEN 'WIN' THEN 1 WHEN 'DRAW' THEN 0.5 ELSE 0 END) FROM tblMatchResult WHERE playerId IN (...) GROUP BY playerId`, người chưa có ván nào có tổng điểm 0 |
-
-### e. Modul quản lý tài khoản
-
-| Lớp | Phương thức | Cách hoạt động |
-|---|---|---|
-| `LoginActivity` | `onRegisterClick()` | mở `RegisterActivity`; khi quay về kèm tên đăng nhập vừa đăng ký thì điền sẵn và hiện "Đăng ký thành công, mời đăng nhập" |
-| `RegisterActivity` | `onRegisterClick()` | kiểm tra bốn ô không rỗng và mật khẩu nhập lại khớp; hợp lệ thì gửi `REGISTER` |
-| | `onMessage()` | `REGISTER_RESULT`: thành công thì trả tên đăng nhập về `LoginActivity` và đóng màn; thất bại thì hiện lỗi, xóa hai ô mật khẩu |
-| | `onBackClick()` | đóng màn, về `LoginActivity`, không gửi gì |
-| `MainActivity` | `onLogoutClick()` | gửi `LOGOUT`, `ClientSession.clear()`, mở `LoginActivity` và đóng các màn hình phía sau |
-| `LoginController` | `handleRegister()` | kiểm tra ba trường không rỗng, băm mật khẩu, gọi `PlayerDAO.addPlayer()`, gửi `REGISTER_RESULT` (`ok`, hoặc `error` "tên đăng nhập đã tồn tại") |
-| | `handleLogout()` | `OnlinePlayerManager.removeOnlinePlayer()`, đặt người chơi của `ClientHandler` về rỗng, `ChallengeController.broadcastOnlineList()` |
-| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password, name) VALUES (?, ?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
-| `OnlinePlayerManager` | `removeOnlinePlayer()` | xóa ánh xạ tên đăng nhập → `ClientHandler`; `ClientHandler` cũng gọi hàm này khi client mất kết nối |
 
 ## 3. Kiểm thử đơn vị
 

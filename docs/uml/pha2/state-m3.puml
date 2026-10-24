@@ -1,11 +1,11 @@
 @startuml state-m3
-title Biểu đồ trạng thái - Modul Play Online Match
+title Biểu đồ trạng thái - Modul Play With Bot
 
 skinparam shadowing false
 skinparam linetype polyline
 skinparam defaultFontSize 13
 skinparam nodesep 120
-skinparam ranksep 110
+skinparam ranksep 90
 skinparam state {
   BackgroundColor #F7F7F7
   BorderColor #4A4A4A
@@ -14,22 +14,16 @@ skinparam state {
 }
 
 state "Hiển thị MainScreen" as Main
-state "Hiển thị ChallengeConfirmDialog" as Confirm
-state "Hiển thị InvitationDialog" as Invitation
-state "Hiển thị MatchScreen" as Match
-state "Hiển thị ResultDialog" as Result
+state "Hiển thị DifficultyScreen" as Difficulty
+state "Hiển thị BotGameScreen" as Game
+state "Hiển thị BotResultDialog" as Result
 
 [*] --> Main
-Main --> Confirm : [click tên đối thủ rỗi]
-Confirm --> Main : [click hủy]\n[click xác nhận]
-Main --> Main : [đối thủ từ chối]
-Main --> Invitation : [nhận lời mời]
-Invitation --> Main : [click reject]
-Invitation --> Match : [click OK]
-Main --> Match : [đối thủ chấp nhận]
-Match --> Match : [click hai ô]
-Match --> Main : [click thoát]
-Match --> Result : [một bên xóa hết ô,\nhết giờ hoặc\nđối thủ thoát]
-Result --> Match : [cả hai click\ntiếp tục]
-Result --> Main : [click dừng hoặc\nđối thủ dừng]
+Main --> Difficulty : [click chơi với máy]
+Difficulty --> Main : [click quay lại]
+Difficulty --> Game : [click bắt đầu]
+Game --> Game : [click hai ô]
+Game --> Main : [click thoát]
+Game --> Result : [một bên xóa hết ô\nhoặc hết giờ]
+Result --> Main : [click OK]
 @enduml

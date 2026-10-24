@@ -1,5 +1,5 @@
 @startuml class-design-m2
-title Biểu đồ lớp thiết kế - Modul Play With Bot
+title Biểu đồ lớp thiết kế - Modul View Ranking
 
 hide circle
 hide empty members
@@ -16,116 +16,145 @@ skinparam class {
 }
 
 ' ===== Client Android: tang giao dien =====
-class MainActivity #E3F2FD {
-  - btnPlayWithBot : Button
-  - player : Player
-  + onPlayWithBotClick(v : View) : void
+class LoginActivity #E3F2FD {
+  - edtUsername : EditText
+  - edtPassword : EditText
+  - tvError : TextView
+  - btnLogin : Button
+  + onLoginClick(v : View) : void
+  + onMessage(msg : Message) : void
 }
 
-class DifficultyActivity #E3F2FD {
-  - rgDifficulty : RadioGroup
-  - btnStart : Button
+class MainActivity #E3F2FD {
+  - tvPlayer : TextView
+  - rvOnlinePlayers : RecyclerView
+  - btnRanking : Button
+  - btnPlayWithBot : Button
+  - btnLogout : Button
+  - player : Player
+  + onRankingClick(v : View) : void
+}
+
+class RankingActivity #E3F2FD {
+  - rvRanking : RecyclerView
   - btnBack : Button
-  + onStartClick(v : View) : void
+  - listRanking : ArrayList<PlayerRanking>
+  + onMessage(msg : Message) : void
   + onBackClick(v : View) : void
 }
 
-class BotGameActivity #E3F2FD {
-  - boardView : BoardView
-  - botBoardView : BoardView
-  - tvTimer : TextView
-  - tvPlayerRemaining : TextView
-  - tvBotRemaining : TextView
-  - btnQuit : Button
-  - board : Board
-  - botBoard : Board
-  - bot : Bot
-  - firstCell : Cell
-  - timer : CountDownTimer
-  - handler : Handler
-  + onCellClick(cell : Cell) : void
-  + onBotTurn() : void
-  + onQuitClick(v : View) : void
-  - endGame(result : String) : void
-}
-
-class BotResultDialog #E3F2FD {
-  - tvResult : TextView
-  - btnOk : Button
-  + onOkClick(v : View) : void
-}
-
+' ===== Client Android: tang mang =====
 class ServerConnection #EDE7F6 {
+  - socket : Socket
+  - reader : BufferedReader
+  - writer : PrintWriter
+  - listeners : ArrayList<MessageListener>
   + getInstance() : ServerConnection
+  + connect(host : String, port : int) : boolean
+  + send(msg : Message) : void
+  + addListener(l : MessageListener) : void
+  + removeListener(l : MessageListener) : void
+}
+
+interface MessageListener #EDE7F6 {
+  + onMessage(msg : Message) : void
+}
+
+class ClientSession #EDE7F6 {
+  + player : Player
+}
+
+' ===== Server: tang dieu khien =====
+class ClientHandler #E8F5E9 {
+  - socket : Socket
+  - reader : BufferedReader
+  - writer : PrintWriter
+  - player : Player
+  + run() : void
   + send(msg : Message) : void
 }
 
-class BoardView #E3F2FD {
-  - board : Board
-  - path : ArrayList<Cell>
-  + setBoard(board : Board) : void
-  + setInteractive(b : boolean) : void
-  + showPath(path : ArrayList<Cell>) : void
-  # onDraw(canvas : Canvas) : void
-  + onTouchEvent(e : MotionEvent) : boolean
+class LoginController #E8F5E9 {
+  + handleLogin(handler : ClientHandler, msg : Message) : void
 }
 
-' ===== core: xu ly ban choi =====
-class BoardGenerator #E8F5E9 {
-  + generateBoard(rows : int, cols : int, iconTypes : int, seed : long) : Board
-  + shuffle(board : Board, seed : long) : Board
+class RankingController #E8F5E9 {
+  + handleGetRanking(handler : ClientHandler, msg : Message) : void
 }
 
-class PathFinder #E8F5E9 {
-  + checkPath(board : Board, a : Cell, b : Cell) : ArrayList<Cell>
-  + findAvailablePair(board : Board) : Cell[]
+class OnlinePlayerManager #E8F5E9 {
+  - onlineHandlers : HashMap<String, ClientHandler>
+  + getInstance() : OnlinePlayerManager
+  + addOnlinePlayer(handler : ClientHandler) : boolean
 }
 
-class Bot #E8F5E9 {
-  - difficulty : Difficulty
-  + Bot(difficulty : Difficulty)
-  + getDelayMs() : long
-  + nextMove(board : Board) : Cell[]
+' ===== Server: tang DAO =====
+class DAO #FFF8E1 {
+  # con : Connection
+  + DAO()
 }
 
-enum Difficulty #E8F5E9 {
-  EASY
-  MEDIUM
-  HARD
+class PlayerDAO #FFF8E1 {
+  + PlayerDAO()
+  + checkLogin(username : String, password : String) : Player
 }
 
-' ===== core: lop thuc the =====
-class Board #FFF3E0 {
+class PlayerRankingDAO #FFF8E1 {
+  + PlayerRankingDAO()
+  + getRanking() : ArrayList<PlayerRanking>
+}
+
+' ===== core: lop thuc the va message =====
+class Message #FFF3E0 {
+  - type : String
+  - data : JsonObject
+  + toJson() : String
+  + fromJson(line : String) : Message
+}
+
+class Player #FFF3E0 {
   - id : int
-  - rowCount : int
-  - columnCount : int
-  - tiles : int[][]
-  + removePair(a : Cell, b : Cell) : void
-  + isCleared() : boolean
-  + countRemaining() : int
-  + copy() : Board
+  - username : String
+  - password : String
+  - name : String
+  - status : String
 }
 
-class Cell #FFF3E0 {
-  - row : int
-  - col : int
+class PlayerRanking #FFF3E0 {
+  - totalPoint : float
+  - avgOpponentPoint : float
+  - avgWinTime : Float
 }
 
-MainActivity -right- DifficultyActivity
-DifficultyActivity -right- BotGameActivity
-BotGameActivity -right- BotResultDialog
-BotResultDialog -[norank]- MainActivity
-BotGameActivity *-down- BoardView
-BotGameActivity -down- ServerConnection
+' giao dien
+LoginActivity -right- MainActivity
+MainActivity -right- RankingActivity
+LoginActivity ..|> MessageListener
+RankingActivity ..|> MessageListener
 
-BotGameActivity -down- BoardGenerator
-BotGameActivity -down- PathFinder
-BotGameActivity -down- Bot
-Bot -right- Difficulty
-Bot -left- PathFinder
+' giao dien - mang
+LoginActivity -down- ServerConnection
+RankingActivity -down- ServerConnection
+LoginActivity -down- ClientSession
+MainActivity -down- ClientSession
+ServerConnection -right- MessageListener
+ServerConnection -[hidden]right- ClientSession
 
-BoardGenerator -down- Board
-PathFinder -down- Board
-BotGameActivity -[norank]- Board
-Board -right- Cell
+' mang client - server (TCP)
+ServerConnection -down- ClientHandler : TCP
+ClientHandler -right- LoginController
+ClientHandler -right- RankingController
+LoginController -right- OnlinePlayerManager
+
+' dieu khien - DAO
+LoginController -down- PlayerDAO
+RankingController -down- PlayerRankingDAO
+DAO <|-down- PlayerDAO
+DAO <|-down- PlayerRankingDAO
+
+' DAO - thuc the
+PlayerDAO -down- Player
+PlayerRankingDAO -down- PlayerRanking
+PlayerRanking -left-|> Player
+ClientHandler -[norank]- Message
 @enduml

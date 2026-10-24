@@ -1,4 +1,4 @@
-@startuml seq-m3-2
+@startuml seq-m4-2
 title Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi và kết thúc ván)
 
 skinparam shadowing false
