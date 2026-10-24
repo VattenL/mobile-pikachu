@@ -31,6 +31,8 @@ partition "Xử lí tại BotGameActivity" {
   note right: BoardGenerator:\ngenerateBoard()
   :Tạo bàn của máy và khởi tạo máy;
   note right: Board: copy()\nBot: Bot()
+  :Báo trạng thái luyện tập;
+  note right: ServerConnection:\nsend(UPDATE_STATUS)
   :Hiển thị bàn chơi, bắt đầu đồng hồ;
   repeat
     if (Sự kiện?) then ([người chơi click hai ô])
@@ -52,6 +54,8 @@ partition "Xử lí tại BotGameActivity" {
     endif
   repeat while (Một bên xóa hết ô hoặc hết giờ?) is ([chưa]) not ([rồi])
   :Dừng đồng hồ, xác định kết quả;
+  :Báo trạng thái rỗi;
+  note right: ServerConnection:\nsend(UPDATE_STATUS)
 }
 partition "Xử lí tại BotResultDialog" {
   :Hiển thị kết quả;

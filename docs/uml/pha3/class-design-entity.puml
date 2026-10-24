@@ -49,6 +49,7 @@ class MatchResult {
 }
 
 class Board {
+  - id : int
   - rowCount : int
   - columnCount : int
   - tiles : int[][]

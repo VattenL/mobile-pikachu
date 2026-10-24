@@ -21,6 +21,7 @@ boundary "Difficulty\nActivity" as DifficultyActivity
 boundary "BotGame\nActivity" as BotGameActivity
 boundary BoardView
 boundary "BotResult\nDialog" as BotResultDialog
+control "Server\nConnection" as ServerConnection
 control BoardGenerator
 control PathFinder
 control Bot
@@ -51,6 +52,7 @@ Bot -> Bot : Bot()
 activate Bot
 Bot --> BotGameActivity : trả về
 deactivate Bot
+BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
 BotGameActivity -> BoardView : setBoard()
 BoardView -> Player : hiển thị
 loop lặp đến khi một bên xóa hết ô hoặc hết giờ
@@ -95,6 +97,7 @@ Board --> BotGameActivity : trả về
 deactivate Board
 BotGameActivity -> Player : hiển thị
 end
+BotGameActivity -> ServerConnection : send(UPDATE_STATUS)
 BotGameActivity -> BotResultDialog : gọi
 BotResultDialog -> Player : hiển thị
 Player -> BotResultDialog : click OK

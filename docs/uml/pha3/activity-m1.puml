@@ -17,10 +17,11 @@ skinparam note {
 }
 
 start
-partition "Xử lí tại LoginActivity" {
-  repeat
+repeat
+  partition "Xử lí tại LoginActivity" {
     :Nhận tên đăng nhập, mật khẩu;
     :Gửi message LOGIN;
+  }
   partition "Xử lí tại server: LoginController.handleLogin()" {
     :Kiểm tra tài khoản;
     note right: PlayerDAO:\ncheckLogin()
@@ -31,8 +32,9 @@ partition "Xử lí tại LoginActivity" {
     endif
     :Gửi LOGIN_RESULT;
   }
-  repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
-  ->[đăng nhập thành công];
+repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
+->[đăng nhập thành công];
+partition "Xử lí tại LoginActivity " {
   :Lưu người chơi vào ClientSession;
 }
 partition "Xử lí tại MainActivity" {
@@ -41,11 +43,13 @@ partition "Xử lí tại MainActivity" {
 ->[click xem bảng xếp hạng];
 partition "Xử lí tại RankingActivity" {
   :Gửi message GET_RANKING;
-  partition "Xử lí tại server: RankingController.handleGetRanking()" {
-    :Lấy bảng xếp hạng;
-    note right: PlayerRankingDAO:\ngetRanking()
-    :Gửi message RANKING;
-  }
+}
+partition "Xử lí tại server: RankingController.handleGetRanking()" {
+  :Lấy bảng xếp hạng;
+  note right: PlayerRankingDAO:\ngetRanking()
+  :Gửi message RANKING;
+}
+partition "Xử lí tại RankingActivity " {
   :Hiển thị bảng xếp hạng;
 }
 ->[click quay lại];

@@ -16,15 +16,6 @@ skinparam class {
 }
 
 ' ===== Client Android: tang giao dien =====
-class MainActivity #E3F2FD {
-  - rvOnlinePlayers : RecyclerView
-  - tvMessage : TextView
-  - player : Player
-  - onlinePlayers : ArrayList<Player>
-  + onPlayerClick(opponent : Player) : void
-  + onMessage(msg : Message) : void
-}
-
 class ChallengeConfirmDialog #E3F2FD {
   - tvOpponent : TextView
   - btnConfirm : Button
@@ -32,6 +23,19 @@ class ChallengeConfirmDialog #E3F2FD {
   - opponent : Player
   + onConfirmClick(v : View) : void
   + onCancelClick(v : View) : void
+}
+
+abstract class BaseActivity #E3F2FD {
+  + onMessage(msg : Message) : void
+}
+
+class MainActivity #E3F2FD {
+  - rvOnlinePlayers : RecyclerView
+  - tvMessage : TextView
+  - player : Player
+  - onlinePlayers : ArrayList<Player>
+  + onPlayerClick(opponent : Player) : void
+  + onMessage(msg : Message) : void
 }
 
 class InvitationDialog #E3F2FD {
@@ -45,10 +49,13 @@ class InvitationDialog #E3F2FD {
 
 class MatchActivity #E3F2FD {
   - boardView : BoardView
+  - opponentBoardView : BoardView
   - tvTimer : TextView
+  - tvMyRemaining : TextView
   - tvOpponentRemaining : TextView
   - btnQuit : Button
   - board : Board
+  - opponentBoard : Board
   - matchId : int
   - opponent : Player
   - firstCell : Cell
@@ -91,6 +98,7 @@ class ClientHandler #E8F5E9 {
 class ChallengeController #E8F5E9 {
   + handleInvite(handler : ClientHandler, msg : Message) : void
   + handleInviteReply(handler : ClientHandler, msg : Message) : void
+  + handleUpdateStatus(handler : ClientHandler, msg : Message) : void
   + broadcastOnlineList() : void
 }
 
@@ -185,6 +193,7 @@ class MatchResult #FFF3E0 {
 }
 
 class Board #FFF3E0 {
+  - id : int
   - rowCount : int
   - columnCount : int
   - tiles : int[][]
@@ -195,14 +204,15 @@ class Board #FFF3E0 {
 
 ' giao dien
 MainActivity -left- ChallengeConfirmDialog
-MainActivity -right- InvitationDialog
+BaseActivity -right- InvitationDialog
 InvitationDialog -right- MatchActivity
 MatchActivity -right- ResultDialog
 ResultDialog -[norank]- MainActivity
-MainActivity ..|> MessageListener
+MainActivity -up-|> BaseActivity
+BaseActivity ..|> MessageListener
 MatchActivity ..|> MessageListener
 ResultDialog ..|> MessageListener
-MainActivity -[norank]- MatchActivity
+BaseActivity -[norank]- MatchActivity
 
 ' giao dien - mang
 MainActivity -down- ServerConnection

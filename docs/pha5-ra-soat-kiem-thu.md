@@ -124,10 +124,6 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | PB_11 | Thoát giữa ván | Bấm Thoát | Về giao diện chính, máy dừng chơi | |
 | PB_12 | Không lưu kết quả | Chơi xong một ván với máy, xem bảng xếp hạng | Tổng điểm và bảng xếp hạng không đổi | |
 | PB_13 | Trạng thái khi chơi với máy | Người chơi khác xem danh sách online | Người đang chơi với máy hiện trạng thái Luyện tập, vẫn mời được | |
-| SO_1 | Chơi solo khi đã đăng nhập | Ở sảnh bấm Chơi solo | Bàn của mình ở giữa, cột phải là bảng solo, không có máy; trạng thái Luyện tập | |
-| SO_2 | Chơi solo offline | Ở màn đăng nhập (không cần server) bấm Chơi solo offline | Vào ván solo, chơi được bình thường khi server tắt | |
-| SO_3 | Hoàn thành solo | Xóa hết bàn | Dialog Chiến thắng kèm thời gian hoàn thành | |
-| SO_4 | Hết giờ solo | Chờ hết 10 phút | Dialog Hết giờ kèm số ô còn lại | |
 
 **Modul thách đấu và đấu đối kháng.** Tiền điều kiện: A (`hoangnam`) và B (`minhanh`) đăng nhập trên hai máy, đều rỗi.
 
@@ -150,6 +146,7 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | CP_15 | Cả hai tiếp tục | Hai người bấm Tiếp tục | Bắt đầu ván mới với đề mới | |
 | CP_16 | Một bên dừng | A bấm Dừng | Hai máy về giao diện chính; B được báo "Hoàng Nam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
 | CP_17 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
+| CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm OK | C nhận dialog lời mời ngay trên màn chơi với máy; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
 
 ### c. Dữ liệu kiểm thử
 

@@ -30,7 +30,7 @@ pikachu/
 │   └── protocol/   Message, MessageType
 ├── core/src/test/java/...           PathFinderTest, BoardGeneratorTest, BoardTest, BotTest
 ├── app/src/main/java/ptit/e23cnpm01/pikachu/
-│   ├── view/       LoginActivity, MainActivity, RankingActivity, DifficultyActivity,
+│   ├── view/       LoginActivity, BaseActivity, MainActivity, RankingActivity, DifficultyActivity,
 │   │               BotGameActivity, MatchActivity, ChallengeConfirmDialog, InvitationDialog,
 │   │               ResultDialog, BotResultDialog, BoardView
 │   └── network/    ServerConnection, MessageListener, ClientSession
@@ -142,11 +142,10 @@ public abstract class DAO {
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
 | `DifficultyActivity` | `onStartClick()` | lấy độ khó của thẻ đang chọn, mở `BotGameActivity` kèm độ khó |
-| `BotGameActivity` | `onCreate()` | `BoardGenerator.generateBoard(10, 10, 25, seed)`, sao bàn cho máy, tạo `Bot`, gắn bàn vào `BoardView`, chạy `CountDownTimer` 10 phút, hẹn lượt máy đầu tiên bằng `handler.postDelayed(..., bot.getDelayMs())` |
+| `BotGameActivity` | `onCreate()` | `BoardGenerator.generateBoard(10, 10, 25, seed)`, sao bàn cho máy, tạo `Bot`, gắn bàn vào `BoardView`, chạy `CountDownTimer` 10 phút, hẹn lượt máy đầu tiên bằng `handler.postDelayed(..., bot.getDelayMs())`; gửi `UPDATE_STATUS` với `TRAINING` |
 | | `onCellClick()` | lần click đầu lưu `firstCell`; lần thứ hai gọi `PathFinder.checkPath()`; có đường thì `board.removePair()`, vẽ đường, kiểm tra `isCleared()` (xong thì `endGame("WIN")`), kiểm tra bế tắc bằng `findAvailablePair()` và `shuffle()` khi cần; không có đường thì bỏ chọn |
 | | `onBotTurn()` | `bot.nextMove(botBoard)` trên luồng nền; rỗng thì xáo bàn của máy; có cặp thì xóa trên `botBoard` và vẽ nước đi lên bàn thu nhỏ (`botBoardView.showMatch()`), cập nhật số ô của máy; máy hết ô thì `endGame("LOSE")`, chưa thì hẹn lượt tiếp |
-| | `onQuitClick()`, hết giờ | thoát: hủy hẹn giờ, về `MainActivity`; hết giờ: `endGame("DRAW")` |
-| | chế độ solo | không truyền độ khó thì không tạo máy; cột phải hiện bảng solo; xóa hết bàn thì báo hoàn thành kèm thời gian, hết giờ thì báo hết giờ; mở được từ sảnh hoặc từ màn đăng nhập (chưa đăng nhập thì không gửi `UPDATE_STATUS`) |
+| | `onQuitClick()`, hết giờ | thoát: hủy hẹn giờ, về `MainActivity`; hết giờ: `endGame("DRAW")`; khi ván kết thúc hoặc thoát đều gửi `UPDATE_STATUS` với `IDLE` |
 | `BoardView` | `onDraw()`, `onTouchEvent()` | chia khung vẽ thành lưới 12x12, vẽ ảnh nhân vật theo mã hình, viền ô đang chọn, đường nối trong khoảng 300 ms; đổi toạ độ chạm thành `Cell` |
 | `PathFinder`, `BoardGenerator`, `Bot` | | theo thuật toán ở pha 3, mục 8 |
 
@@ -155,12 +154,14 @@ public abstract class DAO {
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
 | `MainActivity` | `onPlayerClick()` | bỏ qua nếu người được chọn đang bận; mở `ChallengeConfirmDialog` với người được chọn |
-| | `onMessage()` | `ONLINE_LIST`: cập nhật danh sách; `INVITE_RECEIVED`: mở `InvitationDialog`; `INVITE_RESULT`: hiện thông báo bị từ chối hoặc đối thủ bận; `MATCH_START`: mở `MatchActivity` |
+| | `onMessage()` | `ONLINE_LIST`: cập nhật danh sách; `INVITE_RESULT`: hiện thông báo bị từ chối hoặc đối thủ bận; các message khác chuyển cho `BaseActivity.onMessage()` |
+| `BaseActivity` | `onMessage()` | `INVITE_RECEIVED`: mở `InvitationDialog` trên màn hình đang mở; `MATCH_START`: đóng màn hình hiện tại (`BotGameActivity` khi đóng thì hủy đồng hồ và lượt của máy) rồi mở `MatchActivity` |
 | `ChallengeConfirmDialog` | `onConfirmClick()` | đóng dialog, trả đối thủ về `MainActivity`; `MainActivity` gửi `INVITE`, hiện "Đang chờ ... trả lời" |
 | | `onCancelClick()` | đóng dialog, không gửi gì lên server |
 | `InvitationDialog` | `onOkClick()`, `onRejectClick()` | gửi `INVITE_REPLY` với `accept` tương ứng |
-| `ChallengeController` | `handleInvite()` | `OnlinePlayerManager.sendInvitation()`; người được mời không rỗi hoặc không online thì gửi `INVITE_RESULT` báo `BUSY` hoặc `OFFLINE` cho người mời |
-| | `handleInviteReply()` | từ chối: gửi `INVITE_RESULT` (`REJECTED`); chấp nhận: kiểm tra lại cả hai còn rỗi, `generateBoard()`, `MatchManager.createMatch()`, `updateStatus(..., BUSY)`, gửi `MATCH_START` cho hai người, rồi `broadcastOnlineList()` |
+| `ChallengeController` | `handleInvite()` | `OnlinePlayerManager.sendInvitation()`; người được mời đang bận hoặc không online thì gửi `INVITE_RESULT` báo `BUSY` hoặc `OFFLINE` cho người mời |
+| | `handleInviteReply()` | từ chối: gửi `INVITE_RESULT` (`REJECTED`); chấp nhận: kiểm tra lại cả hai chưa bận, `generateBoard()`, `MatchManager.createMatch()`, `updateStatus(..., BUSY)`, gửi `MATCH_START` cho hai người, rồi `broadcastOnlineList()` |
+| | `handleUpdateStatus()` | bỏ qua nếu người gửi đang `BUSY`; ngược lại `OnlinePlayerManager.updateStatus()` theo `status` trong message rồi `broadcastOnlineList()` |
 | `MatchActivity` | `onCellClick()` | hai lần click thì gửi `MOVE`; trong lúc chờ phản hồi không nhận thêm click |
 | | `onMessage()` | `MOVE_RESULT`: hợp lệ thì xóa hai ô, vẽ đường; `BOARD_SHUFFLED`: thay bàn; `OPPONENT_PROGRESS`: vẽ nước đi của đối thủ lên bàn thu nhỏ, thay bằng `tiles` server gửi, cập nhật số ô đối thủ; `MATCH_END`: mở `ResultDialog` |
 | `MatchController` | `handleMove()` | khóa `MatchRoom`; từ chối nếu người gửi không thuộc ván `matchId` hoặc ván đã kết thúc (kiểm tra này dùng chung cho `handleLeaveMatch()`, `handleRematchReply()`); lấy bàn của người gửi; `checkPath()`; hợp lệ thì `removePair()`; `isCleared()` thì ghi `finishTime` theo đồng hồ server và `endMatch(room, "CLEARED")`; chưa thì kiểm tra bế tắc, xáo riêng bàn đó và gửi `BOARD_SHUFFLED`; gửi `MOVE_RESULT` cho người gửi, `OPPONENT_PROGRESS` cho đối thủ |

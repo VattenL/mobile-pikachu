@@ -15,7 +15,7 @@ skinparam rectangle {
 
 package "app (Android client)" as app #E3F2FD {
   package "view" as view {
-    rectangle "LoginActivity\nMainActivity\nRankingActivity\nDifficultyActivity\nBotGameActivity\nMatchActivity\nInvitationDialog\nResultDialog\nBotResultDialog\nBoardView" as viewC
+    rectangle "LoginActivity\nBaseActivity\nMainActivity\nRankingActivity\nDifficultyActivity\nBotGameActivity\nMatchActivity\nChallengeConfirmDialog\nInvitationDialog\nResultDialog\nBotResultDialog\nBoardView" as viewC
   }
   package "network" as network {
     rectangle "ServerConnection\nMessageListener\nClientSession" as netC

@@ -29,19 +29,23 @@ rectangle Login [
 rectangle Main [
 {{salt
 {+
-  <b>Hoàng Nam - 11 điểm
-  .
-  Người chơi online
-  {#
-    <b>Tên | <b>Tổng điểm | <b>Trạng thái
-    Minh Anh | 12.5 | Rỗi
-    Quốc Bảo | 10.5 | Bận
-    Thu Hà | 7.5 | Rỗi
-  }
-  .
-  [ Xem bảng xếp hạng ]
-  [   Chơi với máy    ]
-  [     Đăng xuất     ]
+  { {+
+      <b>Hoàng Nam
+      11 điểm
+      .
+      .
+      [ Xem bảng xếp hạng ]
+      [   Chơi với máy    ]
+      [     Đăng xuất     ]
+    } | {+
+      <b>Người chơi online
+      {#
+        <b>Tên | <b>Tổng điểm | <b>Trạng thái
+        Minh Anh | 12.5 | Rỗi
+        Quốc Bảo | 10.5 | Bận
+        Thu Hà | 7.5 | Rỗi
+      }
+    } }
 }
 }}
 ]

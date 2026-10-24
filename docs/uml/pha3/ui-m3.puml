@@ -17,14 +17,16 @@ rectangle Main [
       11 điểm
       .
       <color:blue>Đang chờ Minh Anh trả lời...
-      [ Chơi với máy ] | [ Chơi solo ]
-      [ Xếp hạng ] | [ Đăng xuất ]
+      [ Xem bảng xếp hạng ]
+      [   Chơi với máy    ]
+      [     Đăng xuất     ]
     } | {+
       <b>Người chơi online
       {#
-        Minh Anh | 12.5 | Rỗi | [Thách đấu]
-        Quốc Bảo | 10.5 | Bận | [Thách đấu]
-        Thu Hà | 7.5 | Luyện tập | [Thách đấu]
+        <b>Tên | <b>Tổng điểm | <b>Trạng thái
+        Minh Anh | 12.5 | Rỗi
+        Quốc Bảo | 10.5 | Bận
+        Thu Hà | 7.5 | Luyện tập
       }
     } }
 }
@@ -50,7 +52,7 @@ rectangle Invite [
   .
   Hoàng Nam muốn thách đấu bạn
   .
-  [ Từ chối ] | [ Đồng ý ]
+  [ Reject ] | [ OK ]
 }
 }}
 ]
@@ -95,19 +97,19 @@ rectangle Result [
   <b>Chiến thắng!
   .
   Bạn thắng. Thời gian hoàn thành 06:42.
-  Đánh tiếp ván nữa không?
+  Bạn có muốn tiếp tục không?
   .
   [ Dừng ] | [ Tiếp tục ]
 }
 }}
 ]
 
-Main -left-> Confirm : click Thách đấu
+Main -left-> Confirm : click tên đối thủ
 Confirm -right-> Main : hủy, hoặc xác nhận\n(gửi lời mời, hiện "Đang chờ")
 Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
-Invite -left-> Main : từ chối
-Invite -down-> Match : đồng ý
-Main -down-> Match : đối thủ đồng ý
+Invite -left-> Main : Reject
+Invite -down-> Match : OK
+Main -down-> Match : đối thủ chấp nhận
 Match -right-> Result : kết thúc ván
 Result -up-> Match : cả hai tiếp tục
 Result -up-> Main : dừng
