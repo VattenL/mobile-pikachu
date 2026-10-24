@@ -134,21 +134,22 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | Mã | Mục đích kiểm thử | Các bước thực hiện | Kết quả mong muốn | Kết quả |
 |---|---|---|---|---|
 | CP_1 | Danh sách online | Quan sát giao diện chính hai máy | Mỗi máy thấy người kia với tổng điểm và trạng thái Rỗi | |
-| CP_2 | Gửi lời mời | A click tên B | Máy A hiện "Đang chờ Minh Anh trả lời..."; máy B hiện dialog lời mời | |
-| CP_3 | Từ chối | B bấm Reject | Máy A báo bị từ chối; hai người vẫn rỗi | |
-| CP_4 | Mời người đang bận | C đang trong ván với D; A click tên C | A được báo C đang bận; C không nhận lời mời | |
-| CP_5 | Chấp nhận | B bấm OK | Hai máy vào màn chơi với cùng đề, đồng hồ 10:00, "Đối thủ: 100"; máy thứ ba thấy A, B Bận | |
-| CP_6 | Nối hợp lệ | A nối một cặp | Máy A xóa hai ô; trên máy B, bàn thu nhỏ của A mất đúng hai ô đó (có hiệu ứng nối) và hiện "98 ô"; bàn của B không đổi | |
-| CP_7 | Server là trọng tài | Gửi `MOVE` cho cặp không nối được bằng một client thử | Server trả `ok = false`, bàn trên server không đổi | |
-| CP_8 | Bế tắc riêng một người | Dùng đề thử để bàn của A bế tắc | Chỉ máy A nhận bàn xáo mới; bàn của B giữ nguyên; bàn thu nhỏ của A trên máy B cũng đổi theo bàn mới | |
-| CP_9 | Thắng | A xóa hết ô trước | A: "Bạn thắng" kèm thời gian; B: "Bạn thua" kèm số ô còn lại; kết quả được lưu, tổng điểm cập nhật | |
-| CP_10 | Hoàn thành gần như cùng lúc | A và B cùng còn một cặp, bấm gần như cùng lúc | Chỉ một người thắng (người được server xử lý trước), ván chỉ kết thúc và lưu một lần | |
-| CP_11 | Hết giờ | Để hết 10 phút | Hai bên "Hòa"; lưu hai kết quả DRAW | |
-| CP_12 | Thoát giữa ván | A bấm Thoát | A thua, B thắng; B nhận dialog kết quả | |
-| CP_13 | Mất kết nối giữa ván | Tắt mạng máy A giữa ván | Server xử A thua, B thắng; A không còn trong danh sách online | |
-| CP_14 | Cả hai tiếp tục | Hai người bấm Tiếp tục | Bắt đầu ván mới với đề mới | |
-| CP_15 | Một bên dừng | A bấm Dừng | Hai máy về giao diện chính; B được báo "Hoàng Nam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
-| CP_16 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
+| CP_2 | Gửi lời mời | A click tên B, bấm Xác nhận | Sau khi click tên, máy A hiện dialog xác nhận thách đấu Minh Anh; sau khi xác nhận, máy A hiện "Đang chờ Minh Anh trả lời..."; máy B hiện dialog lời mời | |
+| CP_3 | Hủy thách đấu | A click tên B, bấm Hủy | Dialog xác nhận đóng; máy A vẫn ở giao diện chính, không hiện "Đang chờ"; máy B không nhận lời mời | |
+| CP_4 | Từ chối | B bấm Reject | Máy A báo bị từ chối; hai người vẫn rỗi | |
+| CP_5 | Mời người đang bận | C đang trong ván với D; A click tên C, bấm Xác nhận | A được báo C đang bận; C không nhận lời mời | |
+| CP_6 | Chấp nhận | B bấm OK | Hai máy vào màn chơi với cùng đề, đồng hồ 10:00, "Đối thủ: 100"; máy thứ ba thấy A, B Bận | |
+| CP_7 | Nối hợp lệ | A nối một cặp | Máy A xóa hai ô; trên máy B, bàn thu nhỏ của A mất đúng hai ô đó (có hiệu ứng nối) và hiện "98 ô"; bàn của B không đổi | |
+| CP_8 | Server là trọng tài | Gửi `MOVE` cho cặp không nối được bằng một client thử | Server trả `ok = false`, bàn trên server không đổi | |
+| CP_9 | Bế tắc riêng một người | Dùng đề thử để bàn của A bế tắc | Chỉ máy A nhận bàn xáo mới; bàn của B giữ nguyên; bàn thu nhỏ của A trên máy B cũng đổi theo bàn mới | |
+| CP_10 | Thắng | A xóa hết ô trước | A: "Bạn thắng" kèm thời gian; B: "Bạn thua" kèm số ô còn lại; kết quả được lưu, tổng điểm cập nhật | |
+| CP_11 | Hoàn thành gần như cùng lúc | A và B cùng còn một cặp, bấm gần như cùng lúc | Chỉ một người thắng (người được server xử lý trước), ván chỉ kết thúc và lưu một lần | |
+| CP_12 | Hết giờ | Để hết 10 phút | Hai bên "Hòa"; lưu hai kết quả DRAW | |
+| CP_13 | Thoát giữa ván | A bấm Thoát | A thua, B thắng; B nhận dialog kết quả | |
+| CP_14 | Mất kết nối giữa ván | Tắt mạng máy A giữa ván | Server xử A thua, B thắng; A không còn trong danh sách online | |
+| CP_15 | Cả hai tiếp tục | Hai người bấm Tiếp tục | Bắt đầu ván mới với đề mới | |
+| CP_16 | Một bên dừng | A bấm Dừng | Hai máy về giao diện chính; B được báo "Hoàng Nam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
+| CP_17 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
 
 ### c. Dữ liệu kiểm thử
 
@@ -162,7 +163,7 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
   - có một người gặp cùng một đối thủ hai lần.
 - `server/db/seed-tiebreak.sql`: bộ dữ liệu nhỏ riêng cho VR_9, có hai người cùng tổng điểm và cùng TB điểm đối thủ. Dữ liệu này không trộn vào `seed.sql` để bảng xếp hạng mẫu vẫn khớp kịch bản.
 - Một CSDL rỗng (chỉ chạy `schema.sql`) cho VR_10.
-- Đề thử cố định cho PB_7, CP_8 (bàn gần bế tắc) được nạp bằng seed cố định trong chế độ thử của server.
+- Đề thử cố định cho PB_7, CP_9 (bàn gần bế tắc) được nạp bằng seed cố định trong chế độ thử của server.
 
 ### d. Thực hiện và ghi nhận
 

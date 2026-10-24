@@ -31,8 +31,8 @@ pikachu/
 ├── core/src/test/java/...           PathFinderTest, BoardGeneratorTest, BoardTest, BotTest
 ├── app/src/main/java/ptit/e23cnpm01/pikachu/
 │   ├── view/       LoginActivity, MainActivity, RankingActivity, DifficultyActivity,
-│   │               BotGameActivity, MatchActivity, InvitationDialog, ResultDialog,
-│   │               BotResultDialog, BoardView
+│   │               BotGameActivity, MatchActivity, ChallengeConfirmDialog, InvitationDialog,
+│   │               ResultDialog, BotResultDialog, BoardView
 │   └── network/    ServerConnection, MessageListener, ClientSession
 ├── server/src/main/java/ptit/e23cnpm01/pikachu/server/
 │   ├── controller/ GameServer, ClientHandler, LoginController, RankingController,
@@ -154,8 +154,10 @@ public abstract class DAO {
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
-| `MainActivity` | `onPlayerClick()` | bỏ qua nếu người được chọn đang bận; gửi `INVITE`, hiện "Đang chờ ... trả lời" |
+| `MainActivity` | `onPlayerClick()` | bỏ qua nếu người được chọn đang bận; mở `ChallengeConfirmDialog` với người được chọn |
 | | `onMessage()` | `ONLINE_LIST`: cập nhật danh sách; `INVITE_RECEIVED`: mở `InvitationDialog`; `INVITE_RESULT`: hiện thông báo bị từ chối hoặc đối thủ bận; `MATCH_START`: mở `MatchActivity` |
+| `ChallengeConfirmDialog` | `onConfirmClick()` | đóng dialog, trả đối thủ về `MainActivity`; `MainActivity` gửi `INVITE`, hiện "Đang chờ ... trả lời" |
+| | `onCancelClick()` | đóng dialog, không gửi gì lên server |
 | `InvitationDialog` | `onOkClick()`, `onRejectClick()` | gửi `INVITE_REPLY` với `accept` tương ứng |
 | `ChallengeController` | `handleInvite()` | `OnlinePlayerManager.sendInvitation()`; người được mời không rỗi hoặc không online thì gửi `INVITE_RESULT` báo `BUSY` hoặc `OFFLINE` cho người mời |
 | | `handleInviteReply()` | từ chối: gửi `INVITE_RESULT` (`REJECTED`); chấp nhận: kiểm tra lại cả hai còn rỗi, `generateBoard()`, `MatchManager.createMatch()`, `updateStatus(..., BUSY)`, gửi `MATCH_START` cho hai người, rồi `broadcastOnlineList()` |

@@ -33,5 +33,5 @@ UC05 ..> UC05_2 : <<include>>
 UC05 ..> UC05_1 : <<include>>
 UC05 ..> UC02 : <<include>>
 
-UC05_2 <.. UC05_3 : <<extend>>
+UC05 <.. UC05_3 : <<extend>>
 @enduml

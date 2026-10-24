@@ -31,6 +31,18 @@ rectangle Main [
 }}
 ]
 
+rectangle Confirm [
+{{salt
+{+
+  <b>Xác nhận thách đấu
+  .
+  Bạn muốn thách đấu Minh Anh?
+  .
+  [ Hủy ] | [ Xác nhận ]
+}
+}}
+]
+
 rectangle Invite [
 {{salt
 {+
@@ -90,6 +102,8 @@ rectangle Result [
 }}
 ]
 
+Main -left-> Confirm : click Thách đấu
+Confirm -right-> Main : hủy, hoặc xác nhận\n(gửi lời mời, hiện "Đang chờ")
 Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
 Invite -left-> Main : từ chối
 Invite -down-> Match : đồng ý

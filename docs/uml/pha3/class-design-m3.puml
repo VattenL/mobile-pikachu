@@ -25,6 +25,15 @@ class MainActivity #E3F2FD {
   + onMessage(msg : Message) : void
 }
 
+class ChallengeConfirmDialog #E3F2FD {
+  - tvOpponent : TextView
+  - btnConfirm : Button
+  - btnCancel : Button
+  - opponent : Player
+  + onConfirmClick(v : View) : void
+  + onCancelClick(v : View) : void
+}
+
 class InvitationDialog #E3F2FD {
   - tvChallenger : TextView
   - btnOk : Button
@@ -185,6 +194,7 @@ class Board #FFF3E0 {
 }
 
 ' giao dien
+MainActivity -left- ChallengeConfirmDialog
 MainActivity -right- InvitationDialog
 InvitationDialog -right- MatchActivity
 MatchActivity -right- ResultDialog

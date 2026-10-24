@@ -22,6 +22,12 @@ class MainScreen {
   - subSelectOpponent
 }
 
+class ChallengeConfirmDialog {
+  - outOpponent
+  - subConfirm
+  - subCancel
+}
+
 class InvitationDialog {
   - outChallenger
   - subAccept
@@ -86,6 +92,7 @@ class MatchResult {
   - finishTime
 }
 
+MainScreen -left- ChallengeConfirmDialog
 MainScreen -right- InvitationDialog
 InvitationDialog -right- MatchScreen
 MatchScreen -right- ResultDialog

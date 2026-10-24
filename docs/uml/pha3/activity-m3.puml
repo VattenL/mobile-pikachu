@@ -21,6 +21,10 @@ partition "Xử lí tại MainActivity (máy A)" {
   :Hiển thị danh sách người chơi online;
 }
 ->[click tên B đang rỗi];
+partition "Xử lí tại ChallengeConfirmDialog (máy A)" {
+  :Hiển thị dialog xác nhận thách đấu B;
+}
+->[A click xác nhận];
 partition "Xử lí tại server: ChallengeController.handleInvite()" {
   :Gửi lời mời tới B;
   note right: OnlinePlayerManager:\nsendInvitation()

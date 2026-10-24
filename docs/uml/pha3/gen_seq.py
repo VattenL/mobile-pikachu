@@ -161,6 +161,7 @@ M2_LOOP_NOTE = "(Lặp lại các bước {a} đến {b} cho đến khi một b�
 M3A_PARTS = [
     ("actor", "A", "Người chơi A"),
     ("boundary", "MainActivity", None),
+    ("boundary", "ChallengeConfirmDialog", "ChallengeConfirm\\nDialog"),
     ("boundary", "InvitationDialog", "Invitation\\nDialog"),
     ("boundary", "MatchActivity", None),
     ("control", "ServerConnection", "Server\\nConnection"),
@@ -175,6 +176,10 @@ M3A_PARTS = [
 ]
 M3A = [
     ("msg", "A", "MainActivity", "click tên B", "Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi."),
+    ("call", "MainActivity", "ChallengeConfirmDialog", "gọi", "Lớp `MainActivity` gọi lớp `ChallengeConfirmDialog`."),
+    ("msg", "ChallengeConfirmDialog", "A", "hiển thị", "Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A."),
+    ("msg", "A", "ChallengeConfirmDialog", "click xác nhận", "A click nút Xác nhận."),
+    ("ret", "ChallengeConfirmDialog", "MainActivity", "xác nhận", "Lớp `ChallengeConfirmDialog` trả kết quả xác nhận cho lớp `MainActivity`."),
     ("call", "MainActivity", "ServerConnection", "send(INVITE)", "Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu gửi message `INVITE`."),
     ("msg", "MainActivity", "A", "hiển thị", "Lớp `MainActivity` hiển thị thông báo đang chờ B trả lời cho A."),
     ("msg", "ServerConnection", "ClientHandler", "INVITE (TCP)", "Lớp `ServerConnection` gửi message `INVITE` qua TCP tới lớp `ClientHandler` của A trên server."),

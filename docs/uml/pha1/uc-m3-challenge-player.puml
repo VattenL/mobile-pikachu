@@ -41,5 +41,5 @@ UC07 ..> UC08 : <<include>>
 
 UC08 ..> UC08_1 : <<include>>
 UC08 ..> UC08_2 : <<include>>
-UC08_1 <.. UC08_3 : <<extend>>
+UC08 <.. UC08_3 : <<extend>>
 @enduml

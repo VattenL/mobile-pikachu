@@ -14,7 +14,7 @@ skinparam sequence {
   ActorBackgroundColor #F7F7F7
 }
 autonumber "<b>0:"
-autonumber 38 "<b>0:"
+autonumber 42 "<b>0:"
 
 actor "Người chơi A" as A
 boundary MainActivity

@@ -17,6 +17,7 @@ autonumber "<b>0:"
 
 actor "Người chơi A" as A
 boundary MainActivity
+boundary "ChallengeConfirm\nDialog" as ChallengeConfirmDialog
 boundary "Invitation\nDialog" as InvitationDialog
 boundary MatchActivity
 control "Server\nConnection" as ServerConnection
@@ -30,6 +31,10 @@ entity Match
 actor "Người chơi B" as B
 
 A -> MainActivity : click tên B
+MainActivity -> ChallengeConfirmDialog : gọi
+ChallengeConfirmDialog -> A : hiển thị
+A -> ChallengeConfirmDialog : click xác nhận
+ChallengeConfirmDialog --> MainActivity : xác nhận
 MainActivity -> ServerConnection : send(INVITE)
 MainActivity -> A : hiển thị
 ServerConnection -> ClientHandler : INVITE (TCP)

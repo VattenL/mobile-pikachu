@@ -23,6 +23,7 @@ skinparam entity {
 actor "Người chơi B" as B
 actor "Người chơi A" as A
 
+boundary ChallengeConfirmDialog
 boundary MainScreen
 boundary InvitationDialog
 boundary MatchScreen
@@ -33,30 +34,32 @@ entity PlayerRanking
 entity Match
 entity Board
 
-A -down- MainScreen : "1: click tên đối thủ ↓\n5: hiển thị thông báo chờ ↑\n47: hiển thị ↑"
-B -down- MainScreen : "47: hiển thị ↑"
-B -down- InvitationDialog : "7: hiển thị ↑\n8: click OK ↓"
-A -down- MatchScreen : "19: hiển thị ↑\n<U+002A>20: click hai ô ↓\n<U+002A>30: hiển thị ↑"
-B -down- MatchScreen : "19: hiển thị ↑\n<U+002A>30: hiển thị ↑"
-A -down- ResultDialog : "35: hiển thị ↑\n36: click dừng ↓"
-B -down- ResultDialog : "35: hiển thị ↑"
+A -down- MainScreen : "1: click tên đối thủ ↓\n9: hiển thị thông báo chờ ↑\n51: hiển thị ↑"
+A -down- ChallengeConfirmDialog : "3: hiển thị ↑\n4: click xác nhận ↓"
+B -down- MainScreen : "51: hiển thị ↑"
+B -down- InvitationDialog : "11: hiển thị ↑\n12: click OK ↓"
+A -down- MatchScreen : "23: hiển thị ↑\n<U+002A>24: click hai ô ↓\n<U+002A>34: hiển thị ↑"
+B -down- MatchScreen : "23: hiển thị ↑\n<U+002A>34: hiển thị ↑"
+A -down- ResultDialog : "39: hiển thị ↑\n40: click dừng ↓"
+B -down- ResultDialog : "39: hiển thị ↑"
 
-MainScreen -right- InvitationDialog : "6: gọi →"
-InvitationDialog -right- MatchScreen : "18: gọi →"
-MatchScreen -right- ResultDialog : "34: gọi →"
-ResultDialog -[norank]- MainScreen : "40: gọi ←"
+ChallengeConfirmDialog -right- MainScreen : "2: gọi ←\n5: trả về →"
+MainScreen -right- InvitationDialog : "10: gọi →"
+InvitationDialog -right- MatchScreen : "22: gọi →"
+MatchScreen -right- ResultDialog : "38: gọi →"
+ResultDialog -[norank]- MainScreen : "44: gọi ←"
 
-MainScreen -down- Player : "2: gọi ↓\n4: trả về ↑\n41: gọi ↓\n43: trả về ↑"
-MainScreen -down- PlayerRanking : "44: gọi ↓\n46: trả về ↑"
-InvitationDialog -down- Board : "9: gọi ↓\n11: trả về ↑"
-InvitationDialog -down- Match : "12: gọi ↓\n14: trả về ↑"
-InvitationDialog -down- Player : "15: gọi ↓\n17: trả về ↑"
-MatchScreen -down- Board : "<U+002A>21: gọi ↓\n<U+002A>23: trả về ↑\n<U+002A>24: gọi ↓\n<U+002A>26: trả về ↑\n<U+002A>27: gọi ↓\n<U+002A>29: trả về ↑"
-MatchScreen -down- Match : "31: gọi ↓\n33: trả về ↑"
-ResultDialog -down- Player : "37: gọi ↓\n39: trả về ↑"
+MainScreen -down- Player : "6: gọi ↓\n8: trả về ↑\n45: gọi ↓\n47: trả về ↑"
+MainScreen -down- PlayerRanking : "48: gọi ↓\n50: trả về ↑"
+InvitationDialog -down- Board : "13: gọi ↓\n15: trả về ↑"
+InvitationDialog -down- Match : "16: gọi ↓\n18: trả về ↑"
+InvitationDialog -down- Player : "19: gọi ↓\n21: trả về ↑"
+MatchScreen -down- Board : "<U+002A>25: gọi ↓\n<U+002A>27: trả về ↑\n<U+002A>28: gọi ↓\n<U+002A>30: trả về ↑\n<U+002A>31: gọi ↓\n<U+002A>33: trả về ↑"
+MatchScreen -down- Match : "35: gọi ↓\n37: trả về ↑"
+ResultDialog -down- Player : "41: gọi ↓\n43: trả về ↑"
 
-Player -[norank]- Player : "3: sendInvitation()\n16: updateStatus()\n38: updateStatus()\n42: getOnlinePlayers()"
-PlayerRanking -[norank]- PlayerRanking : "45: getTotalPoints()"
-Match -[norank]- Match : "13: createMatch()\n32: saveMatch()"
-Board -[norank]- Board : "10: generateBoard()\n<U+002A>22: checkPath()\n<U+002A>25: removePair()\n<U+002A>28: isCleared()"
+Player -[norank]- Player : "7: sendInvitation()\n20: updateStatus()\n42: updateStatus()\n46: getOnlinePlayers()"
+PlayerRanking -[norank]- PlayerRanking : "49: getTotalPoints()"
+Match -[norank]- Match : "17: createMatch()\n36: saveMatch()"
+Board -[norank]- Board : "14: generateBoard()\n<U+002A>26: checkPath()\n<U+002A>29: removePair()\n<U+002A>32: isCleared()"
 @enduml
