@@ -17,13 +17,14 @@ Tài liệu đi theo quy trình phát triển hướng đối tượng của bà
 
 ## Các modul của hệ thống
 
-Lấy theo 3 chức năng của đề. Mã modul dùng xuyên suốt tài liệu.
+Lấy theo các chức năng của đề. Dòng Dễ của đề (quản lí thông tin người chơi, xem BXH) tách thành hai modul M1 và M4, để mỗi người trong nhóm có một chức năng dễ. Mã modul dùng xuyên suốt tài liệu.
 
 | Mã | Modul | Mức | Nội dung |
 | --- | --- | --- | --- |
-| M1 | Quản lí thông tin người chơi, xem BXH | Dễ | Đăng ký, đăng nhập, đăng xuất, xem bảng xếp hạng |
+| M1 | Xem bảng xếp hạng | Dễ | Đăng nhập, xem bảng xếp hạng theo ba tiêu chí |
 | M2 | Thi đấu với máy | Trung bình | Chọn độ khó, đua với bot trên cùng một đề, xem kết quả |
 | M3 | Thách đấu và đấu đối kháng | Khó | Xem danh sách online, thách đấu, trả lời lời mời, chơi ván đối kháng, chọn tiếp tục / dừng |
+| M4 | Quản lý tài khoản | Dễ | Đăng ký, đăng nhập, đăng xuất |
 
 Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use case tổng quan, lớp thực thể, CSDL) làm một lần. Từ kịch bản trở đi, mỗi modul làm riêng một bộ.
 
@@ -59,7 +60,7 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
   - Bước 1, actor: `Người chơi`; người bị thách đấu là actor gián tiếp của use case thách đấu.
   - Bước 2, mỗi chức năng ở §1.2 thành một use case.
   - Bước 3, mịn hóa: gộp các use case trùng nhau, dùng use case trừu tượng nếu cần.
-- **Use case chi tiết cho từng modul M1, M2, M3:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
+- **Use case chi tiết cho từng modul M1 đến M4:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
 - Ví dụ use case con: `Nối cặp ô` được cả M2 và M3 include; `Trả lời lời mời` (M3).
 - Quy tắc: tên use case là động từ chỉ hành động của actor; mỗi use case có đường đi tới ít nhất một actor; mã use case (UC01, UC02...) giữ nguyên từ biểu đồ tổng quan sang biểu đồ chi tiết.
 
@@ -180,7 +181,7 @@ Mỗi thuật toán có mã giả và hình minh họa.
 
 ### 4.2. Cài đặt các modul (§5.2)
 
-- Mỗi modul M1, M2, M3: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
+- Mỗi modul M1 đến M4: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
 
 ### 4.3. Kiểm thử đơn vị (§5.3)
 
@@ -237,16 +238,28 @@ pikachu/
 
 ## 2. Nguyên tắc chia việc
 
-- **Dev A** sở hữu `core` và màn chơi trên `app`.
-- **Dev B** sở hữu `server` và các màn liên quan mạng trên `app` (đăng nhập, lobby, BXH) cùng tầng network client.
-- Mỗi người chỉ sửa code thuộc phần mình sở hữu; thay đổi interface dùng chung phải báo người kia.
+Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia theo chức năng (use case), không theo tầng, nên mỗi người viết cả client lẫn server cho phần của mình:
+
+| Mức | Dev 1 | Dev 2 |
+| --- | --- | --- |
+| Dễ | Quản lý tài khoản: đăng ký, đăng nhập, đăng xuất (M4) | Xem bảng xếp hạng (M1) |
+| Trung bình | Thi đấu với máy (M2), gồm engine `core` | Thách đấu và trả lời lời mời (thuộc M3) |
+| Khó | Đấu đối kháng online: chơi ván và trọng tài (thuộc M3) | Kết thúc ván và tái đấu (thuộc M3) |
+
+- **Hạ tầng chung do Dev 2 dựng trước:** `GameServer`, `ClientHandler`, `ServerConnection`, `MessageListener`, `Message`, lớp `DAO`, script tạo CSDL và dữ liệu mẫu. Dev 1 đã nhận phần thuật toán nặng nhất (`core`, bot, trọng tài) nên không nhận thêm hạ tầng.
+- **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
+  - Dev 1: `handleMove()`, `MatchManager`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
+  - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `MatchDAO`, `ResultDialog`.
+  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.8, kịch bản v3 và biểu đồ tuần tự M3 cho khớp.
+- `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
+- Mỗi người chỉ sửa code thuộc phần mình; thay đổi interface dùng chung (mục 5) phải báo người kia.
 - Đề yêu cầu "server lưu toàn bộ thông tin", nên CSDL và tài khoản nằm trên server ngay từ Phase 1, không làm bản offline rồi bỏ.
 
 ## 3. Phase 1: Nền tảng (2 người làm song song)
 
-### Dev A: game engine và chơi với máy
+### Dev 1: engine, chơi với máy, tài khoản
 
-**Sản phẩm:** app chơi đơn và đấu máy hoàn chỉnh, chạy offline.
+**Sản phẩm:** đấu máy hoàn chỉnh; đăng ký, đăng nhập, đăng xuất chạy được với server.
 
 - `core`:
   - Mô hình bàn chơi lưới 12x12 (10x10 + viền).
@@ -254,51 +267,47 @@ pikachu/
   - `BoardGenerator`: sinh đề, kiểm tra bế tắc, xáo bài (có seed).
   - `Bot`: tìm cặp hợp lệ, `T_delay` theo mức độ.
   - Unit test cho toàn bộ phần trên.
-- `app`:
-  - Màn bàn chơi: vẽ 10x10 ô ảnh, chọn 2 ô, vẽ đường nối, ẩn ô.
-  - Đồng hồ, nút Thoát, màn kết quả.
-  - Chế độ đấu máy: người và bot đua trên cùng một đề.
+- `app`, chơi với máy:
+  - `BoardView`: vẽ 10x10 ô ảnh, chọn 2 ô, vẽ đường nối, ẩn ô.
+  - Màn chọn độ khó, màn đấu máy (người và bot đua trên cùng một đề), đồng hồ, nút Thoát, dialog kết quả.
+  - Gửi `UPDATE_STATUS` (luyện tập / rỗi) khi bắt đầu và kết thúc ván với máy.
+- Tài khoản (làm sau `core`, khi hạ tầng của Dev 2 đã chạy):
+  - Màn Đăng nhập / Đăng ký, `ClientSession`.
+  - Server: `LoginController` (đăng ký, đăng nhập, đăng xuất, chặn một tài khoản đăng nhập ở hai máy), `PlayerDAO` (`checkLogin()`, `addPlayer()`, băm mật khẩu).
 
-### Dev B: server, tài khoản, bảng xếp hạng
+### Dev 2: hạ tầng, sảnh, bảng xếp hạng
 
-**Sản phẩm:** server chạy được, client đăng nhập được, xem được danh sách online và BXH.
+**Sản phẩm:** server chạy được, client kết nối được, xem được danh sách online và bảng xếp hạng.
 
-- `server`:
-  - `ServerSocket` đa luồng, mỗi client một `ClientHandler`.
-  - Quản lý session, danh sách online, trạng thái rỗi / luyện tập / bận.
-  - CSDL: các bảng `tblPlayer`, `tblMatch`, `tblMatchResult` (như Phần I §3.2); đăng ký, đăng nhập (hash mật khẩu).
-  - Truy vấn BXH 3 tiêu chí. Có thể nhập sẵn dữ liệu trận giả để test.
-- `app`:
+- Hạ tầng (làm trước, Dev 1 cần cho phần tài khoản):
+  - `ServerSocket` đa luồng, mỗi client một `ClientHandler`; `Message` và danh sách loại message.
   - Tầng network client: kết nối, gửi/nhận message JSON trên luồng nền, đẩy sự kiện về UI thread.
-  - Màn Đăng nhập / Đăng ký, Lobby (danh sách online), Bảng xếp hạng.
+  - CSDL: các bảng `tblPlayer`, `tblMatch`, `tblMatchResult` (như Phần I §3.2), lớp `DAO`, dữ liệu mẫu.
+- Sảnh: `OnlinePlayerManager` (danh sách online, trạng thái rỗi / luyện tập / bận), màn chính với danh sách online, tự đẩy `ONLINE_LIST`.
+- Bảng xếp hạng: `PlayerRankingDAO` (truy vấn 3 tiêu chí, đồng hạng; tổng điểm cho danh sách online), `RankingController`, màn Bảng xếp hạng. Có thể nhập sẵn dữ liệu trận giả để test.
 
 ### Việc chung ngày đầu
 
-- Tạo cấu trúc 3 module (Dev A tạo `core`, Dev B tạo `server`).
+- Tạo cấu trúc 3 module (Dev 1 tạo `core`, Dev 2 tạo `server`).
 - Thống nhất interface `core` (mục 5.1) và danh sách message (mục 5.2).
 
 ## 4. Phase 2: Đối kháng online
 
-### Dev A: luồng trận đấu phía client
+### Dev 1: chơi ván và trọng tài
 
-- Màn bàn chơi nhận đề từ server thay vì tự sinh.
-- Gửi nước đi lên server, cập nhật bàn theo phản hồi; thay bàn khi nhận `BOARD_SHUFFLED`; hiện số ô còn lại của đối thủ theo `OPPONENT_PROGRESS`.
-- Nút Thoát gửi `LEAVE_MATCH`.
-- Dialog: nhận lời thách đấu (OK / Reject), kết quả ván (thắng / hòa / thua), hỏi tiếp tục, thông báo đối thủ đã thoát.
+- `MatchActivity`: nhận đề từ server thay vì tự sinh; gửi `MOVE`, cập nhật bàn theo `MOVE_RESULT`; thay bàn khi nhận `BOARD_SHUFFLED`; vẽ bàn thu nhỏ và số ô còn lại của đối thủ theo `OPPONENT_PROGRESS`; nút Thoát gửi `LEAVE_MATCH`.
+- `MatchManager`, `MatchRoom`: tạo phòng với một bản bàn riêng cho mỗi người (cùng đề ban đầu), các thao tác trên phòng được đồng bộ.
+- `MatchController.handleMove()`: kiểm tra nước đi bằng `PathFinder` trên bàn của chính người gửi, ghi nhận thời điểm hoàn thành theo đồng hồ server; bàn của ai bế tắc thì xáo riêng bàn đó và gửi `BOARD_SHUFFLED` cho người đó; hết ô thì gọi `endMatch()` của Dev 2.
 
-### Dev B: phòng chơi và trọng tài
+### Dev 2: thách đấu, kết thúc ván và tái đấu
 
-- Luồng thách đấu: chuyển lời mời, phản hồi, đối thủ đang bận.
-- Tạo phòng, sinh đề bằng `core`, gửi cùng đề ban đầu cho 2 client; server giữ một bản bàn riêng cho mỗi người.
-- Kiểm tra nước đi bằng `PathFinder` trên bàn của chính người gửi, ghi nhận thời điểm hoàn thành của mỗi bên theo đồng hồ server.
-- Khi bàn của một người bế tắc: xáo riêng bàn đó, gửi `BOARD_SHUFFLED` cho người đó.
-- Server giữ đồng hồ 10 phút và tự kết thúc ván khi hết giờ; client chỉ hiển thị.
-- Xác định kết quả, tính điểm, lưu CSDL, gửi kết quả cho 2 bên.
-- Xử lý tái đấu, một bên dừng, mất kết nối giữa trận (xử thua).
+- Thách đấu và trả lời lời mời: `ChallengeConfirmDialog`, `InvitationDialog`, `BaseActivity` (nhận lời mời ở mọi màn hình), `ChallengeController` (`INVITE`, `INVITE_REPLY`, `UPDATE_STATUS`, người được mời đang bận, hai người mời nhau cùng lúc); khi đồng ý thì sinh đề, gọi `MatchManager.createMatch()` của Dev 1, gửi `MATCH_START`.
+- Kết thúc ván: `endMatch()` xác định kết quả theo lý do (xóa hết ô, hết giờ, thoát, mất kết nối) và chỉ kết thúc một lần dù hai người về đích gần như cùng lúc; bộ hẹn giờ 10 phút và `onTimeout()`; `handleLeaveMatch()`; mất kết nối giữa ván bị xử thua; `MatchDAO.saveMatch()` lưu ván và hai kết quả trong một giao dịch; gửi `MATCH_END`.
+- Tái đấu: `ResultDialog`, `handleRematchReply()`: cả hai tiếp tục thì bắt đầu ván mới; một người dừng (hoặc mất kết nối ở dialog tiếp tục) thì gửi `OPPONENT_LEFT`, trả hai người về rỗi, gửi lại danh sách online.
 
 ## 5. Hợp đồng giao tiếp
 
-### 5.1. Interface `core` (Dev A cung cấp)
+### 5.1. Interface `core` (Dev 1 cung cấp)
 
 Chữ ký dự kiến, chốt chi tiết ngày đầu. Tên phương thức giữ đúng tên ở biểu đồ lớp phân tích (`docs/pha2-phan-tich.md`) để truy vết được:
 
@@ -338,7 +347,7 @@ public final class Bot {
 }
 ```
 
-### 5.2. Giao thức message (Dev B chốt trước khi vào Phase 2)
+### 5.2. Giao thức message (Dev 2 chốt trước khi vào Phase 2)
 
 JSON, mỗi message một dòng, trường `type` xác định loại:
 
@@ -371,25 +380,29 @@ Ván mới sau khi cả hai chọn Tiếp tục bắt đầu bằng một `MATCH
 
 ## 6. Cân bằng khối lượng
 
-| Tiêu chí | Dev A | Dev B |
+| Tiêu chí | Dev 1 | Dev 2 |
 | --- | --- | --- |
-| Phase 1 | Khó nhất: thuật toán nối ô, bot | Khó nhất: server đa luồng, network client |
-| Phase 2 | Nhẹ hơn: gắn UI vào luồng mạng | Nặng hơn: phòng chơi, trọng tài, đồng bộ |
-| Phụ thuộc | Phase 2 cần message từ Dev B | Phase 2 cần `core` của Dev A |
-| Rủi ro xung đột | Thấp: chủ yếu sửa `core` và màn chơi | Thấp: chủ yếu sửa `server` và màn lobby |
+| Phase 1 | Nặng: thuật toán nối ô, sinh đề, bot, màn đấu máy; thêm tài khoản | Nặng: server đa luồng, network client, CSDL; sảnh và bảng xếp hạng nhẹ hơn |
+| Phase 2 | Vừa: trọng tài và màn đấu online | Nặng: lời mời, mọi cách kết thúc ván, tái đấu, các tình huống biên |
+| Phụ thuộc | Tài khoản cần hạ tầng của Dev 2; ván online cần `MATCH_START` của Dev 2 | Sinh đề cần `core` của Dev 1; kết thúc ván cần `MatchRoom` của Dev 1 |
+| Rủi ro xung đột | Trung bình: `MatchController` làm chung (ranh giới ở mục 2) | Trung bình: như trên |
 
-Ở Phase 2, Dev A xong sớm hơn có thể nhận thêm: kiểm thử tích hợp, vẽ sơ đồ cho tài liệu.
+Dev 1 xong Phase 2 sớm hơn có thể nhận thêm: kiểm thử tích hợp, vẽ sơ đồ cho tài liệu.
 
 ## 7. Phân công tài liệu đặc tả
 
-Chia theo modul, khớp với phần code mỗi người sở hữu:
+Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong một modul, ai làm chức năng nào thì viết phần đó:
 
 | Phần tài liệu | Người làm |
 | --- | --- |
 | Phần dùng chung: §1.1, §1.2, use case tổng quan §1.3, §1.4, lớp thực thể §2.2, §3.1, CSDL §3.2 | Cả hai, làm trước khi tách modul |
-| Modul M2 (thi đấu với máy), từ use case chi tiết đến kiểm thử; thuật toán §3.5 | Dev A |
-| Modul M1 (người chơi, BXH), từ use case chi tiết đến kiểm thử; giao thức §3.4 | Dev B |
-| Modul M3 (đối kháng): Dev B chủ trì; Dev A làm phần giao diện (§2.3, §3.3.1 bước 1-2) | Dev B + Dev A |
+| M4 (quản lý tài khoản), từ use case chi tiết đến kiểm thử | Dev 1 |
+| M1 (xem bảng xếp hạng), từ use case chi tiết đến kiểm thử | Dev 2 |
+| M2 (thi đấu với máy), từ use case chi tiết đến kiểm thử; thuật toán §3.5 | Dev 1 |
+| M3, phần thách đấu và trả lời lời mời (kịch bản bước 1–6 và các ngoại lệ 4a–6a) | Dev 2 |
+| M3, phần chơi ván (kịch bản bước 7–9, ngoại lệ 8a, 8b) | Dev 1 |
+| M3, phần kết thúc ván và tái đấu (kịch bản bước 10–12, ngoại lệ 6b, 10a, 10b, 12a) | Dev 2 |
+| Giao thức §3.4 | Dev 2 |
 | Thiết kế triển khai §3.3.3, tổ chức dự án §4.1, rà soát §5.1 | Cả hai |
 
 ## 8. Vấn đề cần chốt

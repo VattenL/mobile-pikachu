@@ -1,0 +1,72 @@
+@startuml activity-m4
+title Biểu đồ hoạt động - Modul Manage Account
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam activity {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+skinparam partition {
+  BorderColor #9E9E9E
+}
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #9E9E9E
+}
+
+start
+partition "Xử lí tại LoginActivity" {
+  :Hiển thị giao diện đăng nhập;
+}
+->[click đăng ký];
+repeat
+  partition "Xử lí tại RegisterActivity" {
+    :Nhận tên đăng nhập, mật khẩu,\nmật khẩu nhập lại, tên hiển thị;
+    :Kiểm tra không ô nào rỗng,\nmật khẩu nhập lại khớp;
+    :Gửi message REGISTER;
+  }
+  partition "Xử lí tại server: LoginController.handleRegister()" {
+    :Băm mật khẩu, thêm người chơi mới;
+    note right: PlayerDAO:\naddPlayer()
+    :Gửi REGISTER_RESULT;
+  }
+repeat while () is ([tên đăng nhập đã tồn tại])
+->[đăng ký thành công];
+repeat
+  partition "Xử lí tại LoginActivity " {
+    :Hiển thị tên đăng nhập vừa đăng ký;
+    :Nhận mật khẩu, gửi message LOGIN;
+  }
+  partition "Xử lí tại server: LoginController.handleLogin()" {
+    :Kiểm tra tài khoản;
+    note right: PlayerDAO:\ncheckLogin()
+    :Thêm vào danh sách online;
+    note right: OnlinePlayerManager:\naddOnlinePlayer()
+    :Gửi LOGIN_RESULT;
+  }
+repeat while () is ([sai tài khoản hoặc\nđang đăng nhập nơi khác])
+->[đăng nhập thành công];
+partition "Xử lí tại LoginActivity  " {
+  :Lưu người chơi vào ClientSession;
+}
+partition "Xử lí tại MainActivity" {
+  :Hiển thị giao diện chính;
+}
+->[click đăng xuất];
+partition "Xử lí tại MainActivity " {
+  :Gửi message LOGOUT;
+  :Xóa người chơi khỏi ClientSession;
+}
+partition "Xử lí tại server: LoginController.handleLogout()" {
+  :Xóa khỏi danh sách online;
+  note right: OnlinePlayerManager:\nremoveOnlinePlayer()
+  :Gửi lại danh sách online cho người khác;
+  note right: ChallengeController:\nbroadcastOnlineList()
+}
+partition "Xử lí tại LoginActivity   " {
+  :Hiển thị giao diện đăng nhập;
+}
+stop
+@enduml

@@ -1,5 +1,5 @@
-@startuml uc-m3-challenge-player
-title Biểu đồ use case chi tiết - Modul Challenge Player
+@startuml uc-m3-play-online-match
+title Biểu đồ use case chi tiết - Modul Play Online Match
 
 left to right direction
 skinparam linetype polyline
@@ -19,26 +19,21 @@ skinparam actor {
 
 actor "Player" as Player
 
-rectangle "Modul: Challenge Player" {
+rectangle "Modul: Play Online Match" {
+  usecase "Play Online Match" as UC08
+  usecase "Login" as UC02
   usecase "Challenge Player" as UC06
   usecase "Respond To Challenge" as UC07
-  usecase "Select Opponent" as UC06_1
-  usecase "Login" as UC02
-  usecase "Play Online Match" as UC08
   usecase "Match Tiles" as UC08_1
   usecase "Decide To Continue" as UC08_2
   usecase "Quit Match" as UC08_3
 }
 
-Player --> UC06
-Player --> UC07
+Player --> UC08
 
-UC06 ..> UC06_1 : <<include>>
-UC06 ..> UC02 : <<include>>
-UC06 ..> UC08 : <<include>>
-UC07 ..> UC02 : <<include>>
-UC07 ..> UC08 : <<include>>
-
+UC08 ..> UC02 : <<include>>
+UC08 ..> UC06 : <<include>>
+UC08 ..> UC07 : <<include>>
 UC08 ..> UC08_1 : <<include>>
 UC08 ..> UC08_2 : <<include>>
 UC08 <.. UC08_3 : <<extend>>

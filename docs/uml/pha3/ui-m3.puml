@@ -1,5 +1,5 @@
 @startuml ui-m3
-title Thiết kế giao diện - Modul Challenge Player (màn hình ngang)
+title Thiết kế giao diện - Modul Play Online Match (màn hình ngang)
 
 skinparam shadowing false
 skinparam defaultFontSize 12

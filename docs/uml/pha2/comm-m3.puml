@@ -1,5 +1,5 @@
 @startuml comm-m3
-title Biểu đồ giao tiếp - Modul Challenge Player
+title Biểu đồ giao tiếp - Modul Play Online Match
 
 skinparam shadowing false
 skinparam linetype polyline

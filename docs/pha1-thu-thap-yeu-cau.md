@@ -79,7 +79,7 @@ Những chức năng không đề cập đến thì không thuộc phạm vi c�
 
 ### Bước 3: Hoạt động nghiệp vụ của các chức năng
 
-Mô tả chi tiết ba chức năng được chọn làm modul phân tích, thiết kế:
+Mô tả chi tiết bốn chức năng được chọn làm modul phân tích, thiết kế:
 
 - Người chơi xem bảng xếp hạng: Người chơi mở ứng dụng → giao diện đăng nhập hiện lên → người chơi nhập tên đăng nhập, mật khẩu và bấm Đăng nhập → hệ thống kiểm tra tài khoản, nếu đúng thì hiện giao diện chính gồm danh sách người chơi online (tên, tổng điểm, trạng thái) và các nút Xem bảng xếp hạng, Chơi với máy, Đăng xuất → người chơi bấm Xem bảng xếp hạng → hệ thống hiện bảng xếp hạng toàn bộ người chơi, sắp xếp theo tổng điểm giảm dần; nếu bằng nhau thì theo trung bình điểm của các đối thủ đã gặp giảm dần; nếu vẫn bằng nhau thì theo trung bình thời gian hoàn thành các ván thắng tăng dần → người chơi bấm Quay lại để về giao diện chính.
 
@@ -87,7 +87,7 @@ Mô tả chi tiết ba chức năng được chọn làm modul phân tích, thi�
 
 - Người chơi thách đấu và đấu đối kháng: Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi trong danh sách online → hệ thống hiện dialog xác nhận thách đấu B với hai nút Xác nhận và Hủy, đề phòng A bấm nhầm; nếu A bấm Hủy thì quay lại giao diện chính → A bấm Xác nhận thì hệ thống gửi lời mời tới B và báo A đang chờ trả lời → trên máy của B hiện dialog lời mời với hai nút OK và Reject → nếu B bấm Reject thì hệ thống báo A bị từ chối; nếu B bấm OK thì server tạo ván đấu, sinh một đề bài, gửi cùng đề cho cả hai máy và chuyển trạng thái hai người sang bận → hai người cùng chơi trên đề bài đó trong 10 phút, mỗi lần click một cặp ô thì server kiểm tra đường nối và báo kết quả; mỗi người xóa cặp trên bàn của riêng mình; nếu bàn của một người bị bế tắc thì server xáo lại bàn đó và chỉ gửi bàn mới cho người đó → người xóa hết ô trước thắng; hết giờ mà cả hai chưa xong thì hòa; người bấm Thoát hoặc mất kết nối giữa ván bị xử thua → server lưu kết quả ván, cập nhật điểm và gửi kết quả cho cả hai → mỗi máy hiện dialog kết quả kèm câu hỏi có muốn tiếp tục không → nếu cả hai chọn tiếp tục thì bắt đầu ván mới với đề bài mới; nếu một người dừng thì cả hai về giao diện chính, server báo cho người còn lại biết đối thủ đã dừng chơi, trạng thái hai người trở về rỗi.
 
-Các chức năng đăng ký, đăng nhập, đăng xuất là chức năng thông thường, không mô tả chi tiết.
+- Người chơi quản lý tài khoản: Người chơi mở ứng dụng → giao diện đăng nhập hiện lên → người chơi chưa có tài khoản bấm Đăng ký → hệ thống hiện giao diện đăng ký gồm tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị → người chơi nhập và bấm Đăng ký → hệ thống kiểm tra không ô nào để trống, mật khẩu nhập lại khớp và tên đăng nhập chưa có ai dùng; nếu không hợp lệ thì báo lỗi; nếu hợp lệ thì lưu tài khoản (mật khẩu được băm, không lưu bản gốc) và đưa người chơi về giao diện đăng nhập với tên đăng nhập điền sẵn → người chơi nhập mật khẩu và bấm Đăng nhập → hệ thống kiểm tra tài khoản, từ chối nếu sai hoặc nếu tài khoản đang đăng nhập ở máy khác; nếu đúng thì đưa người chơi vào danh sách online với trạng thái rỗi và hiện giao diện chính → khi muốn thoát, người chơi bấm Đăng xuất → hệ thống xóa người chơi khỏi danh sách online, cập nhật danh sách trên máy những người chơi khác và đưa người chơi về giao diện đăng nhập.
 
 ### Bước 4: Thông tin các đối tượng cần xử lý, quản lý
 
@@ -115,7 +115,7 @@ Từ bước 2 của mục 2, mọi chức năng đều do người chơi thực
 
 Mỗi chức năng ở bước 2 được đề xuất thành một use case. Sau khi mịn hóa:
 
-- Thách đấu và trả lời lời mời là hai hành động khác nhau của hai người chơi, nhưng đều dẫn tới cùng một việc là chơi một ván đối kháng. Vì vậy phần chơi ván được tách thành use case `Play Online Match`, được cả `Challenge Player` và `Respond To Challenge` include.
+- Thách đấu, trả lời lời mời và chơi ván là các bước của cùng một phiên đấu đối kháng giữa hai người chơi: người thách đấu gửi lời mời, người được mời trả lời, rồi cả hai cùng chơi. Vì vậy chức năng này là một use case chính `Play Online Match` có cả hai người chơi tham gia, include `Challenge Player` (phần của người thách đấu) và `Respond To Challenge` (phần của người được mời). Mỗi lần thực hiện gồm đúng một lời mời và một lần trả lời: bị từ chối thì dừng sớm, cả hai chọn tiếp tục thì đấu thêm ván mà không mời lại.
 - Xem danh sách người chơi online không tách thành use case riêng vì đây là giao diện chính sau khi đăng nhập, dùng để chọn đối thủ trong `Challenge Player`.
 
 Biểu đồ use case tổng quan như Hình 1.1.
@@ -131,9 +131,9 @@ Biểu đồ use case tổng quan như Hình 1.1.
 | 3 | `Logout` | Cho phép người chơi đăng xuất khỏi hệ thống |
 | 4 | `View Ranking` | Cho phép người chơi xem bảng xếp hạng toàn bộ người chơi |
 | 5 | `Play With Bot` | Cho phép người chơi chọn độ khó và chơi một ván với máy |
-| 6 | `Challenge Player` | Cho phép người chơi mời một người chơi đang rỗi đấu một ván |
-| 7 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời thách đấu |
-| 8 | `Play Online Match` | Cho phép hai người chơi đấu một ván trên cùng đề bài, server làm trọng tài |
+| 6 | `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu đối kháng trên cùng đề bài, server làm trọng tài |
+| 7 | `Challenge Player` | Cho phép người chơi chọn một người chơi đang rỗi, xác nhận và gửi lời mời đấu |
+| 8 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời thách đấu |
 
 ### b. Use case chi tiết cho modul xem bảng xếp hạng
 
@@ -185,28 +185,49 @@ Biểu đồ use case chi tiết như Hình 1.3.
 Trong chức năng thách đấu, hai người chơi tương tác với các giao diện:
 
 - Giao diện đăng nhập → thống nhất với UC `Login`.
-- Danh sách người chơi online trên giao diện chính, nơi người chơi click tên đối thủ, và dialog xác nhận thách đấu ngay sau đó → đề xuất UC `Select Opponent`. Dialog xác nhận chỉ để chống bấm nhầm, là một phần của việc chọn đối thủ nên không tách thành UC riêng.
+- Danh sách người chơi online trên giao diện chính, nơi người chơi click tên đối thủ, và dialog xác nhận thách đấu ngay sau đó → thống nhất với UC `Challenge Player`. Chọn đối thủ và xác nhận là toàn bộ việc thách đấu, nên không tách thêm UC chọn đối thủ; dialog xác nhận chỉ để chống bấm nhầm.
 - Dialog lời mời trên máy người được mời → thống nhất với UC `Respond To Challenge`.
 - Giao diện bàn chơi → đề xuất UC `Match Tiles`; nút Thoát → đề xuất UC `Quit Match`.
 - Dialog kết quả hỏi có muốn tiếp tục không → đề xuất UC `Decide To Continue`.
-- Người thách đấu phải đăng nhập và chọn đối thủ, do đó `Challenge Player` include `Login` và `Select Opponent`. Người được mời cũng phải đăng nhập, do đó `Respond To Challenge` include `Login`.
-- Một ván đối kháng luôn gồm việc nối các cặp ô và việc chọn tiếp tục hay dừng ở cuối ván, do đó `Play Online Match` include `Match Tiles` và `Decide To Continue`.
-- Thoát giữa ván không bắt buộc và có thể xảy ra bất cứ lúc nào trong ván, kể cả trước khi nối cặp nào, do đó `Quit Match` extend `Play Online Match`. Cả người thách đấu và người được mời đều thoát được, nên `Quit Match` gắn vào `Play Online Match` chứ không gắn vào `Challenge Player`.
+- Mỗi phiên đấu luôn cần hai người chơi đã đăng nhập, một lời mời, một lần trả lời, các lượt nối cặp ô và lựa chọn tiếp tục hay dừng ở cuối mỗi ván, do đó `Play Online Match` include `Login`, `Challenge Player`, `Respond To Challenge`, `Match Tiles` và `Decide To Continue`.
+- Thoát giữa ván không bắt buộc và có thể xảy ra bất cứ lúc nào trong ván, kể cả trước khi nối cặp nào, do đó `Quit Match` extend `Play Online Match`.
 - `Match Tiles` và `Quit Match` dùng chung với modul chơi với máy.
 
 Biểu đồ use case chi tiết như Hình 1.4.
 
-![Hình 1.4: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng](uml/pha1/uc-m3-challenge-player.png)
+![Hình 1.4: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng](uml/pha1/uc-m3-play-online-match.png)
 
 *Hình 1.4: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng*
 
 | Use case | Mô tả |
 |---|---|
-| `Challenge Player` | Cho phép người chơi mời một người chơi đang rỗi đấu một ván |
-| `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời |
+| `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu một phiên đối kháng trên cùng đề bài, server làm trọng tài, lưu kết quả và cập nhật điểm |
 | `Login` | Cho phép người chơi đăng nhập trước khi thách đấu hoặc nhận lời mời |
-| `Select Opponent` | Cho phép người chơi chọn đối thủ đang rỗi trong danh sách người chơi online và xác nhận trước khi gửi lời mời |
-| `Play Online Match` | Cho phép hai người chơi đấu một ván trên cùng đề bài, server làm trọng tài, lưu kết quả và cập nhật điểm |
+| `Challenge Player` | Cho phép người chơi chọn một đối thủ đang rỗi trong danh sách người chơi online, xác nhận rồi gửi lời mời |
+| `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời |
 | `Match Tiles` | Cho phép người chơi click lần lượt hai ô cùng hình để xóa chúng nếu nối được bằng tối đa 3 đoạn thẳng |
 | `Decide To Continue` | Cho phép mỗi người chơi chọn tiếp tục ván mới hoặc dừng sau khi một ván kết thúc |
 | `Quit Match` | Cho phép người chơi bỏ dở ván, người thoát bị xử thua |
+
+### e. Use case chi tiết cho modul quản lý tài khoản
+
+Trong chức năng quản lý tài khoản, người chơi tương tác với các giao diện:
+
+- Giao diện đăng ký, nơi người chơi nhập thông tin tài khoản mới → thống nhất với UC `Register Account`.
+- Giao diện đăng nhập → thống nhất với UC `Login`.
+- Nút Đăng xuất trên giao diện chính → thống nhất với UC `Logout`.
+- Ba use case đều có sẵn trong biểu đồ tổng quan và người chơi dùng trực tiếp cả ba, nên giữ nguyên ba use case nối thẳng với `Player`. Không gộp thành một use case chung vì ba việc có mục đích riêng và không bắt buộc đi cùng nhau: người đã có tài khoản không cần đăng ký.
+- Phải đăng nhập mới đăng xuất được, do đó `Logout` include `Login`, giống `View Ranking` include `Login`.
+- Đăng ký không cần đăng nhập. Đăng ký xong thì người chơi được đưa về giao diện đăng nhập; đây là chuyển giao diện, không phải quan hệ giữa hai use case.
+
+Biểu đồ use case chi tiết như Hình 1.5.
+
+![Hình 1.5: Biểu đồ use case chi tiết cho modul quản lý tài khoản](uml/pha1/uc-m4-manage-account.png)
+
+*Hình 1.5: Biểu đồ use case chi tiết cho modul quản lý tài khoản*
+
+| Use case | Mô tả |
+|---|---|
+| `Register Account` | Cho phép người chơi tạo tài khoản mới với tên đăng nhập chưa ai dùng, mật khẩu và tên hiển thị |
+| `Login` | Cho phép người chơi đăng nhập bằng tên đăng nhập và mật khẩu; một tài khoản chỉ đăng nhập ở một máy tại một thời điểm |
+| `Logout` | Cho phép người chơi đăng xuất, rời khỏi danh sách người chơi online |

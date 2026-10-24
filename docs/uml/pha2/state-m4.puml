@@ -1,0 +1,27 @@
+@startuml state-m4
+title Biểu đồ trạng thái - Modul Manage Account
+
+skinparam shadowing false
+skinparam linetype polyline
+skinparam defaultFontSize 13
+skinparam nodesep 120
+skinparam ranksep 90
+skinparam state {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+state "Hiển thị LoginScreen" as Login
+state "Hiển thị RegisterScreen" as Register
+state "Hiển thị MainScreen" as Main
+
+[*] --> Login
+Login --> Register : [click đăng ký]
+Register --> Register : [click đăng ký, thiếu thông tin\nhoặc tên đăng nhập đã tồn tại]
+Register --> Login : [click quay lại]\n[click đăng ký, thành công]
+Login --> Login : [click đăng nhập, sai tài khoản]
+Login --> Main : [click đăng nhập, đúng tài khoản]
+Main --> Login : [click đăng xuất]
+@enduml

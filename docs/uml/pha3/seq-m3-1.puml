@@ -1,5 +1,5 @@
 @startuml seq-m3-1
-title Biểu đồ tuần tự - Modul Challenge Player (phần 1: thách đấu)
+title Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)
 
 skinparam shadowing false
 skinparam defaultFontSize 12

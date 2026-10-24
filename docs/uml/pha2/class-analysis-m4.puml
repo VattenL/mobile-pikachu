@@ -1,0 +1,59 @@
+@startuml class-analysis-m4
+title Biểu đồ lớp pha phân tích - Modul Manage Account
+
+hide circle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam class {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+' ===== Tang 1: lop bien =====
+class RegisterScreen {
+  - inUsername
+  - inPassword
+  - inConfirmPassword
+  - inName
+  - outMessage
+  - subRegister
+  - subBack
+}
+
+class LoginScreen {
+  - inUsername
+  - inPassword
+  - outMessage
+  - subLogin
+  - subRegister
+}
+
+class MainScreen {
+  - subLogout
+}
+
+' ===== Tang 2: lop thuc the =====
+class Player {
+  - username
+  - password
+  - name
+  - status
+  + addPlayer()
+  + checkLogin()
+  + addOnlinePlayer()
+  + removeOnlinePlayer()
+}
+
+RegisterScreen -right- LoginScreen
+LoginScreen -right- MainScreen
+
+RegisterScreen -down- Player
+LoginScreen -down- Player
+MainScreen -down- Player
+@enduml

@@ -303,6 +303,66 @@ M3B = [
     ("msg", "MainActivity", "A", "hiển thị", "Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo \"A đã dừng chơi\" cho B."),
 ]
 
+# ---------------------------------------------------------------- M4
+M4_PARTS = [
+    ("actor", "Player", "Người chơi"),
+    ("boundary", "RegisterActivity", "Register\\nActivity"),
+    ("boundary", "LoginActivity", None),
+    ("boundary", "MainActivity", None),
+    ("control", "ServerConnection", "Server\\nConnection"),
+    ("control", "ClientHandler", "Client\\nHandler"),
+    ("control", "LoginController", "Login\\nController"),
+    ("control", "OnlinePlayerManager", "OnlinePlayer\\nManager"),
+    ("control", "ChallengeController", "Challenge\\nController"),
+    ("control", "PlayerDAO", None),
+    ("entity", "PlayerE", "Player"),
+]
+M4 = [
+    ("msg", "Player", "LoginActivity", "click đăng ký", "Tại giao diện `LoginActivity`, người chơi click nút Đăng ký."),
+    ("call", "LoginActivity", "RegisterActivity", "gọi", "Lớp `LoginActivity` gọi lớp `RegisterActivity`."),
+    ("msg", "RegisterActivity", "Player", "hiển thị", "Lớp `RegisterActivity` hiển thị giao diện đăng ký cho người chơi."),
+    ("msg", "Player", "RegisterActivity", "nhập, click đăng ký", "Người chơi nhập tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị và click nút Đăng ký."),
+    ("call", "RegisterActivity", "ServerConnection", "send(REGISTER)", "Lớp `RegisterActivity` kiểm tra không ô nào rỗng và mật khẩu nhập lại khớp, rồi gọi lớp `ServerConnection` yêu cầu gửi message `REGISTER`."),
+    ("msg", "ServerConnection", "ClientHandler", "REGISTER (TCP)", "Lớp `ServerConnection` gửi message `REGISTER` qua TCP tới lớp `ClientHandler` trên server."),
+    ("call", "ClientHandler", "LoginController", "handleRegister()", "Lớp `ClientHandler` gọi hàm `handleRegister()` của lớp `LoginController`."),
+    ("call", "LoginController", "PlayerDAO", "gọi", "Lớp `LoginController` băm mật khẩu và gọi lớp `PlayerDAO` yêu cầu thêm người chơi mới."),
+    ("self", "PlayerDAO", None, "addPlayer()", "Lớp `PlayerDAO` gọi hàm `addPlayer()`."),
+    ("ret", "PlayerDAO", "LoginController", "trả về", "Hàm `addPlayer()` trả kết quả cho lớp `LoginController` (sai nếu tên đăng nhập đã tồn tại)."),
+    ("call", "LoginController", "ClientHandler", "send(REGISTER_RESULT)", "Lớp `LoginController` gọi lớp `ClientHandler` gửi message `REGISTER_RESULT`."),
+    ("msg", "ClientHandler", "ServerConnection", "REGISTER_RESULT (TCP)", "Lớp `ClientHandler` gửi message `REGISTER_RESULT` qua TCP tới lớp `ServerConnection`."),
+    ("call", "ServerConnection", "RegisterActivity", "onMessage()", "Lớp `ServerConnection` chuyển message cho lớp `RegisterActivity`."),
+    ("call", "RegisterActivity", "LoginActivity", "gọi", "Lớp `RegisterActivity` gọi lại lớp `LoginActivity`, kèm tên đăng nhập vừa đăng ký."),
+    ("msg", "LoginActivity", "Player", "hiển thị", "Lớp `LoginActivity` hiển thị thông báo đăng ký thành công, ô tên đăng nhập đã điền sẵn."),
+    ("msg", "Player", "LoginActivity", "nhập mật khẩu, click đăng nhập", "Người chơi nhập mật khẩu và click nút Đăng nhập."),
+    ("call", "LoginActivity", "ServerConnection", "send(LOGIN)", "Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`."),
+    ("msg", "ServerConnection", "ClientHandler", "LOGIN (TCP)", "Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server."),
+    ("call", "ClientHandler", "LoginController", "handleLogin()", "Lớp `ClientHandler` gọi hàm `handleLogin()` của lớp `LoginController`."),
+    ("call", "LoginController", "PlayerDAO", "gọi", "Lớp `LoginController` gọi lớp `PlayerDAO` yêu cầu kiểm tra đăng nhập."),
+    ("self", "PlayerDAO", None, "checkLogin()", "Lớp `PlayerDAO` gọi hàm `checkLogin()`."),
+    ("call", "PlayerDAO", "PlayerE", "gọi", "Hàm `checkLogin()` gọi lớp `Player` để đóng gói thông tin."),
+    ("self", "PlayerE", None, "Player()", "Lớp `Player` đóng gói thông tin thực thể."),
+    ("ret", "PlayerE", "PlayerDAO", "trả về", "Lớp `Player` trả kết quả cho hàm `checkLogin()`."),
+    ("ret", "PlayerDAO", "LoginController", "trả về", "Hàm `checkLogin()` trả kết quả cho lớp `LoginController`."),
+    ("call", "LoginController", "OnlinePlayerManager", "gọi", "Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu thêm người chơi vào danh sách online."),
+    ("self", "OnlinePlayerManager", None, "addOnlinePlayer()", "Lớp `OnlinePlayerManager` gọi hàm `addOnlinePlayer()`."),
+    ("ret", "OnlinePlayerManager", "LoginController", "trả về", "Hàm `addOnlinePlayer()` trả kết quả cho lớp `LoginController` (sai nếu tài khoản đang online ở máy khác)."),
+    ("call", "LoginController", "ClientHandler", "send(LOGIN_RESULT)", "Lớp `LoginController` gọi lớp `ClientHandler` gửi message `LOGIN_RESULT`."),
+    ("msg", "ClientHandler", "ServerConnection", "LOGIN_RESULT (TCP)", "Lớp `ClientHandler` gửi message `LOGIN_RESULT` qua TCP tới lớp `ServerConnection`."),
+    ("call", "ServerConnection", "LoginActivity", "onMessage()", "Lớp `ServerConnection` chuyển message cho lớp `LoginActivity`."),
+    ("call", "LoginActivity", "MainActivity", "gọi", "Lớp `LoginActivity` lưu người chơi vào `ClientSession` và gọi lớp `MainActivity`."),
+    ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi."),
+    ("msg", "Player", "MainActivity", "click đăng xuất", "Người chơi click nút Đăng xuất."),
+    ("call", "MainActivity", "ServerConnection", "send(LOGOUT)", "Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGOUT`."),
+    ("call", "MainActivity", "LoginActivity", "gọi", "Lớp `MainActivity` xóa người chơi khỏi `ClientSession` và gọi lại lớp `LoginActivity`."),
+    ("msg", "LoginActivity", "Player", "hiển thị", "Lớp `LoginActivity` hiển thị giao diện đăng nhập cho người chơi."),
+    ("msg", "ServerConnection", "ClientHandler", "LOGOUT (TCP)", "Lớp `ServerConnection` gửi message `LOGOUT` qua TCP tới lớp `ClientHandler` trên server."),
+    ("call", "ClientHandler", "LoginController", "handleLogout()", "Lớp `ClientHandler` gọi hàm `handleLogout()` của lớp `LoginController`."),
+    ("call", "LoginController", "OnlinePlayerManager", "gọi", "Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu xóa người chơi khỏi danh sách online."),
+    ("self", "OnlinePlayerManager", None, "removeOnlinePlayer()", "Lớp `OnlinePlayerManager` gọi hàm `removeOnlinePlayer()`."),
+    ("ret", "OnlinePlayerManager", "LoginController", "trả về", "Hàm `removeOnlinePlayer()` trả kết quả cho lớp `LoginController`."),
+    ("call", "LoginController", "ChallengeController", "broadcastOnlineList()", "Lớp `LoginController` gọi hàm `broadcastOnlineList()` của lớp `ChallengeController` để gửi lại danh sách online cho những người chơi khác."),
+]
+
 
 def puml(name, title, parts, steps, start=1):
     out = [f"@startuml {name}", f"title {title}", "", STYLE.rstrip()]
@@ -368,8 +428,9 @@ def main():
     diagrams = [
         ("seq-m1", "Biểu đồ tuần tự - Modul View Ranking", M1_PARTS, M1, 1),
         ("seq-m2", "Biểu đồ tuần tự - Modul Play With Bot", M2_PARTS, M2, 1),
-        ("seq-m3-1", "Biểu đồ tuần tự - Modul Challenge Player (phần 1: thách đấu)", M3A_PARTS, M3A, 1),
-        ("seq-m3-2", "Biểu đồ tuần tự - Modul Challenge Player (phần 2: chơi và kết thúc ván)", M3B_PARTS, M3B, m3b_start),
+        ("seq-m3-1", "Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)", M3A_PARTS, M3A, 1),
+        ("seq-m3-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi và kết thúc ván)", M3B_PARTS, M3B, m3b_start),
+        ("seq-m4", "Biểu đồ tuần tự - Modul Manage Account", M4_PARTS, M4, 1),
     ]
     for name, title, parts, steps, start in diagrams:
         (HERE / f"{name}.puml").write_text(puml(name, title, parts, steps, start), encoding="utf-8")
@@ -381,6 +442,7 @@ def main():
         "v3-m1": v3(M1)[0],
         "v3-m2": v3(M2, loop_note=M2_LOOP_NOTE)[0],
         "v3-m3": v3(M3A)[0] + v3(M3B, m3b_start, m3_note)[0],
+        "v3-m4": v3(M4)[0],
     }
     text = DOC.read_text(encoding="utf-8")
     for key, lines in blocks.items():

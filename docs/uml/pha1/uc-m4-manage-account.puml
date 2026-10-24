@@ -1,0 +1,32 @@
+@startuml uc-m4-manage-account
+title Biểu đồ use case chi tiết - Modul Manage Account
+
+left to right direction
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam nodesep 25
+skinparam ranksep 90
+skinparam usecase {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+}
+skinparam actor {
+  BackgroundColor #F7F7F7
+  BorderColor #4A4A4A
+}
+
+actor "Player" as Player
+
+rectangle "Modul: Manage Account" {
+  usecase "Register Account" as UC01
+  usecase "Login" as UC02
+  usecase "Logout" as UC03
+}
+
+Player --> UC01
+Player --> UC02
+Player --> UC03
+UC03 ..> UC02 : <<include>>
+@enduml

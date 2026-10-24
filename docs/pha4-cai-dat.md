@@ -30,9 +30,9 @@ pikachu/
 │   └── protocol/   Message, MessageType
 ├── core/src/test/java/...           PathFinderTest, BoardGeneratorTest, BoardTest, BotTest
 ├── app/src/main/java/ptit/e23cnpm01/pikachu/
-│   ├── view/       LoginActivity, BaseActivity, MainActivity, RankingActivity, DifficultyActivity,
-│   │               BotGameActivity, MatchActivity, ChallengeConfirmDialog, InvitationDialog,
-│   │               ResultDialog, BotResultDialog, BoardView
+│   ├── view/       LoginActivity, RegisterActivity, BaseActivity, MainActivity, RankingActivity,
+│   │               DifficultyActivity, BotGameActivity, MatchActivity, ChallengeConfirmDialog,
+│   │               InvitationDialog, ResultDialog, BotResultDialog, BoardView
 │   └── network/    ServerConnection, MessageListener, ClientSession
 ├── server/src/main/java/ptit/e23cnpm01/pikachu/server/
 │   ├── controller/ GameServer, ClientHandler, LoginController, RankingController,
@@ -131,8 +131,6 @@ public abstract class DAO {
 | | `onMessage()` | nhận `LOGIN_RESULT`: thành công thì lưu người chơi vào `ClientSession` và mở `MainActivity`; thất bại thì hiện thông báo lỗi |
 | `LoginController` | `handleLogin()` | băm mật khẩu, gọi `PlayerDAO.checkLogin()`; nếu đúng thì gọi `OnlinePlayerManager.addOnlinePlayer()`, sai hoặc đang online nơi khác thì trả lỗi; gửi `LOGIN_RESULT`, sau đó gửi lại danh sách online cho mọi người |
 | `PlayerDAO` | `checkLogin()` | `SELECT id, username, name FROM tblPlayer WHERE username = ? AND password = ?` bằng `PreparedStatement` (chống SQL injection), có dòng thì đóng gói `Player`, không có thì trả `null` |
-| `LoginController` | `handleRegister()` | chức năng đăng ký (không thuộc kịch bản modul nhưng cần để tạo tài khoản): kiểm tra ba trường không rỗng, băm mật khẩu, gọi `PlayerDAO.addPlayer()`, gửi `REGISTER_RESULT` (`ok`, hoặc `error` "tên đăng nhập đã tồn tại") |
-| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password, name) VALUES (?, ?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
 | `RankingActivity` | `onCreate()`, `onMessage()` | gửi `GET_RANKING`; nhận `RANKING` thì đổ vào `RecyclerView`, đổi `avgWinTime` từ mili giây sang mm:ss |
 | `RankingController` | `handleGetRanking()` | gọi `PlayerRankingDAO.getRanking()`, đánh số hạng theo thứ tự trả về (trùng cả ba tiêu chí thì cùng hạng, kiểu 1, 2, 2, 4), gửi `RANKING` |
 | `PlayerRankingDAO` | `getRanking()` | chạy truy vấn ở pha 3, mục 8d, mỗi dòng đóng gói một `PlayerRanking` (kế thừa `Player`: `id`, `username`, `name`; thêm ba chỉ số) |
@@ -171,6 +169,20 @@ public abstract class DAO {
 | `MatchDAO` | `saveMatch()` | trong một giao dịch: thêm dòng `tblMatch` (kèm đề bài), lấy khóa sinh ra, thêm hai dòng `tblMatchResult` (kết quả, thời gian hoàn thành, bàn lúc kết thúc của từng người; điểm không lưu); lỗi thì `rollback` và trả `false`. Hàm chỉ tự `commit` khi được gọi lúc `autoCommit` đang bật, nên test đơn vị tắt `autoCommit` trước khi gọi thì `rollback` được toàn bộ |
 | `PlayerRankingDAO` | `getTotalPoints()` | `SELECT playerId, SUM(CASE result WHEN 'WIN' THEN 1 WHEN 'DRAW' THEN 0.5 ELSE 0 END) FROM tblMatchResult WHERE playerId IN (...) GROUP BY playerId`, người chưa có ván nào có tổng điểm 0 |
 
+### e. Modul quản lý tài khoản
+
+| Lớp | Phương thức | Cách hoạt động |
+|---|---|---|
+| `LoginActivity` | `onRegisterClick()` | mở `RegisterActivity`; khi quay về kèm tên đăng nhập vừa đăng ký thì điền sẵn và hiện "Đăng ký thành công, mời đăng nhập" |
+| `RegisterActivity` | `onRegisterClick()` | kiểm tra bốn ô không rỗng và mật khẩu nhập lại khớp; hợp lệ thì gửi `REGISTER` |
+| | `onMessage()` | `REGISTER_RESULT`: thành công thì trả tên đăng nhập về `LoginActivity` và đóng màn; thất bại thì hiện lỗi, xóa hai ô mật khẩu |
+| | `onBackClick()` | đóng màn, về `LoginActivity`, không gửi gì |
+| `MainActivity` | `onLogoutClick()` | gửi `LOGOUT`, `ClientSession.clear()`, mở `LoginActivity` và đóng các màn hình phía sau |
+| `LoginController` | `handleRegister()` | kiểm tra ba trường không rỗng, băm mật khẩu, gọi `PlayerDAO.addPlayer()`, gửi `REGISTER_RESULT` (`ok`, hoặc `error` "tên đăng nhập đã tồn tại") |
+| | `handleLogout()` | `OnlinePlayerManager.removeOnlinePlayer()`, đặt người chơi của `ClientHandler` về rỗng, `ChallengeController.broadcastOnlineList()` |
+| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password, name) VALUES (?, ?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
+| `OnlinePlayerManager` | `removeOnlinePlayer()` | xóa ánh xạ tên đăng nhập → `ClientHandler`; `ClientHandler` cũng gọi hàm này khi client mất kết nối |
+
 ## 3. Kiểm thử đơn vị
 
 ### a. Quy trình
@@ -194,6 +206,7 @@ public abstract class DAO {
 | 4 | Máy | `Bot` | `nextMove()`, `getDelayMs()` | Bàn còn cặp: trả về một cặp mà `checkPath()` nối được<br>Bàn bế tắc: trả về null<br>Mức Khó: chọn cặp để lại nhiều cặp nối được nhất<br>Thời gian chờ giảm dần từ Dễ tới Khó |
 | 5 | Đăng nhập | `PlayerDAO` | `checkLogin()` | Đúng tên đăng nhập và mật khẩu: trả về người chơi đúng id, tên<br>Sai mật khẩu: null<br>Tên đăng nhập không tồn tại: null<br>Chuỗi nhập có ký tự `'`, `--`, `OR 1=1`: null, không lỗi SQL |
 | | | `OnlinePlayerManager` | `addOnlinePlayer()` | Người chưa online: trả về đúng, có trong danh sách<br>Người đang online ở máy khác: trả về sai |
+| | Đăng xuất | `OnlinePlayerManager` | `removeOnlinePlayer()` | Người đang online: bị xóa khỏi danh sách<br>Người không có trong danh sách: không báo lỗi, danh sách không đổi |
 | | Đăng ký | `PlayerDAO` | `addPlayer()` | Tên đăng nhập mới: trả về đúng, có thêm một dòng với mật khẩu đã băm<br>Tên đăng nhập đã có: trả về sai, không thêm dòng nào |
 | 6 | Xem bảng xếp hạng | `PlayerRankingDAO` | `getRanking()` | Thứ tự theo tổng điểm giảm dần<br>Bằng tổng điểm: theo trung bình điểm đối thủ giảm dần<br>Bằng cả hai: theo trung bình thời gian thắng tăng dần<br>Trùng cả ba tiêu chí: hai người đứng liền nhau, theo thứ tự tên<br>Người chưa thắng ván nào đứng sau ở tiêu chí 3<br>Ván thắng do đối thủ bỏ cuộc không tính vào trung bình thời gian thắng<br>Gặp cùng đối thủ hai ván: điểm đối thủ tính hai lần<br>Người chưa có ván nào không có trong bảng<br>CSDL chưa có ván nào: danh sách rỗng |
 | | | | `getTotalPoints()` | Danh sách người chơi có ván: đúng tổng điểm<br>Người chưa có ván: tổng điểm 0<br>Danh sách rỗng: kết quả rỗng |

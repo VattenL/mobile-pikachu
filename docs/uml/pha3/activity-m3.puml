@@ -1,5 +1,5 @@
 @startuml activity-m3
-title Biểu đồ hoạt động - Modul Challenge Player
+title Biểu đồ hoạt động - Modul Play Online Match
 
 skinparam shadowing false
 skinparam defaultFontSize 12

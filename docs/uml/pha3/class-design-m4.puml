@@ -1,0 +1,149 @@
+@startuml class-design-m4
+title Biểu đồ lớp thiết kế - Modul Manage Account
+
+hide circle
+hide empty members
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 60
+skinparam classFontSize 13
+skinparam classAttributeFontSize 11
+skinparam class {
+  BorderColor #4A4A4A
+  ArrowColor #4A4A4A
+  FontColor #1A1A1A
+}
+
+' ===== Client Android: tang giao dien =====
+class RegisterActivity #E3F2FD {
+  - edtUsername : EditText
+  - edtPassword : EditText
+  - edtConfirmPassword : EditText
+  - edtName : EditText
+  - tvError : TextView
+  - btnRegister : Button
+  - btnBack : Button
+  + onRegisterClick(v : View) : void
+  + onBackClick(v : View) : void
+  + onMessage(msg : Message) : void
+}
+
+class LoginActivity #E3F2FD {
+  - edtUsername : EditText
+  - edtPassword : EditText
+  - tvError : TextView
+  - btnLogin : Button
+  - btnRegister : Button
+  + onLoginClick(v : View) : void
+  + onRegisterClick(v : View) : void
+  + onMessage(msg : Message) : void
+}
+
+class MainActivity #E3F2FD {
+  - tvPlayer : TextView
+  - btnLogout : Button
+  - player : Player
+  + onLogoutClick(v : View) : void
+}
+
+' ===== Client Android: tang mang =====
+class ServerConnection #EDE7F6 {
+  - socket : Socket
+  - listeners : ArrayList<MessageListener>
+  + getInstance() : ServerConnection
+  + send(msg : Message) : void
+  + addListener(l : MessageListener) : void
+  + removeListener(l : MessageListener) : void
+}
+
+interface MessageListener #EDE7F6 {
+  + onMessage(msg : Message) : void
+}
+
+class ClientSession #EDE7F6 {
+  + player : Player
+  + clear() : void
+}
+
+' ===== Server: tang dieu khien =====
+class ClientHandler #E8F5E9 {
+  - socket : Socket
+  - player : Player
+  + run() : void
+  + send(msg : Message) : void
+}
+
+class LoginController #E8F5E9 {
+  + handleRegister(handler : ClientHandler, msg : Message) : void
+  + handleLogin(handler : ClientHandler, msg : Message) : void
+  + handleLogout(handler : ClientHandler, msg : Message) : void
+}
+
+class OnlinePlayerManager #E8F5E9 {
+  - onlineHandlers : HashMap<String, ClientHandler>
+  + getInstance() : OnlinePlayerManager
+  + addOnlinePlayer(handler : ClientHandler) : boolean
+  + removeOnlinePlayer(handler : ClientHandler) : void
+}
+
+class ChallengeController #E8F5E9 {
+  + broadcastOnlineList() : void
+}
+
+' ===== Server: tang DAO =====
+class DAO #FFF8E1 {
+  # con : Connection
+  + DAO()
+}
+
+class PlayerDAO #FFF8E1 {
+  + PlayerDAO()
+  + addPlayer(player : Player) : boolean
+  + checkLogin(username : String, password : String) : Player
+}
+
+' ===== core: lop thuc the va message =====
+class Message #FFF3E0 {
+  - type : String
+  - data : JsonObject
+  + toJson() : String
+  + fromJson(line : String) : Message
+}
+
+class Player #FFF3E0 {
+  - id : int
+  - username : String
+  - password : String
+  - name : String
+  - status : String
+}
+
+' giao dien
+RegisterActivity -right- LoginActivity
+LoginActivity -right- MainActivity
+RegisterActivity ..|> MessageListener
+LoginActivity ..|> MessageListener
+
+' giao dien - mang
+RegisterActivity -down- ServerConnection
+LoginActivity -down- ServerConnection
+MainActivity -down- ServerConnection
+LoginActivity -down- ClientSession
+MainActivity -down- ClientSession
+ServerConnection -right- MessageListener
+
+' mang client - server (TCP)
+ServerConnection -down- ClientHandler : TCP
+ClientHandler -right- LoginController
+LoginController -right- OnlinePlayerManager
+LoginController -right- ChallengeController
+
+' dieu khien - DAO
+LoginController -down- PlayerDAO
+DAO <|-down- PlayerDAO
+
+' DAO - thuc the
+PlayerDAO -down- Player
+ClientHandler -[norank]- Message
+@enduml

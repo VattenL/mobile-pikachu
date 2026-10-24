@@ -1,5 +1,5 @@
 @startuml class-analysis-m3
-title Biểu đồ lớp pha phân tích - Modul Challenge Player
+title Biểu đồ lớp pha phân tích - Modul Play Online Match
 
 hide circle
 skinparam shadowing false

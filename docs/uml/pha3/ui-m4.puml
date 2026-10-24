@@ -1,0 +1,77 @@
+@startuml ui-m4
+title Thiết kế giao diện - Modul Manage Account (màn hình ngang)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Register [
+{{salt
+{+
+  <b>Đăng ký tài khoản
+  .
+  Tên đăng nhập
+  "thanhtung       "
+  Mật khẩu
+  "********        "
+  Nhập lại mật khẩu
+  "********        "
+  Tên hiển thị
+  "Thanh Tùng      "
+  <color:red>Tên đăng nhập đã tồn tại
+  .
+  [ Quay lại ] | [ Đăng ký ]
+}
+}}
+]
+
+rectangle Login [
+{{salt
+{+
+  <b>Đăng nhập
+  .
+  <color:green>Đăng ký thành công, mời đăng nhập
+  Tên đăng nhập
+  "thanhtung       "
+  Mật khẩu
+  "********        "
+  .
+  [   Đăng nhập   ]
+  [    Đăng ký    ]
+}
+}}
+]
+
+rectangle Main [
+{{salt
+{+
+  { {+
+      <b>Thanh Tùng
+      0 điểm
+      .
+      .
+      [ Xem bảng xếp hạng ]
+      [   Chơi với máy    ]
+      [     Đăng xuất     ]
+    } | {+
+      <b>Người chơi online
+      {#
+        <b>Tên | <b>Tổng điểm | <b>Trạng thái
+        Minh Anh | 12.5 | Rỗi
+        Quốc Bảo | 10.5 | Bận
+        Thu Hà | 7.5 | Rỗi
+      }
+    } }
+}
+}}
+]
+
+Login -left-> Register : đăng ký
+Register -right-> Login : quay lại, hoặc\nđăng ký thành công
+Login -right-> Main : đăng nhập\nthành công
+Main -left-> Login : đăng xuất
+@enduml

@@ -10,7 +10,7 @@ Mỗi phần dùng một checklist rút từ giáo trình (Bảng 6.x), chỉ gi
 
 | Mã | Mục | Y/N/NA | Ghi chú |
 |---|---|---|---|
-| 1 | Mỗi yêu cầu trong đề bài đều có chức năng tương ứng? | Y | Ba modul M1, M2, M3 phủ ba chức năng của đề |
+| 1 | Mỗi yêu cầu trong đề bài đều có chức năng tương ứng? | Y | Bốn modul phủ các chức năng của đề: M1 (xem bảng xếp hạng) và M4 (quản lý tài khoản) cho dòng Dễ, M2 và M3 cho hai dòng còn lại |
 | 2 | Các yêu cầu giao diện người dùng đã hoàn thiện? | Y | Mô tả ở bước 3 của mục 2, chi tiết hóa ở pha 3 |
 | 3 | Các yêu cầu có thể kiểm thử được? | Y | Mỗi hoạt động nghiệp vụ có kết quả quan sát được |
 | 4 | Yêu cầu hiệu năng đầy đủ và khả thi? | Y | Phản hồi một nước đi dưới 200 ms (`plan.md` Phần I §1.4) |
@@ -78,7 +78,7 @@ Thực hiện khi có code, theo các mục chính của checklist giáo trình 
 
 Rút từ Bảng 6.6 của giáo trình, áp dụng cho ứng dụng Android:
 
-- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.7); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
+- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.7, 3.9); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
 - Các màn hình gọi từ nút bấm hiển thị đúng; nút Quay lại của hệ thống Android cho kết quả giống nút Quay lại trên màn hình.
 - Xoay màn hình, ẩn ứng dụng rồi mở lại không làm mất trạng thái ván.
 - Trường bắt buộc (tên đăng nhập, mật khẩu) không cho phép rỗng; khoảng trắng đầu cuối được cắt bỏ.
@@ -147,6 +147,20 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | CP_16 | Một bên dừng | A bấm Dừng | Hai máy về giao diện chính; B được báo "Hoàng Nam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
 | CP_17 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
 | CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm OK | C nhận dialog lời mời ngay trên màn chơi với máy; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
+
+**Modul quản lý tài khoản.** Tiền điều kiện chung: server đang chạy, CSDL đã nạp dữ liệu mẫu (chưa có tài khoản `thanhtung`). Đăng nhập sai, bỏ trống trường và một tài khoản ở hai máy đã có ở VR_3 đến VR_5.
+
+| Mã | Mục đích kiểm thử | Các bước thực hiện | Kết quả mong muốn | Kết quả |
+|---|---|---|---|---|
+| AC_1 | Giao diện đăng ký | Ở màn đăng nhập bấm Đăng ký | Có bốn ô tên đăng nhập, mật khẩu, nhập lại mật khẩu (ẩn ký tự), tên hiển thị, nút Đăng ký, nút Quay lại | |
+| AC_2 | Đăng ký thành công | Nhập `thanhtung`, mật khẩu, nhập lại đúng, tên "Thanh Tùng", bấm Đăng ký | Về màn đăng nhập, báo "Đăng ký thành công, mời đăng nhập", ô tên đăng nhập điền sẵn `thanhtung`; `tblPlayer` có thêm một dòng, cột mật khẩu là chuỗi băm 64 ký tự | |
+| AC_3 | Tên đăng nhập đã tồn tại | Đăng ký với `hoangnam` | Ở lại màn đăng ký, báo "Tên đăng nhập đã tồn tại"; `tblPlayer` không thêm dòng nào | |
+| AC_4 | Thiếu thông tin hoặc mật khẩu không khớp | Bỏ trống tên hiển thị; hoặc nhập lại mật khẩu khác | Báo lỗi ngay trên màn đăng ký, không gửi lên server | |
+| AC_5 | Quay lại | Ở màn đăng ký bấm Quay lại | Về màn đăng nhập, không có tài khoản mới | |
+| AC_6 | Đăng nhập tài khoản mới | Sau AC_2, nhập mật khẩu và bấm Đăng nhập | Vào giao diện chính, tiêu đề "Thanh Tùng", "0 điểm"; máy khác thấy Thanh Tùng trong danh sách online với trạng thái Rỗi | |
+| AC_7 | Đăng xuất | Thanh Tùng bấm Đăng xuất | Về màn đăng nhập; trên máy khác, Thanh Tùng biến khỏi danh sách online | |
+| AC_8 | Đăng nhập lại sau khi đăng xuất | Sau AC_7, đăng nhập lại `thanhtung` trên máy khác | Đăng nhập được (không bị báo đang đăng nhập ở máy khác) | |
+| AC_9 | Mất kết nối | Thanh Tùng đang online thì tắt mạng máy đó | Trên máy khác, Thanh Tùng biến khỏi danh sách online; bật mạng rồi đăng nhập lại được | |
 
 ### c. Dữ liệu kiểm thử
 
