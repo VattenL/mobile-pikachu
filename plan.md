@@ -424,3 +424,6 @@ Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong m�
 - [ ] **Trạng thái trong lúc ở dialog tiếp tục:** đề xuất vẫn là bận cho đến khi cả hai trả lời, để không ai mời chen vào.
 - [ ] **Số loại icon** trên bàn 10x10: đề xuất 25 loại, mỗi loại 4 ô.
 - [ ] **CSDL server:** MySQL hay SQLite. Đề xuất MySQL (server đa luồng ghi đồng thời, giáo trình cũng dùng MySQL).
+- [ ] **Phản hồi nước đi trong ván online:** hiện `MatchActivity` gửi `MOVE` rồi chờ `MOVE_RESULT` mới xóa ô, mạng chậm sẽ thấy giật. Đề xuất client kiểm tra ngay bằng `PathFinder` của `core` và xóa ô trên máy, server vẫn kiểm tra lại; server từ chối thì trả bàn về như cũ. Nếu chốt thì sửa pha 3 mục 4d, mục 7 và kịch bản v3 M4.
+- [ ] **Phát hiện mất kết nối (heartbeat):** hiện chỉ biết mất kết nối khi đọc socket báo lỗi; trên điện thoại kết nối có thể "chết im" nhiều phút, ván treo. Đề xuất client gửi `PING` định kỳ (ví dụ 5 giây), server đặt thời gian chờ đọc (ví dụ 15 giây) rồi xử lý như mất kết nối. Nếu chốt thì thêm message vào pha 3 mục 7 và §5.2.
+- [ ] **Vòng đời Android:** app xuống nền có thể bị thu hồi làm mất kết nối, người chơi bị xử thua. Tối thiểu: giữ `ServerConnection` ở mức ứng dụng (đã là singleton) và gỡ `MessageListener` khi màn hình đóng; làm kỹ hơn thì giữ kết nối trong một Service. Với phạm vi đồ án đề xuất làm mức tối thiểu.
