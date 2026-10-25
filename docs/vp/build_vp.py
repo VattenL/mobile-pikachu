@@ -505,9 +505,9 @@ ACT_M4 = [
         ("action", "Hiển thị bàn chơi, đồng hồ"), ("action", "Nhận hai ô được click, gửi MOVE")]),
     ("Xử lí tại server: MatchController.handleMove()", [
         ("action", "Kiểm tra đường nối trên bàn của người gửi"), ("dao", "PathFinder: checkPath()"),
-        ("action", "Xóa hai ô, kiểm tra hết ô"), ("dao", "Board: removePair()"), ("dao", "Board: isCleared()"),
+        ("action", "Xóa hai ô, kiểm tra hết ô"), ("dao", "Board: removePair(), isCleared()"),
         ("action", "Kiểm tra bế tắc, xáo riêng bàn đó nếu cần"),
-        ("dao", "PathFinder: findAvailablePair()"), ("dao", "BoardGenerator: shuffle()"),
+        ("dao", "PathFinder: findAvailablePair(), BoardGenerator: shuffle()"),
         ("action", "Gửi MOVE_RESULT, OPPONENT_PROGRESS"),
         ("decision", "Có người xóa hết ô, hết giờ hoặc thoát?")]),
     ("Xử lí tại server: MatchController.endMatch()", [
@@ -523,7 +523,7 @@ ACT_M4 = [
 ]
 ACT_M4_FLOWS = [
     ("Bắt đầu", "Hiển thị danh sách người chơi online", ""),
-    ("Hiển thị danh sách người chơi online", "Hiển thị dialog xác nhận thách đấu B", "click tên B đang rỗi"),
+    ("Hiển thị danh sách người chơi online", "Hiển thị dialog xác nhận thách đấu B", "click tên B không bận"),
     ("Hiển thị dialog xác nhận thách đấu B", "Gửi lời mời tới B", "A click xác nhận"),
     ("Gửi lời mời tới B", "Hiển thị lời mời", ""),
     ("Hiển thị lời mời", "Sinh đề bài", "B click OK"),
@@ -548,6 +548,55 @@ ACT_M4_FLOWS = [
     ("Gửi danh sách online mới", "Hiển thị danh sách online đã cập nhật", ""),
     ("Hiển thị danh sách online đã cập nhật", "Kết thúc", ""),
 ]
+
+
+# ---- Pha 3: luồng message giữa hai client và server (protocol.puml)
+
+PROTOCOL_PARTS = [("participant", "Client A"), ("participant", "Server"), ("participant", "Client B")]
+PROTOCOL = [
+    # đăng nhập
+    ("call", "Client A", "Server", "LOGIN {username, password}"),
+    ("ret", "Server", "Client A", "LOGIN_RESULT {ok, player}"),
+    ("ret", "Server", "Client A", "ONLINE_LIST"),
+    ("ret", "Server", "Client B", "ONLINE_LIST (A vừa online)"),
+    # thách đấu
+    ("call", "Client A", "Server", "INVITE {to: B}"),
+    ("call", "Server", "Client B", "INVITE_RECEIVED {from: A}"),
+    ("call", "Client B", "Server", "INVITE_REPLY {from: A, accept: true}"),
+    ("call", "Server", "Client A", "MATCH_START {matchId, tiles, timeLimitSec, opponent}"),
+    ("call", "Server", "Client B", "MATCH_START {matchId, tiles, timeLimitSec, opponent}"),
+    ("call", "Client B", "Server", "INVITE_REPLY {accept: false}"),
+    ("ret", "Server", "Client A", "INVITE_RESULT {accepted: false, reason}"),
+    # chơi ván
+    ("call", "Client A", "Server", "MOVE {matchId, a, b}"),
+    ("ret", "Server", "Client A", "MOVE_RESULT {ok, path, remaining}"),
+    ("call", "Server", "Client B", "OPPONENT_PROGRESS {remaining}"),
+    ("call", "Server", "Client A", "BOARD_SHUFFLED {tiles}"),
+    ("call", "Server", "Client A", "MATCH_END {result, point, finishTime, remaining, reason}"),
+    ("call", "Server", "Client B", "MATCH_END {result, point, finishTime, remaining, reason}"),
+    # sau ván
+    ("call", "Client A", "Server", "REMATCH_REPLY {matchId, accept}"),
+    ("call", "Client B", "Server", "REMATCH_REPLY {matchId, accept}"),
+    ("call", "Server", "Client A", "MATCH_START (ván mới)"),
+    ("call", "Server", "Client B", "MATCH_START (ván mới)"),
+    ("call", "Server", "Client B", "OPPONENT_LEFT"),
+    ("ret", "Server", "Client A", "ONLINE_LIST"),
+    ("ret", "Server", "Client B", "ONLINE_LIST"),
+]
+# (toán tử, điều kiện các nhánh, thông điệp đầu, thông điệp cuối, thông điệp đầu của nhánh 2), theo số thứ tự ở trên
+PROTOCOL_FRAGMENTS = [
+    ("alt", "B chấp nhận|B từ chối, B bận hoặc mất kết nối", 7, 11, "10"),
+    ("loop", "đến khi ván kết thúc", 12, 15, ""),
+    ("opt", "bàn của A bế tắc", 15, 15, ""),
+    ("alt", "cả hai tiếp tục|một người dừng (ví dụ A)", 20, 24, "22"),
+]
+
+
+def build_protocol(name):
+    build_sequence(name, PROTOCOL_PARTS, PROTOCOL)
+    for op, guard, first, last, starts in PROTOCOL_FRAGMENTS:
+        vp("addCombinedFragment", diagramName=name, operator=op, guard=guard, coveredLifelines="",
+           fromSeq=first, toSeq=last, operandStarts=starts)
 
 
 # ---- Pha 3: CSDL (erd.puml)
@@ -668,6 +717,7 @@ DIAGRAMS = [
      lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),
     ("package", "3.24 Biểu đồ gói", build_package),
     ("deployment", "3.25 Biểu đồ triển khai", build_deployment),
+    ("protocol", "3.26 Luồng message", build_protocol),
 ]
 
 

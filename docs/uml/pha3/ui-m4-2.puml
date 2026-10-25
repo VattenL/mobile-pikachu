@@ -1,18 +1,19 @@
 @startuml ui-m4-2
-title Thiết kế giao diện - Chơi ván đối kháng (màn hình ngang)
-
 skinparam shadowing false
 skinparam defaultFontSize 12
-skinparam ArrowColor #4A4A4A
+skinparam defaultFontColor #333333
+skinparam ArrowColor #9E9E9E
+skinparam ArrowFontColor #616161
 skinparam rectangle {
-  BackgroundColor #F7F7F7
-  BorderColor #9E9E9E
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
 }
 
 rectangle Match [
 {{salt
-{+
-  { {+
+{
+  { {
       <b>Đấu với B
       08:30
       .
@@ -27,7 +28,7 @@ rectangle Match [
       B | C | A | . | D | E
       F | G | H | A | . | B
       C | D | E | F | G | A
-    } | {+
+    } | {
       <b>B · 92 ô
       {#
         A | . | C | D | . | F

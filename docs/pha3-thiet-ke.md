@@ -609,7 +609,7 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 
 Luồng message chính giữa hai client và server như Hình 3.26.
 
-![Hình 3.26: Luồng message giữa hai client và server](uml/pha3/protocol.png)
+![Hình 3.26: Luồng message giữa hai client và server](vp/png/protocol.png)
 
 *Hình 3.26: Luồng message giữa hai client và server*
 

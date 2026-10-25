@@ -1,17 +1,18 @@
 @startuml ui-m4-3
-title Thiết kế giao diện - Kết thúc ván và tái đấu (màn hình ngang)
-
 skinparam shadowing false
 skinparam defaultFontSize 12
-skinparam ArrowColor #4A4A4A
+skinparam defaultFontColor #333333
+skinparam ArrowColor #9E9E9E
+skinparam ArrowFontColor #616161
 skinparam rectangle {
-  BackgroundColor #F7F7F7
-  BorderColor #9E9E9E
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
 }
 
 rectangle Result [
 {{salt
-{+
+{
   <b>Chiến thắng!
   .
   Bạn thắng. Thời gian hoàn thành 06:42.
@@ -24,7 +25,7 @@ rectangle Result [
 
 rectangle Wait [
 {{salt
-{+
+{
   <b>Chiến thắng!
   .
   Bạn thắng. Thời gian hoàn thành 06:42.
@@ -37,8 +38,8 @@ rectangle Wait [
 
 rectangle Main [
 {{salt
-{+
-  { {+
+{
+  { {
       <b>Người chơi B
       12.5 điểm
       .
@@ -46,7 +47,7 @@ rectangle Main [
       [ Xem bảng xếp hạng ]
       [   Chơi với máy    ]
       [     Đăng xuất     ]
-    } | {+
+    } | {
       <b>Người chơi online
       {#
         <b>Tên | <b>Tổng điểm | <b>Trạng thái
