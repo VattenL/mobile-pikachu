@@ -16,3 +16,10 @@ local.properties
 
 # Assignment spec (local only)
 /de_bai.md
+
+# Python
+__pycache__/
+
+# Visual Paradigm lock and backup files
+*.vpp.lck
+*.vpp.bak_*

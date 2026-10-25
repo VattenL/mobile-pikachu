@@ -24,6 +24,8 @@ Mọi tài nguyên lấy từ bên ngoài (thư viện, hình ảnh, phông ch�
 | Tài nguyên | Dùng ở | Nguồn | Ghi chú |
 |---|---|---|---|
 | PlantUML (máy chủ plantuml.com) | Vẽ sơ đồ trong `docs/uml/` | https://plantuml.com | Mã nguồn sơ đồ do nhóm viết; ảnh PNG được máy chủ PlantUML sinh ra |
+| Visual Paradigm Community Edition 17.3 | Vẽ sơ đồ trong `docs/vp/` (`pikachu.vpp`, ảnh `docs/vp/png/`) | https://www.visual-paradigm.com | Bản miễn phí cho mục đích phi thương mại; ảnh xuất ra có watermark "Powered By Visual Paradigm Community Edition" |
+| Plugin MCP cho Visual Paradigm (fork `thanhtrnnn/vp-mcp` của plugin của Manoel Brunnen) | `docs/vp/build_vp.py` gọi plugin để dựng sơ đồ | https://github.com/thanhtrnnn/vp-mcp | Apache License 2.0; bản cài trên máy đã sửa để chỉ nhận kết nối từ localhost |
 | Bài giảng *Thực tập tốt nghiệp 2: Công nghệ phần mềm* (BG HP TTTN 2 CNPM), PTIT, 2020 | Phương pháp, khuôn các pha trong `docs/`; checklist rà soát và kiểm thử ở `docs/pha5-ra-soat-kiem-thu.md` rút gọn từ Bảng 6.x của bài giảng | Tài liệu học phần | Tài liệu nội bộ của học phần |
 | Đề bài | `de_bai.md` | Đề bài tập lớn của học phần | Luật chơi, cách tính điểm, tiêu chí xếp hạng |
 
