@@ -78,7 +78,7 @@ Thực hiện khi có code, theo các mục chính của checklist giáo trình 
 
 Rút từ Bảng 6.6 của giáo trình, áp dụng cho ứng dụng Android:
 
-- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.7, 3.9); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
+- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.7, 3.9–3.11); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
 - Các màn hình gọi từ nút bấm hiển thị đúng; nút Quay lại của hệ thống Android cho kết quả giống nút Quay lại trên màn hình.
 - Xoay màn hình, ẩn ứng dụng rồi mở lại không làm mất trạng thái ván.
 - Trường bắt buộc (tên đăng nhập, mật khẩu) không cho phép rỗng; khoảng trắng đầu cuối được cắt bỏ.

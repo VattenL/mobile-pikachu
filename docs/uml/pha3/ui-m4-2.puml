@@ -1,0 +1,51 @@
+@startuml ui-m4-2
+title Thiết kế giao diện - Chơi ván đối kháng (màn hình ngang)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Match [
+{{salt
+{+
+  { {+
+      <b>Đấu với B
+      08:30
+      .
+      <b>Bạn
+      98 ô
+      .
+      [ Thoát ]
+    } | {#
+      A | B | C | D | E | F
+      G | A | . | H | B | C
+      D | . | E | F | G | H
+      B | C | A | . | D | E
+      F | G | H | A | . | B
+      C | D | E | F | G | A
+    } | {+
+      <b>B · 92 ô
+      {#
+        A | . | C | D | . | F
+        G | A | . | H | B | C
+        . | . | E | F | G | H
+        B | C | . | . | D | E
+        F | G | H | A | . | B
+        C | . | E | F | G | .
+      }
+      <i>(bàn của đối thủ, chỉ xem)
+    } }
+}
+}}
+]
+
+rectangle "Dialog kết quả" as Result
+rectangle "Giao diện chính" as Main
+
+Match -right-> Result : kết thúc ván
+Match -down-> Main : thoát
+@enduml

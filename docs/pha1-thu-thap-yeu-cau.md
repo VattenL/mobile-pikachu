@@ -33,7 +33,7 @@ Bảng giải thích ngữ nghĩa của từng khái niệm:
 | 4 | Đăng ký tài khoản | Register account | Người chơi nhập tên đăng nhập, mật khẩu và tên hiển thị để tạo tài khoản mới. |
 | 5 | Đăng nhập | Login | Người chơi nhập tên đăng nhập và mật khẩu để hệ thống xác thực, sau đó vào giao diện chính. |
 | 6 | Đăng xuất | Logout | Người chơi rời khỏi hệ thống, không còn xuất hiện trong danh sách người chơi online. |
-| 7 | Thách đấu | Challenge | Người chơi click vào tên một người chơi đang rỗi trong danh sách online và xác nhận để gửi lời mời đấu một ván. |
+| 7 | Thách đấu | Challenge | Người chơi click vào tên một người chơi không bận (rỗi hoặc luyện tập) trong danh sách online và xác nhận để gửi lời mời đấu một ván. |
 | 8 | Trả lời lời mời | Respond to challenge | Người được mời chấp nhận (OK) hoặc từ chối (Reject) lời mời thách đấu. |
 | 9 | Nối cặp ô | Match tiles | Người chơi click lần lượt hai ô có cùng hình. Nếu hai ô nối được với nhau bằng tối đa 3 đoạn thẳng chỉ đi qua ô trống thì hai ô biến mất. |
 | 10 | Thoát ván | Quit match | Người chơi bấm nút thoát khi ván chưa kết thúc. Ở ván đối kháng, người thoát bị xử thua. |
@@ -69,7 +69,7 @@ Những người được vào hệ thống và chức năng mỗi người đư
   - Đăng nhập
 - Người chơi đã đăng nhập:
   - Đăng xuất
-  - Xem danh sách người chơi online và thách đấu một người chơi đang rỗi
+  - Xem danh sách người chơi online và thách đấu một người chơi không bận (rỗi hoặc luyện tập)
   - Trả lời lời mời thách đấu của người chơi khác
   - Chơi ván đối kháng, chọn tiếp tục hay dừng sau mỗi ván
   - Chơi với máy
@@ -87,7 +87,7 @@ Mô tả chi tiết bốn chức năng được chọn làm modul phân tích, t
 
 - Người chơi chơi với máy: Tại giao diện chính, người chơi bấm Chơi với máy → hệ thống hiện giao diện chọn độ khó (Dễ, Trung bình, Khó) → người chơi chọn độ khó và bấm Bắt đầu → hệ thống sinh một đề bài 10x10, hiện bàn chơi, đồng hồ đếm ngược 10 phút, số ô còn lại của người chơi và của máy, nút Thoát; máy bắt đầu chơi trên một bàn riêng có cùng đề bài → người chơi click lần lượt hai ô cùng hình, nếu hai ô nối được bằng tối đa 3 đoạn thẳng thì hệ thống vẽ đường nối và xóa hai ô, nếu không thì bỏ chọn; máy cũng tự xóa từng cặp sau mỗi khoảng thời gian theo độ khó; nếu bàn bị bế tắc thì hệ thống xáo lại các ô còn lại → bên nào xóa hết ô trước thì thắng; hết giờ mà chưa bên nào xong thì hòa → hệ thống hiện kết quả, người chơi bấm OK để về giao diện chính. Kết quả ván với máy không được lưu và không tính vào bảng xếp hạng.
 
-- Người chơi thách đấu và đấu đối kháng: Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi trong danh sách online → hệ thống hiện dialog xác nhận thách đấu B với hai nút Xác nhận và Hủy, đề phòng A bấm nhầm; nếu A bấm Hủy thì quay lại giao diện chính → A bấm Xác nhận thì hệ thống gửi lời mời tới B và báo A đang chờ trả lời → trên máy của B hiện dialog lời mời với hai nút OK và Reject → nếu B bấm Reject thì hệ thống báo A bị từ chối; nếu B bấm OK thì server tạo ván đấu, sinh một đề bài, gửi cùng đề cho cả hai máy và chuyển trạng thái hai người sang bận → hai người cùng chơi trên đề bài đó trong 10 phút, mỗi lần click một cặp ô thì server kiểm tra đường nối và báo kết quả; mỗi người xóa cặp trên bàn của riêng mình; nếu bàn của một người bị bế tắc thì server xáo lại bàn đó và chỉ gửi bàn mới cho người đó → người xóa hết ô trước thắng; hết giờ mà cả hai chưa xong thì hòa; người bấm Thoát hoặc mất kết nối giữa ván bị xử thua → server lưu kết quả ván, cập nhật điểm và gửi kết quả cho cả hai → mỗi máy hiện dialog kết quả kèm câu hỏi có muốn tiếp tục không → nếu cả hai chọn tiếp tục thì bắt đầu ván mới với đề bài mới; nếu một người dừng thì cả hai về giao diện chính, server báo cho người còn lại biết đối thủ đã dừng chơi, trạng thái hai người trở về rỗi.
+- Người chơi thách đấu và đấu đối kháng: Tại giao diện chính, người chơi A click vào tên người chơi B đang không bận (rỗi hoặc luyện tập) trong danh sách online → hệ thống hiện dialog xác nhận thách đấu B với hai nút Xác nhận và Hủy, đề phòng A bấm nhầm; nếu A bấm Hủy thì quay lại giao diện chính → A bấm Xác nhận thì hệ thống gửi lời mời tới B và báo A đang chờ trả lời → trên máy của B hiện dialog lời mời với hai nút OK và Reject → nếu B bấm Reject thì hệ thống báo A bị từ chối; nếu B bấm OK thì server tạo ván đấu, sinh một đề bài, gửi cùng đề cho cả hai máy và chuyển trạng thái hai người sang bận → hai người cùng chơi trên đề bài đó trong 10 phút, mỗi lần click một cặp ô thì server kiểm tra đường nối và báo kết quả; mỗi người xóa cặp trên bàn của riêng mình; nếu bàn của một người bị bế tắc thì server xáo lại bàn đó và chỉ gửi bàn mới cho người đó → người xóa hết ô trước thắng; hết giờ mà cả hai chưa xong thì hòa; người bấm Thoát hoặc mất kết nối giữa ván bị xử thua → server lưu kết quả ván, cập nhật điểm và gửi kết quả cho cả hai → mỗi máy hiện dialog kết quả kèm câu hỏi có muốn tiếp tục không → nếu cả hai chọn tiếp tục thì bắt đầu ván mới với đề bài mới; nếu một người dừng thì cả hai về giao diện chính, server báo cho người còn lại biết đối thủ đã dừng chơi, trạng thái hai người trở về rỗi.
 
 ### Bước 4: Thông tin các đối tượng cần xử lý, quản lý
 
@@ -132,7 +132,7 @@ Biểu đồ use case tổng quan như Hình 1.1.
 | 4 | `View Ranking` | Cho phép người chơi xem bảng xếp hạng toàn bộ người chơi |
 | 5 | `Play With Bot` | Cho phép người chơi chọn độ khó và chơi một ván với máy |
 | 6 | `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu đối kháng trên cùng đề bài, server làm trọng tài |
-| 7 | `Challenge Player` | Cho phép người chơi chọn một người chơi đang rỗi, xác nhận và gửi lời mời đấu |
+| 7 | `Challenge Player` | Cho phép người chơi chọn một người chơi không bận, xác nhận và gửi lời mời đấu |
 | 8 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời thách đấu |
 
 ### b. Use case chi tiết cho modul quản lý tài khoản
@@ -226,7 +226,7 @@ Biểu đồ use case chi tiết như Hình 1.5.
 |---|---|
 | `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu một phiên đối kháng trên cùng đề bài, server làm trọng tài, lưu kết quả và cập nhật điểm |
 | `Login` | Cho phép người chơi đăng nhập trước khi thách đấu hoặc nhận lời mời |
-| `Challenge Player` | Cho phép người chơi chọn một đối thủ đang rỗi trong danh sách người chơi online, xác nhận rồi gửi lời mời |
+| `Challenge Player` | Cho phép người chơi chọn một đối thủ không bận trong danh sách người chơi online, xác nhận rồi gửi lời mời |
 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời |
 | `Match Tiles` | Cho phép người chơi click lần lượt hai ô cùng hình để xóa chúng nếu nối được bằng tối đa 3 đoạn thẳng |
 | `Decide To Continue` | Cho phép mỗi người chơi chọn tiếp tục ván mới hoặc dừng sau khi một ván kết thúc |

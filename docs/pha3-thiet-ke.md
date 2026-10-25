@@ -178,28 +178,37 @@ Ván với máy chạy hoàn toàn trên client và không lưu kết quả; cli
 
 ### d. Modul thách đấu và đấu đối kháng
 
-Giao diện như Hình 3.9. Dialog xác nhận thách đấu hiện trên máy người thách đấu, dialog lời mời hiện trên máy người được mời; các màn hình còn lại hiện trên cả hai máy.
+Giao diện được tách theo ba chức năng của modul. Thách đấu và trả lời lời mời như Hình 3.9: dialog xác nhận thách đấu hiện trên máy người thách đấu, dialog lời mời hiện trên máy người được mời. Chơi ván như Hình 3.10. Kết thúc ván và tái đấu như Hình 3.11: dialog kết quả hiện trên cả hai máy; người bấm Tiếp tục thấy thông báo chờ cho tới khi đối thủ trả lời.
 
-![Hình 3.9: Thiết kế giao diện modul thách đấu và đấu đối kháng](uml/pha3/ui-m4.png)
+![Hình 3.9: Thiết kế giao diện chức năng thách đấu và trả lời lời mời](uml/pha3/ui-m4-1.png)
 
-*Hình 3.9: Thiết kế giao diện modul thách đấu và đấu đối kháng*
+*Hình 3.9: Thiết kế giao diện chức năng thách đấu và trả lời lời mời*
+
+![Hình 3.10: Thiết kế giao diện chức năng chơi ván đối kháng](uml/pha3/ui-m4-2.png)
+
+*Hình 3.10: Thiết kế giao diện chức năng chơi ván đối kháng*
+
+![Hình 3.11: Thiết kế giao diện chức năng kết thúc ván và tái đấu](uml/pha3/ui-m4-3.png)
+
+*Hình 3.11: Thiết kế giao diện chức năng kết thúc ván và tái đấu*
 
 - `MainScreen` → `MainActivity`: thêm `TextView` thông báo (đang chờ, bị từ chối, đối thủ đã dừng) và xử lý click vào một người chơi trong danh sách: mở `ChallengeConfirmDialog`, chỉ gửi lời mời khi người chơi xác nhận. `MainActivity` nhận `ONLINE_LIST`, `INVITE_RESULT`; hai message `INVITE_RECEIVED`, `MATCH_START` do lớp cha `BaseActivity` xử lý.
 - `BaseActivity`: lớp cha trừu tượng của các Activity sau khi đăng nhập (`MainActivity`, `RankingActivity`, `DifficultyActivity`, `BotGameActivity`; trừ `MatchActivity` vì người đang đấu không nhận lời mời), cài đặt `MessageListener`. `onMessage()` xử lý chung hai message: `INVITE_RECEIVED` thì mở `InvitationDialog` ngay trên màn hình đang mở, nên người được mời nhận lời mời ở bất kỳ màn hình nào, kể cả khi đang chơi với máy; `MATCH_START` thì đóng màn hình hiện tại và mở `MatchActivity`. Nếu màn hình đó là `BotGameActivity` thì ván với máy dừng (hủy đồng hồ và lượt của máy, không lưu).
 - `ChallengeConfirmDialog`: `TextView` tên đối thủ, nút Xác nhận, nút Hủy; thuộc tính ẩn `opponent`. Xác nhận thì trả đối thủ về cho `MainActivity` để gửi `INVITE`; Hủy thì chỉ đóng dialog, không gửi gì lên server.
 - `InvitationDialog`: `TextView` tên người mời, nút OK, nút Reject; thuộc tính ẩn `challenger`.
 - `MatchScreen` → `MatchActivity`: bàn của mình (`BoardView`), bàn thu nhỏ của đối thủ (`opponentBoardView`, chỉ để xem), đồng hồ, số ô còn lại của hai bên, nút Thoát; thuộc tính ẩn `board`, `opponentBoard`, `matchId`, `opponent`, `firstCell`. Khác với ván với máy, `MatchActivity` không tự kiểm tra đường nối mà gửi `MOVE` lên server rồi cập nhật bàn theo `MOVE_RESULT`, thay bàn khi nhận `BOARD_SHUFFLED`; bàn của đối thủ được cập nhật theo `OPPONENT_PROGRESS` (cặp vừa xóa, đường nối và cả bàn hiện tại của đối thủ, gồm cả khi bàn đó vừa được xáo).
-- `ResultDialog`: `TextView` kết quả, nút Tiếp tục, nút Dừng; nhận `OPPONENT_LEFT` khi đối thủ dừng.
+- `ResultDialog`: `TextView` kết quả, nút Tiếp tục, nút Dừng. Bấm Tiếp tục thì gửi `REMATCH_REPLY` đồng ý và hiện thông báo chờ; nhận `MATCH_START` (cả hai đã đồng ý) thì đóng dialog và mở `MatchActivity` với ván mới; nhận `OPPONENT_LEFT` khi đối thủ dừng thì về `MainActivity`.
 - Trên server:
   - `ChallengeController` xử lý `INVITE`, `INVITE_REPLY`, `UPDATE_STATUS` và gửi lại danh sách online (`broadcastOnlineList()`). Lời mời chỉ được gửi khi người được mời không bận (rỗi hoặc luyện tập).
-  - `MatchController` xử lý `MOVE`, `LEAVE_MATCH`, `REMATCH_REPLY`, hết giờ (`onTimeout()`), và kết thúc ván (`endMatch()`).
+  - `MatchController` xử lý `MOVE`, `LEAVE_MATCH`, `REMATCH_REPLY`, hết giờ (`onTimeout()`), mất kết nối (`handleDisconnect()`) và kết thúc ván (`endMatch()`). `handleRematchReply()` ghi câu trả lời vào `rematchReplies` của phòng: có người dừng thì chuyển hai người về rỗi, gửi `OPPONENT_LEFT` cho người kia và gửi lại danh sách online; cả hai đồng ý thì sinh đề mới, tạo phòng mới qua `MatchManager.createMatch()` và gửi `MATCH_START` cho cả hai, trạng thái vẫn là bận.
+  - Mất kết nối: khi đọc socket báo lỗi, `ClientHandler.run()` gọi `MatchController.handleDisconnect()` rồi `OnlinePlayerManager.removeOnlinePlayer()`. `handleDisconnect()` xử lý theo tình huống ở mục 7: đang trong ván thì gọi `endMatch(room, "DISCONNECT")`, đang ở dialog kết quả thì coi như chọn Dừng. `removeOnlinePlayer()` gỡ người chơi khỏi danh sách online và báo `INVITE_RESULT` (`OFFLINE`) cho người đang chờ người đó trả lời lời mời; sau đó `ChallengeController.broadcastOnlineList()` gửi lại danh sách online.
   - `MatchManager` giữ các ván đang diễn ra; mỗi ván là một `MatchRoom` gồm `Match`, hai `ClientHandler`, **hai bản bàn chơi riêng** cho hai người (cùng đề ban đầu), thời điểm bắt đầu theo đồng hồ server và bộ hẹn giờ 10 phút.
   - `OnlinePlayerManager` giữ ánh xạ tên đăng nhập → `ClientHandler` của người đang online và trạng thái (rỗi, luyện tập, bận).
 - Các thao tác trên `MatchRoom` được đồng bộ (`synchronized`) vì hai luồng `ClientHandler` của hai người chơi cùng truy cập một phòng; ai hoàn thành trước được xác định theo thứ tự server xử lý message.
 
-![Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](vp/png/class-design-m4.png)
+![Hình 3.12: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](vp/png/class-design-m4.png)
 
-*Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
+*Hình 3.12: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
 
 ## 5. Thiết kế hoạt động cho bốn modul
 
@@ -207,9 +216,9 @@ Mỗi hành động trong biểu đồ hoạt động ứng với một phương
 
 ### a. Modul quản lý tài khoản
 
-![Hình 3.11: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m1.png)
+![Hình 3.13: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m1.png)
 
-*Hình 3.11: Biểu đồ hoạt động modul quản lý tài khoản*
+*Hình 3.13: Biểu đồ hoạt động modul quản lý tài khoản*
 
 Kịch bản phiên bản 3:
 
@@ -259,15 +268,15 @@ Kịch bản phiên bản 3:
 43. Lớp `LoginController` gọi hàm `broadcastOnlineList()` của lớp `ChallengeController` để gửi lại danh sách online cho những người chơi khác.
 <!-- END v3-m1 -->
 
-![Hình 3.12: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m1.png)
+![Hình 3.14: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m1.png)
 
-*Hình 3.12: Biểu đồ tuần tự modul quản lý tài khoản*
+*Hình 3.14: Biểu đồ tuần tự modul quản lý tài khoản*
 
 ### b. Modul xem bảng xếp hạng
 
-![Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
+![Hình 3.15: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
 
-*Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng*
+*Hình 3.15: Biểu đồ hoạt động modul xem bảng xếp hạng*
 
 Kịch bản phiên bản 3:
 
@@ -310,15 +319,15 @@ Kịch bản phiên bản 3:
 36. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m2 -->
 
-![Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
+![Hình 3.16: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
 
-*Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng*
+*Hình 3.16: Biểu đồ tuần tự modul xem bảng xếp hạng*
 
 ### c. Modul chơi với máy
 
-![Hình 3.15: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
+![Hình 3.17: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
 
-*Hình 3.15: Biểu đồ hoạt động modul chơi với máy*
+*Hình 3.17: Biểu đồ hoạt động modul chơi với máy*
 
 Kịch bản phiên bản 3:
 
@@ -378,15 +387,15 @@ Kịch bản phiên bản 3:
 52. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m3 -->
 
-![Hình 3.16: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
+![Hình 3.18: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
 
-*Hình 3.16: Biểu đồ tuần tự modul chơi với máy*
+*Hình 3.18: Biểu đồ tuần tự modul chơi với máy*
 
 ### d. Modul thách đấu và đấu đối kháng
 
-![Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
+![Hình 3.19: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
 
-*Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
+*Hình 3.19: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
 
 Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; mỗi lớp giao diện và `ServerConnection` có một bản trên mỗi máy, mỗi người chơi có một `ClientHandler` riêng trên server):
 
@@ -493,33 +502,78 @@ Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; m�
 99. Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
 <!-- END v3-m4 -->
 
-Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.18), phần 2 là vòng lặp chơi ván (Hình 3.19), phần 3 từ lúc kết thúc ván tới khi về giao diện chính (Hình 3.20).
+Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.20), phần 2 là vòng lặp chơi ván (Hình 3.21), phần 3 từ lúc kết thúc ván tới khi về giao diện chính (Hình 3.22). Nhánh tái đấu ở cuối mục.
 
-![Hình 3.18: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
+![Hình 3.20: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
 
-*Hình 3.18: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
+*Hình 3.20: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
 
-![Hình 3.19: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
+![Hình 3.21: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
 
-*Hình 3.19: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
+*Hình 3.21: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
 
-![Hình 3.20: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
+![Hình 3.22: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
 
-*Hình 3.20: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván và tái đấu*
+*Hình 3.22: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván*
+
+Ngoại lệ 12a của kịch bản v1 (cả hai người chơi chọn tiếp tục) có kịch bản phiên bản 3 riêng, thay cho phần 3 từ bước 74 (sau khi `ResultDialog` hiện lên ở bước 73). Kịch bản đánh số lại từ 1:
+
+<!-- BEGIN v3-m4-rematch -->
+1. Tại dialog kết quả, A click nút Tiếp tục.
+2. Lớp `ResultDialog` gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý.
+3. Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A.
+4. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của A trên server.
+5. Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`.
+6. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván vừa kết thúc.
+7. Lớp `MatchManager` gọi hàm `getRoom()`.
+8. Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`; lớp `MatchController` ghi nhận A đồng ý vào `rematchReplies` của phòng và chờ vì B chưa trả lời.
+9. Trên máy của mình, B click nút Tiếp tục.
+10. Lớp `ResultDialog` trên máy B gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý.
+11. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của B.
+12. Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`.
+13. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván vừa kết thúc.
+14. Lớp `MatchManager` gọi hàm `getRoom()`.
+15. Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`; lớp `MatchController` ghi nhận B đồng ý, thấy cả hai đã đồng ý nên tạo ván mới.
+16. Lớp `MatchController` gọi lớp `BoardGenerator` yêu cầu sinh đề bài 10x10 mới.
+17. Lớp `BoardGenerator` gọi hàm `generateBoard()`.
+18. Hàm `generateBoard()` gọi lớp `Board` để đóng gói đề bài.
+19. Lớp `Board` đóng gói thông tin thực thể.
+20. Lớp `Board` trả kết quả cho hàm `generateBoard()`.
+21. Hàm `generateBoard()` trả đề bài cho lớp `MatchController`.
+22. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu tạo ván mới cho A và B với đề bài vừa sinh.
+23. Lớp `MatchManager` gọi hàm `createMatch()`, tạo phòng chơi mới giữ hai bản sao đề bài và bỏ phòng của ván cũ.
+24. Hàm `createMatch()` gọi lớp `Match` để đóng gói ván đấu.
+25. Lớp `Match` đóng gói thông tin thực thể.
+26. Lớp `Match` trả kết quả cho hàm `createMatch()`.
+27. Hàm `createMatch()` trả phòng chơi mới cho lớp `MatchController`.
+28. Lớp `MatchController` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_START`; trạng thái hai người vẫn là bận.
+29. Lớp `ClientHandler` gửi message `MATCH_START` qua TCP tới lớp `ServerConnection` trên cả hai máy.
+30. Lớp `ServerConnection` chuyển message cho lớp `ResultDialog` trên cả hai máy.
+31. Lớp `ResultDialog` đóng và gọi lớp `MatchActivity`, kèm đề bài mới và thông tin đối thủ.
+32. Lớp `MatchActivity` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B.
+<!-- END v3-m4-rematch -->
+
+Biểu đồ tuần tự của nhánh tái đấu như Hình 3.23.
+
+![Hình 3.23: Biểu đồ tuần tự modul thách đấu, nhánh tái đấu](vp/png/seq-m4-4.png)
+
+*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh tái đấu*
+
+Các cách kết thúc ván khác (hết giờ, bấm Thoát, mất kết nối) đi theo phần 3 kể từ hàm `endMatch()`: bộ hẹn giờ gọi `MatchController.onTimeout()`, message `LEAVE_MATCH` vào `MatchController.handleLeaveMatch()`, lỗi đọc socket vào `MatchController.handleDisconnect()`; ba hàm này đều gọi `endMatch()` với lý do tương ứng (mục 8d), phần sau giống bước 66 trở đi.
 
 ## 6. Thiết kế triển khai
 
-Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.21.
+Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.24.
 
-![Hình 3.21: Biểu đồ gói](vp/png/package.png)
+![Hình 3.24: Biểu đồ gói](vp/png/package.png)
 
-*Hình 3.21: Biểu đồ gói*
+*Hình 3.24: Biểu đồ gói*
 
-Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.22.
+Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.25.
 
-![Hình 3.22: Biểu đồ triển khai](vp/png/deployment.png)
+![Hình 3.25: Biểu đồ triển khai](vp/png/deployment.png)
 
-*Hình 3.22: Biểu đồ triển khai*
+*Hình 3.25: Biểu đồ triển khai*
 
 ## 7. Thiết kế giao thức truyền thông
 
@@ -553,11 +607,11 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `REMATCH_REPLY` | `matchId`, `accept` |
 | S → C | `OPPONENT_LEFT` | |
 
-Luồng message chính giữa hai client và server như Hình 3.23.
+Luồng message chính giữa hai client và server như Hình 3.26.
 
-![Hình 3.23: Luồng message giữa hai client và server](uml/pha3/protocol.png)
+![Hình 3.26: Luồng message giữa hai client và server](uml/pha3/protocol.png)
 
-*Hình 3.23: Luồng message giữa hai client và server*
+*Hình 3.26: Luồng message giữa hai client và server*
 
 Xử lý các tình huống bất thường:
 
@@ -570,11 +624,11 @@ Xử lý các tình huống bất thường:
 
 ### a. Kiểm tra đường nối hai ô
 
-Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.24.
+Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.27.
 
-![Hình 3.24: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
+![Hình 3.27: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
 
-*Hình 3.24: Các dạng đường nối hai ô*
+*Hình 3.27: Các dạng đường nối hai ô*
 
 `PathFinder.checkPath()` dùng tìm kiếm theo chiều rộng, mỗi trạng thái là một ô kèm hướng đi và số đoạn đã dùng. Từ mỗi trạng thái, thuật toán đi thẳng theo từng hướng qua các ô trống; đổi hướng thì tăng số đoạn; dừng nhánh khi số đoạn vượt 3, gặp ô có hình, ra khỏi lưới, hoặc ô đó đã được tới bằng số đoạn không lớn hơn.
 

@@ -60,12 +60,21 @@ def pick(md, select):
     return "\n".join(out)
 
 
+DEV1_FIGURES = ["uml/pha3/ui-m4-2.png", "uml/pha3/seq-m4-2.png"]  # giao diện và tuần tự phần chơi ván (Dev 1)
+
+
 def adjust(md):
     md = re.sub(r"^(##+ .*?) (?:cho )?bốn modul", r"\1 cho các modul", md, flags=re.M)
-    # Hình 3.19 (tuần tự phần chơi ván) thuộc Dev 1
-    md = re.sub(r"!\[Hình 3\.19:[^\n]*\n\n\*Hình 3\.19:[^\n]*\*\n\n", "", md)
-    md = md.replace("phần 2 là vòng lặp chơi ván (Hình 3.19)",
-                    "phần 2 là vòng lặp chơi ván (Hình 3.19, thuộc phần của Dev 1, xem bản chung)")
+    for src in DEV1_FIGURES:
+        md = re.sub(rf"!\[[^\]]*\]\({re.escape(src)}\)\n\n\*Hình [^\n]*\*\n\n", "", md)
+    for old, new in [
+        (r"Chơi ván như Hình 3\.\d+\.", "Chơi ván thuộc phần của Dev 1."),
+        (r"phần 2 là vòng lặp chơi ván \(Hình 3\.\d+\)", "phần 2 là vòng lặp chơi ván (thuộc phần của Dev 1)"),
+        (r"thuộc modul của Dev 1, chưa vẽ\.", "thuộc phần của Dev 1."),
+    ]:
+        md, n = re.subn(old, new, md)
+        if n != 1:
+            raise SystemExit(f"không khớp: {old}")
     return md
 
 
@@ -106,8 +115,8 @@ def build_html():
     parts = [f"# {TITLE}", INTRO]
     for name, select in SELECT.items():
         md = (DOCS / name).read_text(encoding="utf-8")
-        parts.append(adjust(pick(md, select)))
-    body = markdown.markdown("\n\n".join(parts), extensions=["tables", "sane_lists"])
+        parts.append(pick(md, select))
+    body = markdown.markdown(adjust("\n\n".join(parts)), extensions=["tables", "sane_lists"])
     body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
     body = style(embed_images(body))
     body = re.sub(r"(<h1 [^>]*>Pha)", r'<p style="page-break-before:always"></p>\1', body)

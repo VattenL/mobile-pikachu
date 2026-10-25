@@ -417,6 +417,22 @@ SEQA_M4_2 = [  # kịch bản v2 M4, bước 35-51: kết thúc ván và tái đ
     ("msg2", "MainScreen", ["Người chơi A", "Người chơi B"], "hiển thị"),
 ]
 
+SEQA_M4_3_PARTS = [("actor", "Người chơi A"), ("boundary", "ResultDialog"), ("boundary", "MatchScreen"),
+                   ("entity", "Board"), ("entity", "Match"), ("actor", "Người chơi B")]
+SEQA_M4_3 = [  # nhánh 12a (cả hai chọn tiếp tục), đánh số riêng từ 1
+    ("msg", "Người chơi A", "ResultDialog", "click tiếp tục"),
+    ("msg", "ResultDialog", "Người chơi A", "hiển thị thông báo chờ"),
+    ("msg", "Người chơi B", "ResultDialog", "click tiếp tục"),
+    ("call", "ResultDialog", "Board", "gọi"),
+    ("self", "Board", None, "generateBoard()"),
+    ("ret", "Board", "ResultDialog", "trả về"),
+    ("call", "ResultDialog", "Match", "gọi"),
+    ("self", "Match", None, "createMatch()"),
+    ("ret", "Match", "ResultDialog", "trả về"),
+    ("call", "ResultDialog", "MatchScreen", "gọi"),
+    ("msg2", "MatchScreen", ["Người chơi A", "Người chơi B"], "hiển thị"),
+]
+
 # ---- Pha 2: vị trí các trạng thái M4 (layout tự động làm rối nhãn)
 
 STATE_M4_POS = {
@@ -631,23 +647,27 @@ DIAGRAMS = [
     ("seq-analysis-m2", "2.11 Tuần tự phân tích M2", lambda n: build_sequence(n, SEQA_M2_PARTS, SEQA_M2)),
     ("seq-analysis-m4-1", "2.13 Tuần tự phân tích M4 (thách đấu)",
      lambda n: build_sequence(n, SEQA_M4_1_PARTS, SEQA_M4_1)),
-    ("seq-analysis-m4-2", "2.14 Tuần tự phân tích M4 (kết thúc ván, tái đấu)",
+    ("seq-analysis-m4-2", "2.14 Tuần tự phân tích M4 (kết thúc ván)",
      lambda n: build_sequence(n, SEQA_M4_2_PARTS, SEQA_M4_2, 35)),
+    ("seq-analysis-m4-3", "2.15 Tuần tự phân tích M4 (tái đấu)",
+     lambda n: build_sequence(n, SEQA_M4_3_PARTS, SEQA_M4_3)),
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế",
      lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity")),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
     ("class-design-m2", "3.6 Lớp thiết kế M2", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2")),
-    ("class-design-m4", "3.10 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4")),
-    ("activity-m2", "3.13 Hoạt động M2", lambda n: build_activity(n, ACT_M2, ACT_M2_FLOWS)),
-    ("seq-m2", "3.14 Tuần tự thiết kế M2",
+    ("class-design-m4", "3.12 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4")),
+    ("activity-m2", "3.15 Hoạt động M2", lambda n: build_activity(n, ACT_M2, ACT_M2_FLOWS)),
+    ("seq-m2", "3.16 Tuần tự thiết kế M2",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
-    ("activity-m4", "3.17 Hoạt động M4", lambda n: build_activity(n, ACT_M4, ACT_M4_FLOWS)),
-    ("seq-m4-1", "3.18 Tuần tự thiết kế M4 (thách đấu)",
+    ("activity-m4", "3.19 Hoạt động M4", lambda n: build_activity(n, ACT_M4, ACT_M4_FLOWS)),
+    ("seq-m4-1", "3.20 Tuần tự thiết kế M4 (thách đấu)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4A_PARTS), seq_steps(gen_seq.M4A_PARTS, gen_seq.M4A))),
-    ("seq-m4-3", "3.20 Tuần tự thiết kế M4 (kết thúc ván, tái đấu)",
+    ("seq-m4-3", "3.22 Tuần tự thiết kế M4 (kết thúc ván)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4C_PARTS), seq_steps(gen_seq.M4C_PARTS, gen_seq.M4C), M4C_START)),
-    ("package", "3.21 Biểu đồ gói", build_package),
-    ("deployment", "3.22 Biểu đồ triển khai", build_deployment),
+    ("seq-m4-4", "3.23 Tuần tự thiết kế M4 (tái đấu)",
+     lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),
+    ("package", "3.24 Biểu đồ gói", build_package),
+    ("deployment", "3.25 Biểu đồ triển khai", build_deployment),
 ]
 
 

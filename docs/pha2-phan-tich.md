@@ -2,7 +2,7 @@
 
 ## 1. Kịch bản cho bốn modul
 
-Dữ liệu mẫu dùng chung: người chơi Hoàng Nam (tên đăng nhập `hoangnam`) là người thao tác chính; Minh Anh (`minhanh`) là đối thủ ở modul thách đấu; Thanh Tùng (`thanhtung`) là người chơi mới ở modul quản lý tài khoản.
+Kịch bản của modul xem bảng xếp hạng và modul thách đấu dùng người chơi A (người thao tác chính) và người chơi B (đối thủ ở modul thách đấu); các người chơi khác trong dữ liệu mẫu là C, D, E. Bước lẻ là thao tác của người chơi, bước chẵn là phản hồi của hệ thống; dữ liệu hiển thị được ghi thành bảng. Modul quản lý tài khoản và modul chơi với máy dùng dữ liệu mẫu: người chơi Hoàng Nam (tên đăng nhập `hoangnam`) là người thao tác chính, Thanh Tùng (`thanhtung`) là người chơi mới.
 
 ### a. Kịch bản cho modul quản lý tài khoản
 
@@ -23,7 +23,7 @@ Dữ liệu mẫu dùng chung: người chơi Hoàng Nam (tên đăng nhập `ho
 | **Actor** | Player (Người chơi) |
 | **Tiền điều kiện** | Người chơi đã có tài khoản và đang ở giao diện đăng nhập của ứng dụng |
 | **Hậu điều kiện** | Người chơi xem được bảng xếp hạng và quay về giao diện chính |
-| **Kịch bản chuẩn** | 1. Tại giao diện đăng nhập, Hoàng Nam nhập tên đăng nhập `hoangnam`, mật khẩu và click nút **Đăng nhập**.<br>2. Hệ thống kiểm tra tài khoản hợp lệ, hiện giao diện chính gồm danh sách người chơi online và các nút **Xem bảng xếp hạng**, **Chơi với máy**, **Đăng xuất**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Quốc Bảo</td><td>10.5</td><td>Bận</td></tr><tr><td>3</td><td>Thu Hà</td><td>7.5</td><td>Rỗi</td></tr></table><br>3. Hoàng Nam click nút **Xem bảng xếp hạng**.<br>4. Giao diện bảng xếp hạng hiện lên, sắp xếp theo tổng điểm giảm dần, rồi trung bình điểm đối thủ giảm dần, rồi trung bình thời gian thắng tăng dần; có nút **Quay lại**:<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>1</td><td>Minh Anh</td><td>12.5</td><td>9.2</td><td>05:48</td></tr><tr><td>2</td><td>Hoàng Nam</td><td>11</td><td>10.1</td><td>06:10</td></tr><tr><td>3</td><td>Quốc Bảo</td><td>10.5</td><td>9.5</td><td>06:31</td></tr><tr><td>4</td><td>Thu Hà</td><td>7.5</td><td>11.0</td><td>07:02</td></tr><tr><td>5</td><td>Đức Long</td><td>7.5</td><td>8.4</td><td>06:55</td></tr></table><br>5. Hoàng Nam click nút **Quay lại**.<br>6. Hệ thống đưa Hoàng Nam về giao diện chính. |
+| **Kịch bản chuẩn** | 1. Tại giao diện đăng nhập, người chơi A nhập tên đăng nhập, mật khẩu và click nút **Đăng nhập**.<br>2. Hệ thống kiểm tra tài khoản hợp lệ, hiện giao diện chính gồm danh sách người chơi online và các nút **Xem bảng xếp hạng**, **Chơi với máy**, **Đăng xuất**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Người chơi B</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Người chơi C</td><td>10.5</td><td>Bận</td></tr><tr><td>3</td><td>Người chơi D</td><td>7.5</td><td>Luyện tập</td></tr></table><br>3. A click nút **Xem bảng xếp hạng**.<br>4. Giao diện bảng xếp hạng hiện lên, sắp xếp theo tổng điểm giảm dần, rồi trung bình điểm đối thủ giảm dần, rồi trung bình thời gian thắng tăng dần; có nút **Quay lại**:<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>1</td><td>Người chơi B</td><td>12.5</td><td>9.2</td><td>05:48</td></tr><tr><td>2</td><td>Người chơi A</td><td>11</td><td>10.1</td><td>06:10</td></tr><tr><td>3</td><td>Người chơi C</td><td>10.5</td><td>9.5</td><td>06:31</td></tr><tr><td>4</td><td>Người chơi D</td><td>7.5</td><td>11.0</td><td>07:02</td></tr><tr><td>5</td><td>Người chơi E</td><td>7.5</td><td>8.4</td><td>06:55</td></tr></table><br>5. A click nút **Quay lại**.<br>6. Hệ thống đưa A về giao diện chính. |
 | **Ngoại lệ** | 2a. Tên đăng nhập hoặc mật khẩu không đúng.<br>2b. Tài khoản đang được đăng nhập trên một máy khác.<br>4a. Hệ thống chưa có ván đối kháng nào nên bảng xếp hạng rỗng. |
 
 ### c. Kịch bản cho modul chơi với máy
@@ -42,11 +42,11 @@ Dữ liệu mẫu dùng chung: người chơi Hoàng Nam (tên đăng nhập `ho
 | Trường | Nội dung |
 |---|---|
 | **Use case** | `Play Online Match`: Thách đấu và đấu đối kháng |
-| **Actor** | Player: Hoàng Nam là người thách đấu, Minh Anh là người được mời |
-| **Tiền điều kiện** | Cả hai người chơi đã đăng nhập trên hai máy client và đang ở trạng thái rỗi |
+| **Actor** | Player: người chơi A là người thách đấu, người chơi B là người được mời |
+| **Tiền điều kiện** | A và B đã đăng nhập trên hai máy client; A đang rỗi, B không bận (rỗi hoặc luyện tập) |
 | **Hậu điều kiện** | Kết quả ván và điểm của hai người chơi được lưu trên server; hai người chơi về giao diện chính ở trạng thái rỗi |
-| **Kịch bản chuẩn** | 1. Tại giao diện chính, Hoàng Nam click vào tên Minh Anh (đang rỗi) trong danh sách người chơi online.<br>2. Hệ thống hiện dialog xác nhận "Bạn muốn thách đấu Minh Anh?" với hai nút **Xác nhận** và **Hủy** trên máy của Hoàng Nam.<br>3. Hoàng Nam click **Xác nhận**.<br>4. Hệ thống gửi lời mời tới Minh Anh và hiện thông báo "Đang chờ Minh Anh trả lời..." trên máy của Hoàng Nam; trên máy của Minh Anh hiện dialog "Hoàng Nam muốn thách đấu bạn" với hai nút **OK** và **Reject**.<br>5. Minh Anh click **OK**.<br>6. Hệ thống tạo ván đấu, sinh một đề bài 10x10, chuyển trạng thái hai người sang bận và hiện giao diện chơi trên cả hai máy: bàn chơi với cùng đề bài, đồng hồ đếm ngược 10:00, số ô còn lại của đối thủ "Đối thủ: 100", nút **Thoát**.<br>7. Hoàng Nam click lần lượt hai ô cùng hình.<br>8. Hệ thống kiểm tra hai ô nối được bằng tối đa 3 đoạn thẳng, vẽ đường nối, xóa hai ô trên máy của Hoàng Nam và cập nhật "Đối thủ: 98" trên máy của Minh Anh.<br>(Lặp lại bước 7-8; Minh Anh chơi song song trên máy của mình theo cùng cách.)<br>9. Hoàng Nam click cặp ô cuối cùng.<br>10. Hệ thống xóa cặp ô, ghi nhận Hoàng Nam hoàn thành lúc 06:42, kết thúc ván, lưu kết quả, cập nhật điểm và hiện dialog kết quả trên hai máy: máy của Hoàng Nam "Bạn thắng. Thời gian hoàn thành 06:42.", máy của Minh Anh "Bạn thua. Bạn còn 18 ô."; kèm câu hỏi "Bạn có muốn tiếp tục không?" với hai nút **Tiếp tục** và **Dừng**.<br>11. Hoàng Nam click **Dừng**.<br>12. Hệ thống chuyển hai người chơi về trạng thái rỗi, đưa cả hai về giao diện chính với danh sách người chơi online đã cập nhật điểm, và báo Minh Anh "Hoàng Nam đã dừng chơi". |
-| **Ngoại lệ** | 4a. Hoàng Nam click **Hủy**: hệ thống đóng dialog, không gửi lời mời, Hoàng Nam ở lại giao diện chính.<br>4b. Minh Anh vừa chuyển sang trạng thái bận trước khi lời mời tới.<br>6a. Minh Anh click **Reject**.<br>6b. Một người chơi click **Thoát** khi ván đang diễn ra, kể cả trước khi nối cặp nào, hoặc mất kết nối giữa ván.<br>8a. Hai ô không cùng hình hoặc không nối được bằng tối đa 3 đoạn thẳng.<br>8b. Bàn chơi bị bế tắc, không còn cặp nào nối được.<br>10a. Minh Anh xóa hết ô trước Hoàng Nam.<br>10b. Hết 10 phút mà cả hai người chơi chưa xóa hết ô.<br><br>**12a. Cả hai người chơi click Tiếp tục.**<br>12a1. Hệ thống tạo ván mới với đề bài mới và hiện giao diện chơi trên cả hai máy như bước 6. |
+| **Kịch bản chuẩn** | 1. Tại giao diện chính, A click vào tên B (không bận) trong danh sách người chơi online.<br>2. Hệ thống hiện dialog xác nhận "Bạn muốn thách đấu B?" với hai nút **Xác nhận** và **Hủy** trên máy của A.<br>3. A click **Xác nhận**.<br>4. Hệ thống gửi lời mời tới B và hiện thông báo "Đang chờ B trả lời..." trên máy của A; trên máy của B hiện dialog "A muốn thách đấu bạn" với hai nút **OK** và **Reject**.<br>5. B click **OK**.<br>6. Hệ thống tạo ván đấu, sinh một đề bài 10x10, chuyển trạng thái hai người sang bận và hiện giao diện chơi trên cả hai máy: bàn chơi với cùng đề bài, đồng hồ đếm ngược 10:00, số ô còn lại của đối thủ "Đối thủ: 100", nút **Thoát**.<br>7. A click lần lượt hai ô cùng hình.<br>8. Hệ thống kiểm tra hai ô nối được bằng tối đa 3 đoạn thẳng, vẽ đường nối, xóa hai ô trên máy của A và cập nhật "Đối thủ: 98" trên máy của B.<br>(Lặp lại bước 7-8; B chơi song song trên máy của mình theo cùng cách.)<br>9. A click cặp ô cuối cùng.<br>10. Hệ thống xóa cặp ô, ghi nhận A hoàn thành lúc 06:42, kết thúc ván, lưu kết quả, cập nhật điểm và hiện dialog kết quả trên hai máy, kèm câu hỏi "Bạn có muốn tiếp tục không?" với hai nút **Tiếp tục** và **Dừng**:<table><tr><th>Máy</th><th>Nội dung dialog kết quả</th></tr><tr><td>A</td><td>Bạn thắng. Thời gian hoàn thành 06:42.</td></tr><tr><td>B</td><td>Bạn thua. Bạn còn 18 ô.</td></tr></table><br>11. A click **Dừng**.<br>12. Hệ thống chuyển hai người chơi về trạng thái rỗi, đưa cả hai về giao diện chính với danh sách người chơi online đã cập nhật điểm, và báo B "A đã dừng chơi". |
+| **Ngoại lệ** | 4a. A click **Hủy**: hệ thống đóng dialog, không gửi lời mời, A ở lại giao diện chính.<br>4b. B vừa chuyển sang trạng thái bận trước khi lời mời tới.<br>6a. B click **Reject**.<br>6b. Một người chơi click **Thoát** khi ván đang diễn ra, kể cả trước khi nối cặp nào, hoặc mất kết nối giữa ván.<br>8a. Hai ô không cùng hình hoặc không nối được bằng tối đa 3 đoạn thẳng.<br>8b. Bàn chơi bị bế tắc, không còn cặp nào nối được.<br>10a. B xóa hết ô trước A.<br>10b. Hết 10 phút mà cả hai người chơi chưa xóa hết ô.<br><br>**12a. Cả hai người chơi click Tiếp tục.**<br>12a1. Hệ thống tạo ván mới với đề bài mới và hiện giao diện chơi trên cả hai máy như bước 6. |
 
 ## 2. Biểu đồ lớp thực thể của hệ thống
 
@@ -183,7 +183,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.4.
 - Bước 6, khi người được mời chấp nhận, cần: sinh đề bài → `Board.generateBoard()`; tạo ván đấu cho hai người với đề bài vừa sinh, output là `Match` → `createMatch()`, gán cho `Match`; chuyển trạng thái hai người sang bận, input là các `Player` → `updateStatus()`, gán cho `Player`.
 - Bước 6, giao diện chơi đề xuất lớp `MatchScreen`, cần có: bàn chơi, đồng hồ, số ô còn lại của đối thủ, kiểu output; ô người chơi click, kiểu input; nút thoát, kiểu submit. Các xử lý khi chọn hai ô dùng lại `checkPath()`, `removePair()`, `isCleared()`, `findAvailablePair()`, `shuffle()` của `Board`.
 - Bước 10, khi ván kết thúc, cần: lưu ván cùng hai kết quả và điểm, input là ván và kết quả của hai người → `saveMatch()`, gán cho `Match` vì `Match` gắn chặt với hai `MatchResult`.
-- Bước 10, dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, kiểu output; nút tiếp tục và nút dừng, kiểu submit. Khi dừng, chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()`.
+- Bước 10, dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, kiểu output; nút tiếp tục và nút dừng, kiểu submit. Khi dừng, chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()`. Khi cả hai chọn tiếp tục (ngoại lệ 12a), dùng lại `Board.generateBoard()` và `Match.createMatch()` để tạo ván mới, nên `ResultDialog` liên kết với `Board` và `Match`.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 
@@ -330,7 +330,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 
 ### d. Kịch bản phiên bản 2 cho modul thách đấu và đấu đối kháng
 
-1. Tại giao diện chính, người chơi A click vào tên người chơi B đang rỗi.
+1. Tại giao diện chính, người chơi A click vào tên người chơi B đang không bận (rỗi hoặc luyện tập).
 2. Lớp `MainScreen` gọi lớp `ChallengeConfirmDialog`.
 3. Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A.
 4. A click nút Xác nhận.
@@ -383,6 +383,20 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 50. Lớp `PlayerRanking` trả kết quả cho lớp `MainScreen`.
 51. Lớp `MainScreen` hiển thị danh sách người chơi online đã cập nhật cho A và B, kèm thông báo đối thủ đã dừng chơi cho B.
 
+Nhánh 12a của kịch bản v1 (cả hai người chơi chọn tiếp tục) thay cho các bước 40–51:
+
+1. Tại dialog kết quả, A click nút Tiếp tục.
+2. Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A.
+3. B click nút Tiếp tục.
+4. Lớp `ResultDialog` gọi lớp `Board` yêu cầu sinh đề bài 10x10 mới.
+5. Lớp `Board` sinh đề bài.
+6. Lớp `Board` trả đề bài cho lớp `ResultDialog`.
+7. Lớp `ResultDialog` gọi lớp `Match` yêu cầu tạo ván mới cho A và B với đề bài vừa sinh.
+8. Lớp `Match` tạo ván đấu.
+9. Lớp `Match` trả ván đấu cho lớp `ResultDialog`.
+10. Lớp `ResultDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
+11. Lớp `MatchScreen` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B; trạng thái hai người vẫn là bận.
+
 ## 6. Biểu đồ tương tác cho bốn modul
 
 Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2 cùng số thứ tự, và chỉ đi giữa hai lớp có liên kết trong biểu đồ lớp phân tích của modul. Modul xem bảng xếp hạng và modul thách đấu dùng biểu đồ tuần tự cho dễ đọc; modul quản lý tài khoản và modul chơi với máy dùng biểu đồ giao tiếp, trong đó dấu `*` đánh dấu các bước nằm trong vòng lặp.
@@ -407,7 +421,7 @@ Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2
 
 ### d. Biểu đồ tuần tự modul thách đấu và đấu đối kháng
 
-Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ chia theo kịch bản phiên bản 2: phần thách đấu (bước 1–23) ở Hình 2.13, phần kết thúc ván và tái đấu (bước 35–51) ở Hình 2.14. Phần chơi ván (bước 24–34) chưa vẽ.
+Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ chia theo kịch bản phiên bản 2: phần thách đấu (bước 1–23) ở Hình 2.13, phần kết thúc ván khi một người dừng (bước 35–51) ở Hình 2.14, nhánh tái đấu khi cả hai chọn tiếp tục ở Hình 2.15. Phần chơi ván (bước 24–34) thuộc modul của Dev 1, chưa vẽ.
 
 ![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần thách đấu](vp/png/seq-analysis-m4-1.png)
 
@@ -415,4 +429,8 @@ Người chơi A và người chơi B là hai actor cùng loại `Player` trên 
 
 ![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần kết thúc ván](vp/png/seq-analysis-m4-2.png)
 
-*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần kết thúc ván và tái đấu*
+*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần kết thúc ván*
+
+![Hình 2.15: Biểu đồ tuần tự pha phân tích của modul thách đấu, nhánh tái đấu](vp/png/seq-analysis-m4-3.png)
+
+*Hình 2.15: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, nhánh tái đấu*

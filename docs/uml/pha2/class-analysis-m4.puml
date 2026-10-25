@@ -106,6 +106,8 @@ InvitationDialog -down- Player
 MatchScreen -down- Board
 MatchScreen -down- Match
 ResultDialog -down- Player
+ResultDialog -down- Board
+ResultDialog -down- Match
 
 Player "1" -[norank]-o "0..*" MatchResult
 Match "1" *-down- "2" MatchResult

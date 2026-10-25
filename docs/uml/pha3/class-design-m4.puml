@@ -107,6 +107,7 @@ class MatchController #E8F5E9 {
   + handleLeaveMatch(handler : ClientHandler, msg : Message) : void
   + handleRematchReply(handler : ClientHandler, msg : Message) : void
   + onTimeout(room : MatchRoom) : void
+  + handleDisconnect(handler : ClientHandler) : void
   - endMatch(room : MatchRoom, reason : String) : void
 }
 
@@ -116,6 +117,7 @@ class OnlinePlayerManager #E8F5E9 {
   + getOnlinePlayers() : ArrayList<Player>
   + sendInvitation(from : Player, to : Player) : boolean
   + updateStatus(listPlayer : ArrayList<Player>, status : String) : boolean
+  + removeOnlinePlayer(handler : ClientHandler) : boolean
 }
 
 class MatchManager #E8F5E9 {

@@ -1,0 +1,74 @@
+@startuml seq-m4-4
+title Biểu đồ tuần tự - Modul Play Online Match (nhánh tái đấu)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam ArrowColor #4A4A4A
+skinparam sequence {
+  LifeLineBorderColor #4A4A4A
+  ParticipantBorderColor #4A4A4A
+  ParticipantBackgroundColor #F7F7F7
+  ActorBorderColor #4A4A4A
+  ActorBackgroundColor #F7F7F7
+}
+autonumber "<b>0:"
+
+actor "Người chơi A" as A
+boundary ResultDialog
+boundary MatchActivity
+control "Server\nConnection" as ServerConnection
+control "Client\nHandler" as ClientHandler
+control "Match\nController" as MatchController
+control "Match\nManager" as MatchManager
+control "Board\nGenerator" as BoardGenerator
+entity Board
+entity Match
+actor "Người chơi B" as B
+
+A -> ResultDialog : click tiếp tục
+ResultDialog -> ServerConnection : send(REMATCH_REPLY)
+ResultDialog -> A : hiển thị
+ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
+ClientHandler -> MatchController : handleRematchReply()
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : getRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+B -> ResultDialog : click tiếp tục
+ResultDialog -> ServerConnection : send(REMATCH_REPLY)
+ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
+ClientHandler -> MatchController : handleRematchReply()
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : getRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> BoardGenerator : gọi
+BoardGenerator -> BoardGenerator : generateBoard()
+activate BoardGenerator
+BoardGenerator -> Board : gọi
+Board -> Board : Board()
+activate Board
+Board --> BoardGenerator : trả về
+deactivate Board
+BoardGenerator --> MatchController : trả về
+deactivate BoardGenerator
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : createMatch()
+activate MatchManager
+MatchManager -> Match : gọi
+Match -> Match : Match()
+activate Match
+Match --> MatchManager : trả về
+deactivate Match
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> ClientHandler : send(MATCH_START)
+ClientHandler -> ServerConnection : MATCH_START (TCP)
+ServerConnection -> ResultDialog : onMessage()
+ResultDialog -> MatchActivity : gọi
+MatchActivity -> A : hiển thị
+@enduml

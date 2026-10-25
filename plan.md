@@ -250,7 +250,7 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 - **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
   - Dev 1: `handleMove()`, `MatchManager`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
   - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `MatchDAO`, `ResultDialog`.
-  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.10, kịch bản v3 và biểu đồ tuần tự M4 cho khớp.
+  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.12, kịch bản v3 và biểu đồ tuần tự M4 cho khớp.
 - `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
 - Mỗi người chỉ sửa code thuộc phần mình; thay đổi interface dùng chung (mục 5) phải báo người kia.
 - Đề yêu cầu "server lưu toàn bộ thông tin", nên CSDL và tài khoản nằm trên server ngay từ Phase 1, không làm bản offline rồi bỏ.

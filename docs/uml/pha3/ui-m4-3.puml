@@ -1,0 +1,68 @@
+@startuml ui-m4-3
+title Thiết kế giao diện - Kết thúc ván và tái đấu (màn hình ngang)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Result [
+{{salt
+{+
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 06:42.
+  Bạn có muốn tiếp tục không?
+  .
+  [ Dừng ] | [ Tiếp tục ]
+}
+}}
+]
+
+rectangle Wait [
+{{salt
+{+
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 06:42.
+  <color:blue>Đang chờ đối thủ trả lời...
+  .
+  [ Dừng ] | [ Tiếp tục ]
+}
+}}
+]
+
+rectangle Main [
+{{salt
+{+
+  { {+
+      <b>Người chơi B
+      12.5 điểm
+      .
+      <color:blue>A đã dừng chơi
+      [ Xem bảng xếp hạng ]
+      [   Chơi với máy    ]
+      [     Đăng xuất     ]
+    } | {+
+      <b>Người chơi online
+      {#
+        <b>Tên | <b>Tổng điểm | <b>Trạng thái
+        Người chơi A | 12 | Rỗi
+        Người chơi C | 10.5 | Bận
+        Người chơi D | 7.5 | Luyện tập
+      }
+    } }
+}
+}}
+]
+
+rectangle "Giao diện chơi\n(ván mới)" as Match
+
+Result -right-> Wait : click tiếp tục
+Wait -right-> Match : đối thủ cũng tiếp tục
+Result -down-> Main : click dừng,\nhoặc đối thủ dừng
+Wait -down-> Main : đối thủ dừng
+@enduml

@@ -1,0 +1,68 @@
+@startuml ui-m4-1
+title Thiết kế giao diện - Thách đấu và trả lời lời mời (màn hình ngang)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ArrowColor #4A4A4A
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #9E9E9E
+}
+
+rectangle Main [
+{{salt
+{+
+  { {+
+      <b>Người chơi A
+      11 điểm
+      .
+      <color:blue>Đang chờ B trả lời...
+      [ Xem bảng xếp hạng ]
+      [   Chơi với máy    ]
+      [     Đăng xuất     ]
+    } | {+
+      <b>Người chơi online
+      {#
+        <b>Tên | <b>Tổng điểm | <b>Trạng thái
+        Người chơi B | 12.5 | Rỗi
+        Người chơi C | 10.5 | Bận
+        Người chơi D | 7.5 | Luyện tập
+      }
+    } }
+}
+}}
+]
+
+rectangle Confirm [
+{{salt
+{+
+  <b>Xác nhận thách đấu
+  .
+  Bạn muốn thách đấu B?
+  .
+  [ Hủy ] | [ Xác nhận ]
+}
+}}
+]
+
+rectangle Invite [
+{{salt
+{+
+  <b>Thách đấu!
+  .
+  A muốn thách đấu bạn
+  .
+  [ Reject ] | [ OK ]
+}
+}}
+]
+
+rectangle "Giao diện chơi" as Match
+
+Main -left-> Confirm : click tên đối thủ\nkhông bận
+Confirm -right-> Main : hủy, hoặc xác nhận\n(gửi lời mời, hiện "Đang chờ")
+Main -right-> Invite : nhận lời mời\n(máy người được mời,\nở bất kỳ màn hình nào)
+Invite -left-> Main : Reject
+Invite -down-> Match : OK
+Main -down-> Match : đối thủ chấp nhận
+@enduml

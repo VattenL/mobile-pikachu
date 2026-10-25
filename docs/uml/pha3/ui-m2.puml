@@ -15,7 +15,7 @@ rectangle Login [
   <b>Đăng nhập
   .
   Tên đăng nhập
-  "hoangnam        "
+  "nguoichoia      "
   Mật khẩu
   "********        "
   <color:red>Sai tên đăng nhập hoặc mật khẩu
@@ -30,7 +30,7 @@ rectangle Main [
 {{salt
 {+
   { {+
-      <b>Hoàng Nam
+      <b>Người chơi A
       11 điểm
       .
       .
@@ -41,9 +41,9 @@ rectangle Main [
       <b>Người chơi online
       {#
         <b>Tên | <b>Tổng điểm | <b>Trạng thái
-        Minh Anh | 12.5 | Rỗi
-        Quốc Bảo | 10.5 | Bận
-        Thu Hà | 7.5 | Rỗi
+        Người chơi B | 12.5 | Rỗi
+        Người chơi C | 10.5 | Bận
+        Người chơi D | 7.5 | Luyện tập
       }
     } }
 }
@@ -57,11 +57,11 @@ rectangle Ranking [
   .
   {#
     <b>Hạng | <b>Tên | <b>Tổng điểm | <b>TB điểm đối thủ | <b>TB thời gian thắng
-    1 | Minh Anh | 12.5 | 9.2 | 05:48
-    2 | Hoàng Nam | 11 | 10.1 | 06:10
-    3 | Quốc Bảo | 10.5 | 9.5 | 06:31
-    4 | Thu Hà | 7.5 | 11.0 | 07:02
-    5 | Đức Long | 7.5 | 8.4 | 06:55
+    1 | Người chơi B | 12.5 | 9.2 | 05:48
+    2 | Người chơi A | 11 | 10.1 | 06:10
+    3 | Người chơi C | 10.5 | 9.5 | 06:31
+    4 | Người chơi D | 7.5 | 11.0 | 07:02
+    5 | Người chơi E | 7.5 | 8.4 | 06:55
   }
   .
   [ Quay lại ]

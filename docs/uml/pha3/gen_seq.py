@@ -266,7 +266,7 @@ M4B = [
     ("end",),
 ]
 
-# Phần 3 (Dev 2): kết thúc ván và tái đấu. Ảnh dùng trong tài liệu vẽ bằng Visual Paradigm (docs/vp/build_vp.py).
+# Phần 3 (Dev 2): kết thúc ván, người chơi chọn dừng. Ảnh dùng trong tài liệu vẽ bằng Visual Paradigm (docs/vp/build_vp.py).
 M4C = [
     ("self", "MatchController", None, "endMatch()", "Khi bàn của A đã hết ô, lớp `MatchController` gọi hàm `endMatch()`, tính kết quả và điểm của hai người."),
     ("call", "MatchController", "MatchDAO", "gọi", "Hàm `endMatch()` gọi lớp `MatchDAO` yêu cầu lưu ván đấu cùng hai kết quả."),
@@ -305,6 +305,56 @@ M4C = [
     ("call", "ResultDialog", "MainActivity", "gọi", "Lớp `ResultDialog` gọi lớp `MainActivity` trên máy B."),
     ("call", "ServerConnection", "MainActivity", "onMessage()", "Lớp `ServerConnection` chuyển message `ONLINE_LIST` cho lớp `MainActivity` trên hai máy."),
     ("msg", "MainActivity", "A", "hiển thị", "Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo \"A đã dừng chơi\" cho B."),
+]
+
+# Phần 4 (Dev 2): nhánh tái đấu, ngoại lệ 12a của kịch bản v1 (cả hai chọn tiếp tục), thay cho phần 3 từ bước A click.
+# Đánh số riêng từ 1. Ảnh dùng trong tài liệu vẽ bằng Visual Paradigm (docs/vp/build_vp.py).
+M4D_PARTS = [
+    ("actor", "A", "Người chơi A"),
+    ("boundary", "ResultDialog", None),
+    ("boundary", "MatchActivity", None),
+    ("control", "ServerConnection", "Server\\nConnection"),
+    ("control", "ClientHandler", "Client\\nHandler"),
+    ("control", "MatchController", "Match\\nController"),
+    ("control", "MatchManager", "Match\\nManager"),
+    ("control", "BoardGenerator", "Board\\nGenerator"),
+    ("entity", "Board", None),
+    ("entity", "Match", None),
+    ("actor", "B", "Người chơi B"),
+]
+M4D = [
+    ("msg", "A", "ResultDialog", "click tiếp tục", "Tại dialog kết quả, A click nút Tiếp tục."),
+    ("call", "ResultDialog", "ServerConnection", "send(REMATCH_REPLY)", "Lớp `ResultDialog` gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý."),
+    ("msg", "ResultDialog", "A", "hiển thị", "Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A."),
+    ("msg", "ServerConnection", "ClientHandler", "REMATCH_REPLY (TCP)", "Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của A trên server."),
+    ("call", "ClientHandler", "MatchController", "handleRematchReply()", "Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`."),
+    ("call", "MatchController", "MatchManager", "gọi", "Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván vừa kết thúc."),
+    ("self", "MatchManager", None, "getRoom()", "Lớp `MatchManager` gọi hàm `getRoom()`."),
+    ("ret", "MatchManager", "MatchController", "trả về", "Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`; lớp `MatchController` ghi nhận A đồng ý vào `rematchReplies` của phòng và chờ vì B chưa trả lời."),
+    ("msg", "B", "ResultDialog", "click tiếp tục", "Trên máy của mình, B click nút Tiếp tục."),
+    ("call", "ResultDialog", "ServerConnection", "send(REMATCH_REPLY)", "Lớp `ResultDialog` trên máy B gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý."),
+    ("msg", "ServerConnection", "ClientHandler", "REMATCH_REPLY (TCP)", "Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của B."),
+    ("call", "ClientHandler", "MatchController", "handleRematchReply()", "Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`."),
+    ("call", "MatchController", "MatchManager", "gọi", "Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván vừa kết thúc."),
+    ("self", "MatchManager", None, "getRoom()", "Lớp `MatchManager` gọi hàm `getRoom()`."),
+    ("ret", "MatchManager", "MatchController", "trả về", "Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`; lớp `MatchController` ghi nhận B đồng ý, thấy cả hai đã đồng ý nên tạo ván mới."),
+    ("call", "MatchController", "BoardGenerator", "gọi", "Lớp `MatchController` gọi lớp `BoardGenerator` yêu cầu sinh đề bài 10x10 mới."),
+    ("self", "BoardGenerator", None, "generateBoard()", "Lớp `BoardGenerator` gọi hàm `generateBoard()`."),
+    ("call", "BoardGenerator", "Board", "gọi", "Hàm `generateBoard()` gọi lớp `Board` để đóng gói đề bài."),
+    ("self", "Board", None, "Board()", "Lớp `Board` đóng gói thông tin thực thể."),
+    ("ret", "Board", "BoardGenerator", "trả về", "Lớp `Board` trả kết quả cho hàm `generateBoard()`."),
+    ("ret", "BoardGenerator", "MatchController", "trả về", "Hàm `generateBoard()` trả đề bài cho lớp `MatchController`."),
+    ("call", "MatchController", "MatchManager", "gọi", "Lớp `MatchController` gọi lớp `MatchManager` yêu cầu tạo ván mới cho A và B với đề bài vừa sinh."),
+    ("self", "MatchManager", None, "createMatch()", "Lớp `MatchManager` gọi hàm `createMatch()`, tạo phòng chơi mới giữ hai bản sao đề bài và bỏ phòng của ván cũ."),
+    ("call", "MatchManager", "Match", "gọi", "Hàm `createMatch()` gọi lớp `Match` để đóng gói ván đấu."),
+    ("self", "Match", None, "Match()", "Lớp `Match` đóng gói thông tin thực thể."),
+    ("ret", "Match", "MatchManager", "trả về", "Lớp `Match` trả kết quả cho hàm `createMatch()`."),
+    ("ret", "MatchManager", "MatchController", "trả về", "Hàm `createMatch()` trả phòng chơi mới cho lớp `MatchController`."),
+    ("call", "MatchController", "ClientHandler", "send(MATCH_START)", "Lớp `MatchController` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_START`; trạng thái hai người vẫn là bận."),
+    ("msg", "ClientHandler", "ServerConnection", "MATCH_START (TCP)", "Lớp `ClientHandler` gửi message `MATCH_START` qua TCP tới lớp `ServerConnection` trên cả hai máy."),
+    ("call", "ServerConnection", "ResultDialog", "onMessage()", "Lớp `ServerConnection` chuyển message cho lớp `ResultDialog` trên cả hai máy."),
+    ("call", "ResultDialog", "MatchActivity", "gọi", "Lớp `ResultDialog` đóng và gọi lớp `MatchActivity`, kèm đề bài mới và thông tin đối thủ."),
+    ("msg", "MatchActivity", "A", "hiển thị", "Lớp `MatchActivity` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B."),
 ]
 
 # ---------------------------------------------------------------- M1
@@ -444,8 +494,8 @@ def main():
         ("seq-m3", "Biểu đồ tuần tự - Modul Play With Bot", M3_PARTS, M3, 1),
         ("seq-m4-1", "Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)", M4A_PARTS, M4A, 1),
         ("seq-m4-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi ván)", M4B_PARTS, M4B, m4b_start),
-        ("seq-m4-3", "Biểu đồ tuần tự - Modul Play Online Match (phần 3: kết thúc ván và tái đấu)", M4C_PARTS, M4C,
-         m4c_start),
+        ("seq-m4-3", "Biểu đồ tuần tự - Modul Play Online Match (phần 3: kết thúc ván)", M4C_PARTS, M4C, m4c_start),
+        ("seq-m4-4", "Biểu đồ tuần tự - Modul Play Online Match (nhánh tái đấu)", M4D_PARTS, M4D, 1),
         ("seq-m1", "Biểu đồ tuần tự - Modul Manage Account", M1_PARTS, M1, 1),
     ]
     for name, title, parts, steps, start in diagrams:
@@ -458,6 +508,7 @@ def main():
         "v3-m2": v3(M2)[0],
         "v3-m3": v3(M3, loop_note=M3_LOOP_NOTE)[0],
         "v3-m4": v3(M4A)[0] + v3(M4B, m4b_start, m4_note)[0] + v3(M4C, m4c_start)[0],
+        "v3-m4-rematch": v3(M4D)[0],
         "v3-m1": v3(M1)[0],
     }
     text = DOC.read_text(encoding="utf-8")
