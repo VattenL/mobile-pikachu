@@ -53,7 +53,7 @@ Cơ sở dữ liệu đặt trên server, hệ quản trị đề xuất là MyS
 ### b. Bỏ thuộc tính kiểu đối tượng, đổi kiểu dữ liệu
 
 - Bỏ `Match.board`, `Match.results`, `MatchResult.player`, `MatchResult.board`.
-- `int`, `Integer` → `int(10)`, `String` → `varchar`, `Date` → `datetime` (các thuộc tính `float` chỉ có ở `point` và `PlayerRanking`, đều là dẫn xuất nên bị loại ở bước e). `Board.tiles` là mảng hai chiều nên được lưu dưới dạng chuỗi: mã hình của 100 ô vùng chơi, đọc theo từng hàng, cách nhau bởi dấu phẩy (tối đa 299 ký tự) → `varchar(300)`.
+- `int`, `Integer` → `integer`, `String` → `varchar`, `Date` → `timestamp` (các thuộc tính `float` chỉ có ở `point` và `PlayerRanking`, đều là dẫn xuất nên bị loại ở bước e). `Board.tiles` là mảng hai chiều nên được lưu dưới dạng chuỗi: mã hình của 100 ô vùng chơi, đọc theo từng hàng, cách nhau bởi dấu phẩy (tối đa 299 ký tự) → `varchar(300)`.
 
 ### c. Chuyển quan hệ số lượng thành quan hệ giữa các bảng
 

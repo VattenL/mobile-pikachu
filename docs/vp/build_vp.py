@@ -56,18 +56,6 @@ RUN = ""  # hậu tố tên khi dựng thử (--only)
 VIS = {"-": "private", "+": "public", "#": "protected", "~": "package", "": "private"}
 
 
-def pad(name):
-    """VP CE in watermark ở góc dưới phải ảnh. Một ghi chú "." đặt ngay dưới góc phải của nội dung kéo dài
-    ảnh xuống, để watermark rơi vào khoảng trống mới (và che ghi chú) thay vì đè lên hình."""
-    geo = vp("getDiagramGeometry", diagramName=name)
-    right = bottom = 0
-    for x, y, w, h in re.findall(r"(-?\d+),(-?\d+) (\d+)x(\d+)", geo):
-        right, bottom = max(right, int(x) + int(w)), max(bottom, int(y) + int(h))
-    for x, y in re.findall(r"\((-?\d+),(-?\d+)\)", geo):
-        right, bottom = max(right, int(x)), max(bottom, int(y))
-    vp("addNote", diagramName=name, text=".", attachedTo="", x=max(right - 100, 1), y=bottom + 10)
-
-
 def label(s):
     """Nhãn PlantUML -> nhãn VP: bỏ xuống dòng cứng."""
     return s.replace("\\n", " ").replace("<U+002A>", "*").strip()
@@ -569,8 +557,6 @@ def build_erd(name):
     vp("addForeignKey", diagramName=name, fromTable="tblMatchResult", toTable="tblPlayer", fromColumn="playerId",
        toColumn="", relationshipName="")
     vp("autoLayoutDiagram", diagramName=name)
-    vp("addNote", diagramName=name, text="UNIQUE (matchId, playerId); matchId: ON DELETE CASCADE",
-       attachedTo="tblMatchResult", x=0, y=0)
 
 
 # ---- Pha 3: biểu đồ gói (package.puml)
@@ -693,7 +679,6 @@ def main():
             continue
         name += RUN
         build(name)
-        pad(name)
         vp("exportDiagramImage", diagramName=name, filePath=str(PNG / f"{key}.png"))
         print("ok", key)
     if not only:
