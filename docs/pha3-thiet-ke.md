@@ -38,7 +38,7 @@ Ngoài các lớp thực thể, `core` có lớp giá trị `Cell` (`row : int`,
 
 Kết quả thu được biểu đồ lớp thực thể pha thiết kế như Hình 3.1.
 
-![Hình 3.1: Biểu đồ lớp thực thể pha thiết kế](uml/pha3/class-design-entity.png)
+![Hình 3.1: Biểu đồ lớp thực thể pha thiết kế](vp/png/class-design-entity.png)
 
 *Hình 3.1: Biểu đồ lớp thực thể pha thiết kế*
 
@@ -80,7 +80,7 @@ Cơ sở dữ liệu đặt trên server, hệ quản trị đề xuất là MyS
 
 Kết quả thu được thiết kế cơ sở dữ liệu như Hình 3.2.
 
-![Hình 3.2: Biểu đồ thiết kế cơ sở dữ liệu](uml/pha3/erd.png)
+![Hình 3.2: Biểu đồ thiết kế cơ sở dữ liệu](vp/png/erd.png)
 
 *Hình 3.2: Biểu đồ thiết kế cơ sở dữ liệu*
 
@@ -155,7 +155,7 @@ Giao diện gồm ba màn hình, nối theo luồng như Hình 3.5.
 - Trên server, `LoginController.handleLogin()` gọi `PlayerDAO.checkLogin()` rồi `OnlinePlayerManager.addOnlinePlayer()`; hàm này trả về sai nếu tài khoản đang online ở máy khác (ngoại lệ 2b của kịch bản xem bảng xếp hạng). `RankingController.handleGetRanking()` gọi `PlayerRankingDAO.getRanking()`.
 - `PlayerDAO`, `PlayerRankingDAO` kế thừa lớp `DAO` để dùng chung một kết nối CSDL.
 
-![Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](uml/pha3/class-design-m2.png)
+![Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](vp/png/class-design-m2.png)
 
 *Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng*
 
@@ -197,13 +197,13 @@ Giao diện như Hình 3.9. Dialog xác nhận thách đấu hiện trên máy n
   - `OnlinePlayerManager` giữ ánh xạ tên đăng nhập → `ClientHandler` của người đang online và trạng thái (rỗi, luyện tập, bận).
 - Các thao tác trên `MatchRoom` được đồng bộ (`synchronized`) vì hai luồng `ClientHandler` của hai người chơi cùng truy cập một phòng; ai hoàn thành trước được xác định theo thứ tự server xử lý message.
 
-![Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](uml/pha3/class-design-m4.png)
+![Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](vp/png/class-design-m4.png)
 
 *Hình 3.10: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
 
 ## 5. Thiết kế hoạt động cho bốn modul
 
-Mỗi hành động trong biểu đồ hoạt động ứng với một phương thức đã thiết kế ở mục 4; phương thức của lớp DAO, lớp quản lý và lớp xử lý được ghi ở ghi chú bên cạnh. Trong kịch bản phiên bản 3 và biểu đồ tuần tự, các bước gán từng thuộc tính khi đóng gói lớp thực thể được lược bỏ cho gọn. Tên hành động là tên phương thức đã thiết kế; khung kích hoạt thể hiện phạm vi hoạt động của từng phương thức.
+Mỗi hành động trong biểu đồ hoạt động ứng với một phương thức đã thiết kế ở mục 4. Phần xử lí tại mỗi lớp là một khung (M1, M3) hoặc một làn (M2, M4); phương thức của lớp DAO, lớp quản lý và lớp xử lý được ghi ở ghi chú bên cạnh (M1, M3) hoặc ở một nút riêng nối hai chiều với hành động gọi nó (M2, M4). Trong kịch bản phiên bản 3 và biểu đồ tuần tự, các bước gán từng thuộc tính khi đóng gói lớp thực thể được lược bỏ cho gọn. Tên hành động là tên phương thức đã thiết kế; khung kích hoạt thể hiện phạm vi hoạt động của từng phương thức.
 
 ### a. Modul quản lý tài khoản
 
@@ -265,7 +265,7 @@ Kịch bản phiên bản 3:
 
 ### b. Modul xem bảng xếp hạng
 
-![Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng](uml/pha3/activity-m2.png)
+![Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
 
 *Hình 3.13: Biểu đồ hoạt động modul xem bảng xếp hạng*
 
@@ -310,7 +310,7 @@ Kịch bản phiên bản 3:
 36. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m2 -->
 
-![Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng](uml/pha3/seq-m2.png)
+![Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
 
 *Hình 3.14: Biểu đồ tuần tự modul xem bảng xếp hạng*
 
@@ -384,7 +384,7 @@ Kịch bản phiên bản 3:
 
 ### d. Modul thách đấu và đấu đối kháng
 
-![Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](uml/pha3/activity-m4.png)
+![Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
 
 *Hình 3.17: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
 
@@ -493,29 +493,33 @@ Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; m�
 99. Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
 <!-- END v3-m4 -->
 
-Biểu đồ tuần tự được chia làm hai phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.18), phần 2 từ lúc chơi tới khi về giao diện chính (Hình 3.19).
+Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.18), phần 2 là vòng lặp chơi ván (Hình 3.19), phần 3 từ lúc kết thúc ván tới khi về giao diện chính (Hình 3.20).
 
-![Hình 3.18: Biểu đồ tuần tự modul thách đấu, phần 1](uml/pha3/seq-m4-1.png)
+![Hình 3.18: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
 
-*Hình 3.18: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1*
+*Hình 3.18: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
 
 ![Hình 3.19: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
 
-*Hình 3.19: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2*
+*Hình 3.19: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
+
+![Hình 3.20: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
+
+*Hình 3.20: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván và tái đấu*
 
 ## 6. Thiết kế triển khai
 
-Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.20.
+Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.21.
 
-![Hình 3.20: Biểu đồ gói](uml/pha3/package.png)
+![Hình 3.21: Biểu đồ gói](vp/png/package.png)
 
-*Hình 3.20: Biểu đồ gói*
+*Hình 3.21: Biểu đồ gói*
 
-Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.21.
+Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.22.
 
-![Hình 3.21: Biểu đồ triển khai](uml/pha3/deployment.png)
+![Hình 3.22: Biểu đồ triển khai](vp/png/deployment.png)
 
-*Hình 3.21: Biểu đồ triển khai*
+*Hình 3.22: Biểu đồ triển khai*
 
 ## 7. Thiết kế giao thức truyền thông
 
@@ -549,11 +553,11 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `REMATCH_REPLY` | `matchId`, `accept` |
 | S → C | `OPPONENT_LEFT` | |
 
-Luồng message chính giữa hai client và server như Hình 3.22.
+Luồng message chính giữa hai client và server như Hình 3.23.
 
-![Hình 3.22: Luồng message giữa hai client và server](uml/pha3/protocol.png)
+![Hình 3.23: Luồng message giữa hai client và server](uml/pha3/protocol.png)
 
-*Hình 3.22: Luồng message giữa hai client và server*
+*Hình 3.23: Luồng message giữa hai client và server*
 
 Xử lý các tình huống bất thường:
 
@@ -566,11 +570,11 @@ Xử lý các tình huống bất thường:
 
 ### a. Kiểm tra đường nối hai ô
 
-Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.23.
+Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.24.
 
-![Hình 3.23: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
+![Hình 3.24: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
 
-*Hình 3.23: Các dạng đường nối hai ô*
+*Hình 3.24: Các dạng đường nối hai ô*
 
 `PathFinder.checkPath()` dùng tìm kiếm theo chiều rộng, mỗi trạng thái là một ô kèm hướng đi và số đoạn đã dùng. Từ mỗi trạng thái, thuật toán đi thẳng theo từng hướng qua các ô trống; đổi hướng thì tăng số đoạn; dừng nhánh khi số đoạn vượt 3, gặp ô có hình, ra khỏi lưới, hoặc ô đó đã được tới bằng số đoạn không lớn hơn.
 

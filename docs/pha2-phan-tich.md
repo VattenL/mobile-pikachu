@@ -90,7 +90,7 @@ Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị An
 
 Kết quả thu được biểu đồ lớp thực thể pha phân tích của toàn hệ thống như Hình 2.1.
 
-![Hình 2.1: Biểu đồ lớp thực thể của hệ thống](uml/pha2/class-entity.png)
+![Hình 2.1: Biểu đồ lớp thực thể của hệ thống](vp/png/class-entity.png)
 
 *Hình 2.1: Biểu đồ lớp thực thể của hệ thống*
 
@@ -136,7 +136,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.2.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.3.
 
-![Hình 2.3: Biểu đồ lớp pha phân tích cho modul xem bảng xếp hạng](uml/pha2/class-analysis-m2.png)
+![Hình 2.3: Biểu đồ lớp pha phân tích cho modul xem bảng xếp hạng](vp/png/class-analysis-m2.png)
 
 *Hình 2.3: Biểu đồ lớp pha phân tích cho modul xem bảng xếp hạng*
 
@@ -187,7 +187,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.4.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 
-![Hình 2.5: Biểu đồ lớp pha phân tích cho modul thách đấu và đấu đối kháng](uml/pha2/class-analysis-m4.png)
+![Hình 2.5: Biểu đồ lớp pha phân tích cho modul thách đấu và đấu đối kháng](vp/png/class-analysis-m4.png)
 
 *Hình 2.5: Biểu đồ lớp pha phân tích cho modul thách đấu và đấu đối kháng*
 
@@ -219,7 +219,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 - Từ giao diện chính, khi click xem bảng xếp hạng thì hệ thống chuyển sang giao diện bảng xếp hạng.
 - Từ giao diện bảng xếp hạng, khi click quay lại thì hệ thống trở về giao diện chính.
 
-![Hình 2.7: Biểu đồ trạng thái của modul xem bảng xếp hạng](uml/pha2/state-m2.png)
+![Hình 2.7: Biểu đồ trạng thái của modul xem bảng xếp hạng](vp/png/state-m2.png)
 
 *Hình 2.7: Biểu đồ trạng thái của modul xem bảng xếp hạng*
 
@@ -241,7 +241,7 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 - Tại giao diện chơi, mỗi lần click hai ô thì hệ thống hiện lại chính giao diện đó; khi click thoát thì trở về giao diện chính; khi một bên xóa hết ô, hết giờ hoặc đối thủ thoát thì chuyển sang dialog kết quả.
 - Từ dialog kết quả, nếu cả hai click tiếp tục thì chuyển sang giao diện chơi của ván mới; nếu mình click dừng hoặc đối thủ dừng thì trở về giao diện chính.
 
-![Hình 2.9: Biểu đồ trạng thái của modul thách đấu và đấu đối kháng](uml/pha2/state-m4.png)
+![Hình 2.9: Biểu đồ trạng thái của modul thách đấu và đấu đối kháng](vp/png/state-m4.png)
 
 *Hình 2.9: Biểu đồ trạng thái của modul thách đấu và đấu đối kháng*
 
@@ -383,9 +383,9 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 50. Lớp `PlayerRanking` trả kết quả cho lớp `MainScreen`.
 51. Lớp `MainScreen` hiển thị danh sách người chơi online đã cập nhật cho A và B, kèm thông báo đối thủ đã dừng chơi cho B.
 
-## 6. Biểu đồ giao tiếp cho bốn modul
+## 6. Biểu đồ tương tác cho bốn modul
 
-Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2 cùng số thứ tự. Dấu `*` đánh dấu các bước nằm trong vòng lặp. Các thông điệp chỉ đi trên những liên kết có trong biểu đồ lớp phân tích của modul.
+Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2 cùng số thứ tự, và chỉ đi giữa hai lớp có liên kết trong biểu đồ lớp phân tích của modul. Modul xem bảng xếp hạng và modul thách đấu dùng biểu đồ tuần tự cho dễ đọc; modul quản lý tài khoản và modul chơi với máy dùng biểu đồ giao tiếp, trong đó dấu `*` đánh dấu các bước nằm trong vòng lặp.
 
 ### a. Biểu đồ giao tiếp modul quản lý tài khoản
 
@@ -393,11 +393,11 @@ Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2
 
 *Hình 2.10: Biểu đồ giao tiếp của modul quản lý tài khoản*
 
-### b. Biểu đồ giao tiếp modul xem bảng xếp hạng
+### b. Biểu đồ tuần tự modul xem bảng xếp hạng
 
-![Hình 2.11: Biểu đồ giao tiếp của modul xem bảng xếp hạng](uml/pha2/comm-m2.png)
+![Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng](vp/png/seq-analysis-m2.png)
 
-*Hình 2.11: Biểu đồ giao tiếp của modul xem bảng xếp hạng*
+*Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng*
 
 ### c. Biểu đồ giao tiếp modul chơi với máy
 
@@ -405,10 +405,14 @@ Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2
 
 *Hình 2.12: Biểu đồ giao tiếp của modul chơi với máy*
 
-### d. Biểu đồ giao tiếp modul thách đấu và đấu đối kháng
+### d. Biểu đồ tuần tự modul thách đấu và đấu đối kháng
 
-Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Các bước hiển thị trên cả hai máy (23, 34, 39, 51) được vẽ trên cả hai đường nối.
+Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ chia theo kịch bản phiên bản 2: phần thách đấu (bước 1–23) ở Hình 2.13, phần kết thúc ván và tái đấu (bước 35–51) ở Hình 2.14. Phần chơi ván (bước 24–34) chưa vẽ.
 
-![Hình 2.13: Biểu đồ giao tiếp của modul thách đấu và đấu đối kháng](uml/pha2/comm-m4.png)
+![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần thách đấu](vp/png/seq-analysis-m4-1.png)
 
-*Hình 2.13: Biểu đồ giao tiếp của modul thách đấu và đấu đối kháng*
+*Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần thách đấu*
+
+![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần kết thúc ván](vp/png/seq-analysis-m4-2.png)
+
+*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần kết thúc ván và tái đấu*

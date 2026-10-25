@@ -120,7 +120,7 @@ Mỗi chức năng ở bước 2 được đề xuất thành một use case. Sa
 
 Biểu đồ use case tổng quan như Hình 1.1.
 
-![Hình 1.1: Biểu đồ use case tổng quan](uml/pha1/uc-overview.png)
+![Hình 1.1: Biểu đồ use case tổng quan](vp/png/uc-overview.png)
 
 *Hình 1.1: Biểu đồ use case tổng quan*
 
@@ -168,7 +168,7 @@ Trong chức năng xem bảng xếp hạng, người chơi tương tác với c�
 
 Biểu đồ use case chi tiết như Hình 1.3.
 
-![Hình 1.3: Biểu đồ use case chi tiết cho modul xem bảng xếp hạng](uml/pha1/uc-m2-view-ranking.png)
+![Hình 1.3: Biểu đồ use case chi tiết cho modul xem bảng xếp hạng](vp/png/uc-m2-view-ranking.png)
 
 *Hình 1.3: Biểu đồ use case chi tiết cho modul xem bảng xếp hạng*
 
@@ -218,7 +218,7 @@ Trong chức năng thách đấu, hai người chơi tương tác với các gia
 
 Biểu đồ use case chi tiết như Hình 1.5.
 
-![Hình 1.5: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng](uml/pha1/uc-m4-play-online-match.png)
+![Hình 1.5: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng](vp/png/uc-m4-play-online-match.png)
 
 *Hình 1.5: Biểu đồ use case chi tiết cho modul thách đấu và đấu đối kháng*
 

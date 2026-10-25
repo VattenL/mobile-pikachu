@@ -221,7 +221,7 @@ M4A = [
     ("msg", "MatchActivity", "A", "hiển thị", "Lớp `MatchActivity` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B."),
 ]
 
-M4B_PARTS = [
+M4BC_PARTS = [  # phần 2 và 3; mỗi phần chỉ giữ lớp có mặt trong các bước của nó
     ("actor", "A", "Người chơi A"),
     ("boundary", "MainActivity", None),
     ("boundary", "MatchActivity", None),
@@ -264,6 +264,10 @@ M4B = [
     ("call", "ServerConnection", "MatchActivity", "onMessage()", "Lớp `ServerConnection` chuyển message cho lớp `MatchActivity` trên hai máy."),
     ("msg", "MatchActivity", "A", "hiển thị", "Lớp `MatchActivity` vẽ đường nối và bàn chơi mới cho A; trên máy B, vẽ nước đi của A lên bàn thu nhỏ của đối thủ và cập nhật số ô còn lại của A."),
     ("end",),
+]
+
+# Phần 3 (Dev 2): kết thúc ván và tái đấu. Ảnh dùng trong tài liệu vẽ bằng Visual Paradigm (docs/vp/build_vp.py).
+M4C = [
     ("self", "MatchController", None, "endMatch()", "Khi bàn của A đã hết ô, lớp `MatchController` gọi hàm `endMatch()`, tính kết quả và điểm của hai người."),
     ("call", "MatchController", "MatchDAO", "gọi", "Hàm `endMatch()` gọi lớp `MatchDAO` yêu cầu lưu ván đấu cùng hai kết quả."),
     ("self", "MatchDAO", None, "saveMatch()", "Lớp `MatchDAO` gọi hàm `saveMatch()`."),
@@ -364,6 +368,15 @@ M1 = [
 ]
 
 
+def used_parts(parts, steps):
+    names = {x for st in steps if st[0] not in ("loop", "end", "deact") for x in st[1:3] if x}
+    return [p for p in parts if p[1] in names]
+
+
+M4B_PARTS = used_parts(M4BC_PARTS, M4B)
+M4C_PARTS = used_parts(M4BC_PARTS, M4C)
+
+
 def puml(name, title, parts, steps, start=1):
     out = [f"@startuml {name}", f"title {title}", "", STYLE.rstrip()]
     if start != 1:
@@ -425,11 +438,14 @@ def count(steps):
 
 def main():
     m4b_start = count(M4A) + 1
+    m4c_start = m4b_start + count(M4B)
     diagrams = [
         ("seq-m2", "Biểu đồ tuần tự - Modul View Ranking", M2_PARTS, M2, 1),
         ("seq-m3", "Biểu đồ tuần tự - Modul Play With Bot", M3_PARTS, M3, 1),
         ("seq-m4-1", "Biểu đồ tuần tự - Modul Play Online Match (phần 1: thách đấu)", M4A_PARTS, M4A, 1),
-        ("seq-m4-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi và kết thúc ván)", M4B_PARTS, M4B, m4b_start),
+        ("seq-m4-2", "Biểu đồ tuần tự - Modul Play Online Match (phần 2: chơi ván)", M4B_PARTS, M4B, m4b_start),
+        ("seq-m4-3", "Biểu đồ tuần tự - Modul Play Online Match (phần 3: kết thúc ván và tái đấu)", M4C_PARTS, M4C,
+         m4c_start),
         ("seq-m1", "Biểu đồ tuần tự - Modul Manage Account", M1_PARTS, M1, 1),
     ]
     for name, title, parts, steps, start in diagrams:
@@ -441,7 +457,7 @@ def main():
     blocks = {
         "v3-m2": v3(M2)[0],
         "v3-m3": v3(M3, loop_note=M3_LOOP_NOTE)[0],
-        "v3-m4": v3(M4A)[0] + v3(M4B, m4b_start, m4_note)[0],
+        "v3-m4": v3(M4A)[0] + v3(M4B, m4b_start, m4_note)[0] + v3(M4C, m4c_start)[0],
         "v3-m1": v3(M1)[0],
     }
     text = DOC.read_text(encoding="utf-8")
