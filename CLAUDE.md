@@ -32,13 +32,10 @@ From now until the end of the implementation phase (user decision 2026-10-26), a
 
 ## Code layout
 
-Code is on hold until the design (phase 3) is settled: the first implementation was written too early and was removed (user decision). The repo holds only the Android Studio setup (single `app` module with the template `MainActivity`). Do not start coding until the user says to.
-
-Planned layout (`plan.md` Part II, `docs/pha4-cai-dat.md`): three Gradle modules, all Java 11.
+Layout (`plan.md` Part II, `docs/pha4-cai-dat.md`): three Gradle modules, all Java 11. The package skeleton was created on `main` on 2026-10-26: one file per class of the design class diagrams (fields and method signatures, bodies `// TODO` or `UnsupportedOperationException`, the owner dev in each class Javadoc), plus `MessageType`, `Difficulty`, `GameServer`, `ServerConfig`, `server/db/*.sql` stubs and `server/server.properties.example` (the real `server.properties` is git-ignored).
 - `core`: plain `java-library`, no Android or socket code. Board model (10x10 play area inside a 12x12 grid with an empty border), path finder (≤ 3 segments / ≤ 2 turns), seeded board generation and shuffle, bot, protocol message classes.
 - `server`: plain Java (`ServerSocket`, one thread per client, JDBC to MySQL). Depends on `core`.
 - `app`: Android client. Depends on `core`.
-When adding `core` or `server`, register them in `settings.gradle.kts`.
 
 Key design constraints:
 - The server is the referee. It re-validates every client move with `core`'s path finder on that player's own board and never trusts a client-reported result.
@@ -58,6 +55,7 @@ Key design constraints:
 ## Build & test
 
 Use the Gradle wrapper. From Bash run `./gradlew`; from PowerShell run `.\gradlew.bat`.
+If a build fails with `jlink executable ... does not exist`, a Gradle daemon started under VS Code's bundled JRE is running: `./gradlew --stop` and build again (JDK 21 at `C:/Program Files/Eclipse Adoptium/jdk-21.0.10.7-hotspot`).
 
 ```bash
 ./gradlew :app:assembleDebug                 # build debug APK

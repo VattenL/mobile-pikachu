@@ -6,7 +6,9 @@ Mọi tài nguyên lấy từ bên ngoài (thư viện, hình ảnh, phông ch�
 
 | Thư viện | Phiên bản | Dùng ở | Nguồn | Giấy phép |
 |---|---|---|---|---|
-| AndroidX AppCompat, Activity, ConstraintLayout | xem `gradle/libs.versions.toml` | `app` | https://developer.android.com/jetpack/androidx | Apache License 2.0 |
+| AndroidX AppCompat, Activity, ConstraintLayout, RecyclerView | xem `gradle/libs.versions.toml` | `app` | https://developer.android.com/jetpack/androidx | Apache License 2.0 |
+| Gson | 2.13.1 | `core` (message JSON) | https://github.com/google/gson | Apache License 2.0 |
+| MySQL Connector/J | 9.3.0 | `server` (JDBC) | https://dev.mysql.com/downloads/connector/j/ | GPL 2.0 kèm Universal FOSS Exception |
 | Material Components for Android | 1.14.0 | `app` (giao diện) | https://github.com/material-components/material-components-android | Apache License 2.0 |
 | JUnit 4 | 4.13.2 | test | https://junit.org/junit4/ | Eclipse Public License 1.0 |
 | Gradle Wrapper | 9.5.0 | build | https://gradle.org | Apache License 2.0 |
