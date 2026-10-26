@@ -26,6 +26,10 @@ Course project (PTIT): an online head-to-head Pikachu (Onet / connect-pair) game
 
 - M1 (Manage Account) also includes viewing and editing the player's own profile (user decision). It is deliberately kept out of `plan.md` for now. Do not add it to the module table, use cases or screens until the user says to.
 
+## Prompt log
+
+From now until the end of the implementation phase (user decision 2026-10-26), append every user prompt that asks for code to `docs/prompts.md`, verbatim, in the same turn the code is written. Also append any other prompt the user asks to save. Each entry gets a heading with the date and a short label; never edit or reorder earlier entries.
+
 ## Code layout
 
 Code is on hold until the design (phase 3) is settled: the first implementation was written too early and was removed (user decision). The repo holds only the Android Studio setup (single `app` module with the template `MainActivity`). Do not start coding until the user says to.
