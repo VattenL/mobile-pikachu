@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatDialog;
  */
 public class InvitationDialog extends AppCompatDialog {
     private TextView tvChallenger;
-    private Button btnOk;
+    private Button btnAccept;
     private Button btnReject;
     private String challenger;
 
@@ -21,7 +21,7 @@ public class InvitationDialog extends AppCompatDialog {
         super(context);
     }
 
-    public void onOkClick(View v) {
+    public void onAcceptClick(View v) {
         // TODO
     }
 

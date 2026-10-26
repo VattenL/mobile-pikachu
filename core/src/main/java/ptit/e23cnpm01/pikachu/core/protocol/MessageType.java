@@ -12,6 +12,7 @@ public final class MessageType {
     public static final String LOGIN_RESULT = "LOGIN_RESULT";
     public static final String LOGOUT = "LOGOUT";
     public static final String UPDATE_STATUS = "UPDATE_STATUS";
+    public static final String GET_ONLINE_LIST = "GET_ONLINE_LIST";
     public static final String ONLINE_LIST = "ONLINE_LIST";
     public static final String GET_RANKING = "GET_RANKING";
     public static final String RANKING = "RANKING";

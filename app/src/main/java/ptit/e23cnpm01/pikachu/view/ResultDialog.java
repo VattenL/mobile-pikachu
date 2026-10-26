@@ -9,13 +9,13 @@ import ptit.e23cnpm01.pikachu.core.protocol.Message;
 import ptit.e23cnpm01.pikachu.network.MessageListener;
 
 /**
- * Dialog kết quả ván đối kháng, hỏi tiếp tục hay dừng.
+ * Dialog kết quả ván đối kháng, hỏi tái đấu hay dừng.
  *
  * <p>Phụ trách: Dev 2.
  */
 public class ResultDialog extends AppCompatDialog implements MessageListener {
     private TextView tvResult;
-    private Button btnContinue;
+    private Button btnRematch;
     private Button btnStop;
     private int matchId;
 
@@ -23,7 +23,7 @@ public class ResultDialog extends AppCompatDialog implements MessageListener {
         super(context);
     }
 
-    public void onContinueClick(View v) {
+    public void onRematchClick(View v) {
         // TODO
     }
 

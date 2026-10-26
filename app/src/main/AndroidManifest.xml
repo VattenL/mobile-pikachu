@@ -14,17 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Pikachu">
         <activity
-            android:name=".view.LoginActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".view.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.LoginActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".view.RegisterActivity" />
-        <activity android:name=".view.MainActivity" />
+        <activity android:name=".view.LobbyActivity" />
         <activity android:name=".view.RankingActivity" />
         <activity android:name=".view.DifficultyActivity" />
         <activity android:name=".view.BotGameActivity" />

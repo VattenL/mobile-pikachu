@@ -1,7 +1,7 @@
 package ptit.e23cnpm01.pikachu.core.model;
 
 /**
- * Người chơi. status: IDLE, TRAINING, BUSY (chỉ giữ trong bộ nhớ server).
+ * Người chơi. username cũng là tên hiển thị. status: IDLE, TRAINING, BUSY (chỉ giữ trong bộ nhớ server).
  *
  * <p>Phụ trách: dùng chung.
  */
@@ -9,7 +9,6 @@ public class Player {
     private int id;
     private String username;
     private String password;
-    private String name;
     private String status;
 
     public Player() {
@@ -37,14 +36,6 @@ public class Player {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getStatus() {
