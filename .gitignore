@@ -23,3 +23,4 @@ __pycache__/
 # Visual Paradigm lock and backup files
 *.vpp.lck
 *.vpp.bak_*
+docs/vp/build-stamp.txt

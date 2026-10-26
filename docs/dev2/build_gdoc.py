@@ -1,8 +1,9 @@
 """Dựng Google Doc "thiết kế hệ thống và các modul của Dev 2" từ docs/pha1..3-*.md.
 
 Lấy phần dùng chung và các mục của M2 (xem bảng xếp hạng), M4 (thách đấu và đấu đối kháng); bỏ các mục của
-Dev 1 (M1, M3, thuật toán đường nối, sinh đề, bot, sơ đồ tuần tự phần chơi ván). Số mục và số hình giữ như tài
-liệu chung để các tham chiếu "mục 4d", "Hình 2.1" vẫn đúng. Ảnh được nhúng thẳng vào HTML (data URI).
+Dev 1 (M1, M3, thuật toán đường nối, sinh đề, bot, phần chơi ván của M4). Chữ cái các mục cấp 3 được đánh lại liên
+tiếp (b, d thành a, b) và các tham chiếu "mục 4d" đổi theo; số hình giữ như tài liệu chung. Các bước chơi ván (phần
+của Dev 1) trong kịch bản v2, v3 của M4 được gộp thành một dòng. Ảnh được nhúng thẳng vào HTML (data URI).
 
     python build_gdoc.py --html out.html          # chỉ ghi HTML để xem trước
     python build_gdoc.py                          # tạo Google Doc mới, in link
@@ -34,8 +35,8 @@ SELECT = {
 INTRO = (
     "Tài liệu trích từ bản đặc tả chung của nhóm, gồm phần dùng chung của hệ thống và các modul do Dev 2 phụ "
     "trách: xem bảng xếp hạng (M2), thách đấu và trả lời lời mời, kết thúc ván và tái đấu (thuộc M4). Các mục "
-    "của Dev 1 (quản lý tài khoản, chơi với máy, phần chơi ván của M4, thuật toán) được lược bỏ; số mục và số "
-    "hình giữ như bản chung."
+    "của Dev 1 (quản lý tài khoản, chơi với máy, phần chơi ván của M4, thuật toán) được lược bỏ; số "
+    "hình giữ như bản chung, chữ cái các mục được đánh lại liên tiếp."
 )
 
 PAGE_WIDTH_PX = 624  # 6.5 inch ở 96 dpi
@@ -43,39 +44,86 @@ PAGE_HEIGHT_PX = 853  # 640 pt: vừa một trang Letter lề 1 inch, chừa ch�
 
 
 def pick(md, select):
-    """Giữ tiêu đề cấp 1, các mục cấp 2 và cấp 3 được chọn."""
-    out, keep, h2 = [], True, None
+    """Giữ tiêu đề cấp 1, các mục cấp 2 và cấp 3 được chọn; chữ cái mục cấp 3 đánh lại liên tiếp trong mỗi mục cấp 2
+    và các tham chiếu "mục 4d" trong cùng file đổi theo."""
+    out, keep, h2, letters = [], True, None, {}
     for line in md.splitlines():
         if line.startswith("# "):
             keep = True
         elif m := re.match(r"## (\d+)\.", line):
             h2 = m[1]
             keep = h2 in select
-        elif m := re.match(r"### ([a-z])\.", line):
+        elif m := re.match(r"### ([a-z])\. ", line):
             keep = h2 in select and (select[h2] is None or m[1] in select[h2])
+            if keep:
+                new = "abcdefgh"[sum(1 for k in letters if k[0] == h2)]
+                letters[h2, m[1]] = new
+                line = f"### {new}. " + line[len(m[0]):]
         elif line.startswith("### "):  # "### Bước 1: ..." thuộc mục cấp 2 lấy cả
             keep = h2 in select and select[h2] is None
         if keep:
             out.append(line)
+
+    def ref(m):
+        if (m[1], m[2]) not in letters:
+            raise SystemExit(f"tham chiếu tới mục không có trong tài liệu Dev 2: {m[0]}")
+        return f"mục {m[1]}{letters[m[1], m[2]]}"
+    return re.sub(r"mục (\d)([a-e])\b", ref, "\n".join(out))
+
+
+def indent_lists(md):
+    """Python-Markdown chỉ nhận danh sách con thụt 4 dấu cách; md thụt 2 nên nhân đôi (ngoài khối code)."""
+    out, code = [], False
+    for line in md.splitlines():
+        if line.startswith("```"):
+            code = not code
+        elif not code:
+            line = re.sub(r"^((?:  )+)(?=[-*] |\d+\. )", lambda m: m[1] * 2, line)
+        out.append(line)
     return "\n".join(out)
 
 
+def fold_play_steps(md):
+    """Kịch bản v2, v3 của M4: các bước chơi ván trong vòng lặp (phần của Dev 1) gộp thành một dòng."""
+    out, n = [], 0
+    for line in md.split("\n"):
+        m = re.match(r"\(Lặp lại các bước (\d+)(?:-| đến )(\d+) .*B chơi song song", line)
+        if m:
+            a, b = int(m[1]), int(m[2])
+            while out and (k := re.match(r"(\d+)\. ", out[-1])) and a <= int(k[1]) <= b:
+                out.pop()
+            # dòng trống hai bên để danh sách sau bắt đầu lại đúng số bước
+            out += ["", f"(Các bước {a} đến {b}: chơi ván, thuộc phần của Dev 1; lặp đến khi một người xóa hết ô.)", ""]
+            n += 1
+        else:
+            out.append(line)
+    md = "\n".join(out)
+    if n != 2:
+        raise SystemExit(f"gộp bước chơi ván: {n} chỗ, cần 2")
+    return md
+
+
 DEV1_FIGURES = ["uml/pha3/ui-m4-2.png", "uml/pha3/seq-m4-2.png"]  # giao diện và tuần tự phần chơi ván (Dev 1)
+# hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): hoạt động M4 không có vòng lặp chơi ván
+DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png"}
 
 
 def adjust(md):
     md = re.sub(r"^(##+ .*?) (?:cho )?bốn modul", r"\1 cho các modul", md, flags=re.M)
     for src in DEV1_FIGURES:
         md = re.sub(rf"!\[[^\]]*\]\({re.escape(src)}\)\n\n\*Hình [^\n]*\*\n\n", "", md)
+    for old, new in DEV2_FIGURES.items():
+        md = md.replace(f"]({old})", f"]({new})")
     for old, new in [
-        (r"Chơi ván như Hình 3\.\d+\.", "Chơi ván thuộc phần của Dev 1."),
+        (r"giao diện chơi \(Hình 3\.\d+\)", "giao diện chơi (thuộc phần của Dev 1)"),
+        (r"^- `MatchScreen` → `MatchActivity`: .*$", "- `MatchScreen` → `MatchActivity`: thuộc phần của Dev 1."),
         (r"phần 2 là vòng lặp chơi ván \(Hình 3\.\d+\)", "phần 2 là vòng lặp chơi ván (thuộc phần của Dev 1)"),
         (r"thuộc modul của Dev 1, chưa vẽ\.", "thuộc phần của Dev 1."),
     ]:
-        md, n = re.subn(old, new, md)
+        md, n = re.subn(old, new, md, flags=re.M)
         if n != 1:
             raise SystemExit(f"không khớp: {old}")
-    return md
+    return fold_play_steps(md)
 
 
 def embed_images(html):
@@ -102,6 +150,9 @@ def style(html):
     html = re.sub(r"<li>", f'<li style="{FONT}font-size:13pt;margin:3pt 0">', html)
     for tag, size in (("h1", 16), ("h2", 14), ("h3", 13), ("h4", 13)):
         html = html.replace(f"<{tag}>", f'<{tag} style="{FONT}font-size:{size}pt;font-weight:bold;margin:12pt 0 6pt">')
+    # dòng tiêu đề trong <thead> bị Google Docs ghim lại: chuyển thành dòng thường, chữ đậm
+    html = re.sub(r"</?(?:thead|tbody)>\n?", "", html)
+    html = re.sub(r"<th( [^>]*)?>(.*?)</th>", r"<td\1><b>\2</b></td>", html, flags=re.S)
     html = html.replace("<table>", '<table style="border-collapse:collapse;width:100%">')
     for tag in ("td", "th"):
         html = re.sub(rf"<{tag}( [^>]*)?>",
@@ -116,7 +167,7 @@ def build_html():
     for name, select in SELECT.items():
         md = (DOCS / name).read_text(encoding="utf-8")
         parts.append(pick(md, select))
-    body = markdown.markdown(adjust("\n\n".join(parts)), extensions=["tables", "sane_lists"])
+    body = markdown.markdown(indent_lists(adjust("\n\n".join(parts))), extensions=["tables", "sane_lists"])
     body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
     body = style(embed_images(body))
     body = re.sub(r"(<h1 [^>]*>Pha)", r'<p style="page-break-before:always"></p>\1', body)
