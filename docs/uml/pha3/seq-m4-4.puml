@@ -27,7 +27,7 @@ entity Board
 entity Match
 actor "Người chơi B" as B
 
-A -> ResultDialog : click tiếp tục
+A -> ResultDialog : click tái đấu
 ResultDialog -> ServerConnection : send(REMATCH_REPLY)
 ResultDialog -> A : hiển thị
 ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
@@ -37,7 +37,7 @@ MatchManager -> MatchManager : getRoom()
 activate MatchManager
 MatchManager --> MatchController : trả về
 deactivate MatchManager
-B -> ResultDialog : click tiếp tục
+B -> ResultDialog : click tái đấu
 ResultDialog -> ServerConnection : send(REMATCH_REPLY)
 ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
 ClientHandler -> MatchController : handleRematchReply()

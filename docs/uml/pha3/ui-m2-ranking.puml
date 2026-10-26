@@ -1,0 +1,28 @@
+@startuml ui-m2-ranking
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam defaultFontColor #333333
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
+}
+
+rectangle Ranking [
+{{salt
+{
+  <b>Bảng xếp hạng
+  .
+  {#
+    <b>Hạng | <b>Tên | <b>Tổng điểm | <b>TB điểm đối thủ | <b>TB thời gian thắng
+    11 | Người chơi N | 4.5 | 7.5 | 07:45
+    <b>12 | <b>Người chơi A | <b>3.5 | <b>8.6 | <b>06:58
+  }
+  .
+  { [ Trang trước ] | Trang 2/2 | [ Trang sau ] }
+  .
+  { [ Quay lại ] | [ Vị trí của tôi ] }
+}
+}}
+]
+@enduml

@@ -1,0 +1,23 @@
+@startuml ui-m4-result
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam defaultFontColor #333333
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
+}
+
+rectangle Result [
+{{salt
+{
+  <b>Chiến thắng!
+  .
+  Bạn thắng. Thời gian hoàn thành 06:42.
+  Bạn có muốn tái đấu không?
+  .
+  [ Dừng ] | [ Tái đấu ]
+}
+}}
+]
+@enduml

@@ -30,7 +30,7 @@ pikachu/
 │   └── protocol/   Message, MessageType
 ├── core/src/test/java/...           PathFinderTest, BoardGeneratorTest, BoardTest, BotTest
 ├── app/src/main/java/ptit/e23cnpm01/pikachu/
-│   ├── view/       LoginActivity, RegisterActivity, BaseActivity, MainActivity, RankingActivity,
+│   ├── view/       LoginActivity, RegisterActivity, BaseActivity, MainActivity, LobbyActivity, RankingActivity,
 │   │               DifficultyActivity, BotGameActivity, MatchActivity, ChallengeConfirmDialog,
 │   │               InvitationDialog, ResultDialog, BotResultDialog, BoardView
 │   └── network/    ServerConnection, MessageListener, ClientSession
@@ -64,8 +64,7 @@ DROP TABLE IF EXISTS tblPlayer;
 CREATE TABLE tblPlayer (
   id        INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
   username  VARCHAR(50)  NOT NULL UNIQUE,
-  password  VARCHAR(64)  NOT NULL,
-  name      VARCHAR(100) NOT NULL
+  password  VARCHAR(64)  NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE tblMatch (
@@ -131,23 +130,25 @@ public abstract class DAO {
 | `RegisterActivity` | `onRegisterClick()` | kiểm tra bốn ô không rỗng và mật khẩu nhập lại khớp; hợp lệ thì gửi `REGISTER` |
 | | `onMessage()` | `REGISTER_RESULT`: thành công thì trả tên đăng nhập về `LoginActivity` và đóng màn; thất bại thì hiện lỗi, xóa hai ô mật khẩu |
 | | `onBackClick()` | đóng màn, về `LoginActivity`, không gửi gì |
+| `LoginActivity` | `onLoginClick()` | kiểm tra hai ô không rỗng, gửi `LOGIN` qua `ServerConnection` |
+| | `onMessage()` | nhận `LOGIN_RESULT`: thành công thì lưu người chơi vào `ClientSession` và mở `MainActivity`; thất bại thì hiện thông báo lỗi |
+| `LoginController` | `handleLogin()` | băm mật khẩu, gọi `PlayerDAO.checkLogin()`; nếu đúng thì gọi `OnlinePlayerManager.addOnlinePlayer()`, sai hoặc đang online nơi khác thì trả lỗi; gửi `LOGIN_RESULT`, sau đó gửi lại danh sách online cho mọi người |
+| `PlayerDAO` | `checkLogin()` | `SELECT id, username FROM tblPlayer WHERE username = ? AND password = ?` bằng `PreparedStatement` (chống SQL injection), có dòng thì đóng gói `Player`, không có thì trả `null` |
 | `MainActivity` | `onLogoutClick()` | gửi `LOGOUT`, `ClientSession.clear()`, mở `LoginActivity` và đóng các màn hình phía sau |
 | `LoginController` | `handleRegister()` | kiểm tra ba trường không rỗng, băm mật khẩu, gọi `PlayerDAO.addPlayer()`, gửi `REGISTER_RESULT` (`ok`, hoặc `error` "tên đăng nhập đã tồn tại") |
 | | `handleLogout()` | `OnlinePlayerManager.removeOnlinePlayer()`, đặt người chơi của `ClientHandler` về rỗng, `ChallengeController.broadcastOnlineList()` |
-| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password, name) VALUES (?, ?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
+| `PlayerDAO` | `addPlayer()` | `INSERT INTO tblPlayer (username, password) VALUES (?, ?)`; trùng `username` thì CSDL báo vi phạm ràng buộc `UNIQUE`, hàm bắt lỗi và trả `false` |
 | `OnlinePlayerManager` | `removeOnlinePlayer()` | xóa ánh xạ tên đăng nhập → `ClientHandler`; `ClientHandler` cũng gọi hàm này khi client mất kết nối |
 
 ### c. Modul xem bảng xếp hạng
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
-| `LoginActivity` | `onLoginClick()` | kiểm tra hai ô không rỗng, gửi `LOGIN` qua `ServerConnection` |
-| | `onMessage()` | nhận `LOGIN_RESULT`: thành công thì lưu người chơi vào `ClientSession` và mở `MainActivity`; thất bại thì hiện thông báo lỗi |
-| `LoginController` | `handleLogin()` | băm mật khẩu, gọi `PlayerDAO.checkLogin()`; nếu đúng thì gọi `OnlinePlayerManager.addOnlinePlayer()`, sai hoặc đang online nơi khác thì trả lỗi; gửi `LOGIN_RESULT`, sau đó gửi lại danh sách online cho mọi người |
-| `PlayerDAO` | `checkLogin()` | `SELECT id, username, name FROM tblPlayer WHERE username = ? AND password = ?` bằng `PreparedStatement` (chống SQL injection), có dòng thì đóng gói `Player`, không có thì trả `null` |
-| `RankingActivity` | `onCreate()`, `onMessage()` | gửi `GET_RANKING`; nhận `RANKING` thì đổ vào `RecyclerView`, đổi `avgWinTime` từ mili giây sang mm:ss |
-| `RankingController` | `handleGetRanking()` | gọi `PlayerRankingDAO.getRanking()`, đánh số hạng theo thứ tự trả về (trùng cả ba tiêu chí thì cùng hạng, kiểu 1, 2, 2, 4), gửi `RANKING` |
-| `PlayerRankingDAO` | `getRanking()` | chạy truy vấn ở pha 3, mục 8d, mỗi dòng đóng gói một `PlayerRanking` (kế thừa `Player`: `id`, `username`, `name`; thêm ba chỉ số) |
+| `MainActivity` | `onRankingClick()` | mở `RankingActivity`; dùng được cả khi là khách |
+| `RankingActivity` | `onCreate()`, `onMessage()` | ẩn nút Vị trí của tôi nếu `ClientSession` chưa có người chơi; gửi `GET_RANKING` với `page = 1`; nhận `RANKING` thì đổ các dòng của trang vào `RecyclerView`, hiện "Trang page/pageCount", tô màu dòng có hạng `me`; `mine` mà `me` rỗng thì báo "Bạn chưa có trong bảng xếp hạng"; đổi `avgWinTime` từ mili giây sang mm:ss |
+| | `onPrevPageClick()`, `onNextPageClick()`, `onMyRankClick()` | gửi `GET_RANKING` với `page - 1`, `page + 1` (vô hiệu ở trang đầu, trang cuối) hoặc `mine = true` |
+| `RankingController` | `handleGetRanking()` | gọi `PlayerRankingDAO.getRanking()`, đánh số hạng theo thứ tự trả về (trùng cả ba tiêu chí thì cùng hạng, kiểu 1, 2, 2, 4); `mine = true` thì tìm dòng của `handler.player` (rỗng nếu chưa đăng nhập hoặc chưa có trong bảng) và lấy trang chứa dòng đó, ngược lại lấy trang `page` (ngoài khoảng thì kẹp về 1..pageCount); gửi `RANKING` với `page`, `pageCount`, `me` và `PAGE_SIZE` = 10 dòng của trang |
+| `PlayerRankingDAO` | `getRanking()` | chạy truy vấn ở pha 3, mục 8d, mỗi dòng đóng gói một `PlayerRanking` (kế thừa `Player`: `id`, `username`; thêm ba chỉ số) |
 
 ### d. Modul chơi với máy
 
@@ -165,13 +166,16 @@ public abstract class DAO {
 
 | Lớp | Phương thức | Cách hoạt động |
 |---|---|---|
-| `MainActivity` | `onPlayerClick()` | bỏ qua nếu người được chọn đang bận; mở `ChallengeConfirmDialog` với người được chọn |
+| `MainActivity` | `onMatchClick()` | `ClientSession` chưa có người chơi thì mở `LoginActivity` (đăng nhập xong thì mở `LobbyActivity`); đã đăng nhập thì mở `LobbyActivity` |
+| `LobbyActivity` | `onCreate()` | gửi `GET_ONLINE_LIST` |
+| | `onPlayerClick()` | bỏ qua nếu người được chọn đang bận; mở `ChallengeConfirmDialog` với người được chọn |
 | | `onMessage()` | `ONLINE_LIST`: cập nhật danh sách; `INVITE_RESULT`: hiện thông báo bị từ chối hoặc đối thủ bận; các message khác chuyển cho `BaseActivity.onMessage()` |
 | `BaseActivity` | `onMessage()` | `INVITE_RECEIVED`: mở `InvitationDialog` trên màn hình đang mở; `MATCH_START`: đóng màn hình hiện tại (`BotGameActivity` khi đóng thì hủy đồng hồ và lượt của máy) rồi mở `MatchActivity` |
-| `ChallengeConfirmDialog` | `onConfirmClick()` | đóng dialog, trả đối thủ về `MainActivity`; `MainActivity` gửi `INVITE`, hiện "Đang chờ ... trả lời" |
+| `ChallengeConfirmDialog` | `onConfirmClick()` | đóng dialog, trả đối thủ về `LobbyActivity`; `LobbyActivity` gửi `INVITE`, hiện "Đang chờ ... trả lời" |
 | | `onCancelClick()` | đóng dialog, không gửi gì lên server |
-| `InvitationDialog` | `onOkClick()`, `onRejectClick()` | gửi `INVITE_REPLY` với `accept` tương ứng |
-| `ChallengeController` | `handleInvite()` | `OnlinePlayerManager.sendInvitation()`; người được mời đang bận hoặc không online thì gửi `INVITE_RESULT` báo `BUSY` hoặc `OFFLINE` cho người mời |
+| `InvitationDialog` | `onAcceptClick()`, `onRejectClick()` | gửi `INVITE_REPLY` với `accept` tương ứng |
+| `ChallengeController` | `handleGetOnlineList()` | `OnlinePlayerManager.getOnlinePlayers()`, `PlayerRankingDAO.getTotalPoints()`, gửi `ONLINE_LIST` cho riêng người hỏi |
+| | `handleInvite()` | `OnlinePlayerManager.sendInvitation()`; người được mời đang bận hoặc không online thì gửi `INVITE_RESULT` báo `BUSY` hoặc `OFFLINE` cho người mời |
 | | `handleInviteReply()` | từ chối: gửi `INVITE_RESULT` (`REJECTED`); chấp nhận: kiểm tra lại cả hai chưa bận, `generateBoard()`, `MatchManager.createMatch()`, `updateStatus(..., BUSY)`, gửi `MATCH_START` cho hai người, rồi `broadcastOnlineList()` |
 | | `handleUpdateStatus()` | bỏ qua nếu người gửi đang `BUSY`; ngược lại `OnlinePlayerManager.updateStatus()` theo `status` trong message rồi `broadcastOnlineList()` |
 | `MatchActivity` | `onCellClick()` | hai lần click thì gửi `MOVE`; trong lúc chờ phản hồi không nhận thêm click |
@@ -179,7 +183,7 @@ public abstract class DAO {
 | `MatchController` | `handleMove()` | khóa `MatchRoom`; từ chối nếu người gửi không thuộc ván `matchId` hoặc ván đã kết thúc (kiểm tra này dùng chung cho `handleLeaveMatch()`, `handleRematchReply()`); lấy bàn của người gửi; `checkPath()`; hợp lệ thì `removePair()`; `isCleared()` thì ghi `finishTime` theo đồng hồ server và `endMatch(room, "CLEARED")`; chưa thì kiểm tra bế tắc, xáo riêng bàn đó và gửi `BOARD_SHUFFLED`; gửi `MOVE_RESULT` cho người gửi, `OPPONENT_PROGRESS` cho đối thủ |
 | | `endMatch()` | hủy bộ hẹn giờ, xác định kết quả theo bảng ở pha 3, mục 8d, tính điểm, `MatchDAO.saveMatch()`, gửi `MATCH_END` cho hai người; một ván chỉ được kết thúc một lần (cờ trong `MatchRoom`) |
 | | `handleLeaveMatch()`, `onTimeout()` | `endMatch(room, "QUIT")`, `endMatch(room, "TIMEOUT")` |
-| | `handleRematchReply()` | ghi lựa chọn; cả hai tiếp tục thì sinh đề mới và gửi `MATCH_START`; một người dừng thì `updateStatus(..., IDLE)`, gửi `OPPONENT_LEFT` cho người kia, `broadcastOnlineList()` |
+| | `handleRematchReply()` | ghi lựa chọn; cả hai tái đấu thì sinh đề mới và gửi `MATCH_START`; một người dừng thì `updateStatus(..., IDLE)`, gửi `OPPONENT_LEFT` cho người kia, `broadcastOnlineList()` |
 | `MatchDAO` | `saveMatch()` | trong một giao dịch: thêm dòng `tblMatch` (kèm đề bài), lấy khóa sinh ra, thêm hai dòng `tblMatchResult` (kết quả, thời gian hoàn thành, bàn lúc kết thúc của từng người; điểm không lưu); lỗi thì `rollback` và trả `false`. Hàm chỉ tự `commit` khi được gọi lúc `autoCommit` đang bật, nên test đơn vị tắt `autoCommit` trước khi gọi thì `rollback` được toàn bộ |
 | `PlayerRankingDAO` | `getTotalPoints()` | `SELECT playerId, SUM(CASE result WHEN 'WIN' THEN 1 WHEN 'DRAW' THEN 0.5 ELSE 0 END) FROM tblMatchResult WHERE playerId IN (...) GROUP BY playerId`, người chưa có ván nào có tổng điểm 0 |
 
@@ -209,7 +213,8 @@ public abstract class DAO {
 | | Đăng xuất | `OnlinePlayerManager` | `removeOnlinePlayer()` | Người đang online: bị xóa khỏi danh sách<br>Người không có trong danh sách: không báo lỗi, danh sách không đổi |
 | | Đăng ký | `PlayerDAO` | `addPlayer()` | Tên đăng nhập mới: trả về đúng, có thêm một dòng với mật khẩu đã băm<br>Tên đăng nhập đã có: trả về sai, không thêm dòng nào |
 | 6 | Xem bảng xếp hạng | `PlayerRankingDAO` | `getRanking()` | Thứ tự theo tổng điểm giảm dần<br>Bằng tổng điểm: theo trung bình điểm đối thủ giảm dần<br>Bằng cả hai: theo trung bình thời gian thắng tăng dần<br>Trùng cả ba tiêu chí: hai người đứng liền nhau, theo thứ tự tên<br>Người chưa thắng ván nào đứng sau ở tiêu chí 3<br>Ván thắng do đối thủ bỏ cuộc không tính vào trung bình thời gian thắng<br>Gặp cùng đối thủ hai ván: điểm đối thủ tính hai lần<br>Người chưa có ván nào không có trong bảng<br>CSDL chưa có ván nào: danh sách rỗng |
-| | | | `getTotalPoints()` | Danh sách người chơi có ván: đúng tổng điểm<br>Người chưa có ván: tổng điểm 0<br>Danh sách rỗng: kết quả rỗng |
+| | | `RankingController` | `handleGetRanking()` | 12 người có ván: `page = 1` trả 10 dòng, `pageCount` 2; `page = 2` trả 2 dòng<br>`mine` với người ở hạng 12: trả trang 2, `me` = 12<br>`mine` với người chưa có ván hoặc kết nối chưa đăng nhập: `me` rỗng<br>`page` ngoài khoảng: kẹp về trang đầu hoặc cuối<br>Bảng rỗng: `pageCount` 1, không có dòng |
+| | | `PlayerRankingDAO` | `getTotalPoints()` | Danh sách người chơi có ván: đúng tổng điểm<br>Người chưa có ván: tổng điểm 0<br>Danh sách rỗng: kết quả rỗng |
 | 7 | Thách đấu | `OnlinePlayerManager` | `sendInvitation()`, `updateStatus()` | Người được mời rỗi: gửi được<br>Người được mời bận: không gửi được<br>Người được mời không online: không gửi được<br>Chuyển hai người sang bận rồi về rỗi: trạng thái đúng |
 | 8 | Đấu đối kháng | `MatchController` | `endMatch()` | Một người xóa hết ô: người đó WIN có `finishTime`, người kia LOSE<br>Hết giờ: hai người DRAW<br>Một người thoát hoặc mất kết nối: người đó LOSE, người kia WIN không có `finishTime`<br>Hai người hoàn thành gần như cùng lúc: chỉ người được xử lý trước thắng, ván chỉ kết thúc một lần |
 | | | `MatchDAO` | `saveMatch()` | Lưu ván hợp lệ: có một dòng `tblMatch` và hai dòng `tblMatchResult` đúng dữ liệu, gồm bàn lúc kết thúc của từng người<br>Xóa ván vừa lưu: hai dòng kết quả bị xóa theo (`ON DELETE CASCADE`)<br>Một kết quả tham chiếu người chơi không tồn tại: trả về sai, không còn dòng nào được lưu (rollback) |

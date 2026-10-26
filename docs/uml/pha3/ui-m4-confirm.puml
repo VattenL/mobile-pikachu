@@ -1,0 +1,22 @@
+@startuml ui-m4-confirm
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam defaultFontColor #333333
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
+}
+
+rectangle Confirm [
+{{salt
+{
+  <b>Xác nhận thách đấu
+  .
+  Bạn muốn thách đấu B?
+  .
+  [ Hủy ] | [ Xác nhận ]
+}
+}}
+]
+@enduml

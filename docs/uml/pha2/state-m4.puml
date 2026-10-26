@@ -14,22 +14,28 @@ skinparam state {
 }
 
 state "Hiển thị MainScreen" as Main
+state "Hiển thị LoginScreen" as Login
+state "Hiển thị LobbyScreen" as Lobby
 state "Hiển thị ChallengeConfirmDialog" as Confirm
 state "Hiển thị InvitationDialog" as Invitation
 state "Hiển thị MatchScreen" as Match
 state "Hiển thị ResultDialog" as Result
 
 [*] --> Main
-Main --> Confirm : [click tên đối thủ rỗi]
-Confirm --> Main : [click hủy]\n[click xác nhận]
-Main --> Main : [đối thủ từ chối]
-Main --> Invitation : [nhận lời mời]
-Invitation --> Main : [click reject]
-Invitation --> Match : [click OK]
-Main --> Match : [đối thủ chấp nhận]
+Main --> Login : [click đấu đối kháng,\nchưa đăng nhập]
+Login --> Lobby : [đăng nhập thành công]
+Main --> Lobby : [click đấu đối kháng,\nđã đăng nhập]
+Lobby --> Main : [click quay lại]
+Lobby --> Confirm : [click tên đối thủ không bận]
+Confirm --> Lobby : [click hủy]\n[click xác nhận]
+Lobby --> Lobby : [đối thủ từ chối]
+Lobby --> Invitation : [nhận lời mời]
+Invitation --> Lobby : [click reject]
+Invitation --> Match : [click accept]
+Lobby --> Match : [đối thủ chấp nhận]
 Match --> Match : [click hai ô]
-Match --> Main : [click thoát]
+Match --> Lobby : [click thoát]
 Match --> Result : [một bên xóa hết ô,\nhết giờ hoặc\nđối thủ thoát]
-Result --> Match : [cả hai click\ntiếp tục]
-Result --> Main : [click dừng hoặc\nđối thủ dừng]
+Result --> Match : [cả hai click\ntái đấu]
+Result --> Lobby : [click dừng hoặc\nđối thủ dừng]
 @enduml

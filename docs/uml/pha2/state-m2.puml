@@ -13,13 +13,11 @@ skinparam state {
   FontColor #1A1A1A
 }
 
-state "Hiển thị LoginScreen" as Login
 state "Hiển thị MainScreen" as Main
 state "Hiển thị RankingScreen" as Ranking
 
-[*] --> Login
-Login --> Login : [click đăng nhập, sai tài khoản]
-Login --> Main : [click đăng nhập, đúng tài khoản]
+[*] --> Main
 Main --> Ranking : [click xem bảng xếp hạng]
+Ranking --> Ranking : [click trang trước, trang sau\nhoặc vị trí của tôi]
 Ranking --> Main : [click quay lại]
 @enduml

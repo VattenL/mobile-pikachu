@@ -1,0 +1,30 @@
+@startuml ui-m4-lobby
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam defaultFontColor #333333
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #BDBDBD
+  RoundCorner 8
+}
+
+rectangle Lobby [
+{{salt
+{
+  { <b>Đấu đối kháng | . | . | Người chơi A }
+  .
+  <b>Người chơi online
+  {#
+    <b>Tên | <b>Tổng điểm | <b>Trạng thái
+    Người chơi B | 12.5 | Rỗi
+    Người chơi C | 10.5 | Bận
+    Người chơi D | 9 | Luyện tập
+  }
+  .
+  <color:blue>Đang chờ B trả lời...
+  .
+  [ Quay lại ]
+}
+}}
+]
+@enduml

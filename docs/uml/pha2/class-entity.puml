@@ -19,7 +19,6 @@ skinparam class {
 class Player {
   username
   password
-  name
   status
 }
 

@@ -30,20 +30,27 @@ abstract class BaseActivity #E3F2FD {
 }
 
 class MainActivity #E3F2FD {
+  - btnMatch : Button
+  - player : Player
+  + onMatchClick(v : View) : void
+}
+
+class LobbyActivity #E3F2FD {
   - rvOnlinePlayers : RecyclerView
   - tvMessage : TextView
-  - player : Player
-  - onlinePlayers : ArrayList<Player>
+  - btnBack : Button
+  - onlinePlayers : ArrayList<PlayerRanking>
   + onPlayerClick(opponent : Player) : void
   + onMessage(msg : Message) : void
+  + onBackClick(v : View) : void
 }
 
 class InvitationDialog #E3F2FD {
   - tvChallenger : TextView
-  - btnOk : Button
+  - btnAccept : Button
   - btnReject : Button
   - challenger : String
-  + onOkClick(v : View) : void
+  + onAcceptClick(v : View) : void
   + onRejectClick(v : View) : void
 }
 
@@ -66,10 +73,10 @@ class MatchActivity #E3F2FD {
 
 class ResultDialog #E3F2FD {
   - tvResult : TextView
-  - btnContinue : Button
+  - btnRematch : Button
   - btnStop : Button
   - matchId : int
-  + onContinueClick(v : View) : void
+  + onRematchClick(v : View) : void
   + onStopClick(v : View) : void
   + onMessage(msg : Message) : void
 }
@@ -96,6 +103,7 @@ class ClientHandler #E8F5E9 {
 }
 
 class ChallengeController #E8F5E9 {
+  + handleGetOnlineList(handler : ClientHandler, msg : Message) : void
   + handleInvite(handler : ClientHandler, msg : Message) : void
   + handleInviteReply(handler : ClientHandler, msg : Message) : void
   + handleUpdateStatus(handler : ClientHandler, msg : Message) : void
@@ -168,7 +176,6 @@ class PlayerRankingDAO #FFF8E1 {
 class Player #FFF3E0 {
   - id : int
   - username : String
-  - name : String
   - status : String
 }
 
@@ -205,19 +212,21 @@ class Board #FFF3E0 {
 }
 
 ' giao dien
-MainActivity -left- ChallengeConfirmDialog
+MainActivity -right- LobbyActivity
+LobbyActivity -left- ChallengeConfirmDialog
 BaseActivity -right- InvitationDialog
 InvitationDialog -right- MatchActivity
 MatchActivity -right- ResultDialog
-ResultDialog -[norank]- MainActivity
+ResultDialog -[norank]- LobbyActivity
 MainActivity -up-|> BaseActivity
+LobbyActivity -up-|> BaseActivity
 BaseActivity ..|> MessageListener
 MatchActivity ..|> MessageListener
 ResultDialog ..|> MessageListener
 BaseActivity -[norank]- MatchActivity
 
 ' giao dien - mang
-MainActivity -down- ServerConnection
+LobbyActivity -down- ServerConnection
 InvitationDialog -down- ServerConnection
 MatchActivity -down- ServerConnection
 ResultDialog -down- ServerConnection

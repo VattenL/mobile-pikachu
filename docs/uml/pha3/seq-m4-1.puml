@@ -17,6 +17,7 @@ autonumber "<b>0:"
 
 actor "Người chơi A" as A
 boundary MainActivity
+boundary LobbyActivity
 boundary "ChallengeConfirm\nDialog" as ChallengeConfirmDialog
 boundary "Invitation\nDialog" as InvitationDialog
 boundary MatchActivity
@@ -26,17 +27,43 @@ control "Challenge\nController" as ChallengeController
 control "OnlinePlayer\nManager" as OnlinePlayerManager
 control "Board\nGenerator" as BoardGenerator
 control "Match\nManager" as MatchManager
+control "PlayerRanking\nDAO" as PlayerRankingDAO
 entity Board
 entity Match
+entity "Player\nRanking" as PlayerRanking
 actor "Người chơi B" as B
 
-A -> MainActivity : click tên B
-MainActivity -> ChallengeConfirmDialog : gọi
+A -> MainActivity : click đấu đối kháng
+MainActivity -> LobbyActivity : gọi
+LobbyActivity -> ServerConnection : send(GET_ONLINE_LIST)
+ServerConnection -> ClientHandler : GET_ONLINE_LIST (TCP)
+ClientHandler -> ChallengeController : handleGetOnlineList()
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : getOnlinePlayers()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ChallengeController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getTotalPoints()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> ChallengeController : trả về
+deactivate PlayerRankingDAO
+ChallengeController -> ClientHandler : send(ONLINE_LIST)
+ClientHandler -> ServerConnection : ONLINE_LIST (TCP)
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> A : hiển thị
+A -> LobbyActivity : click tên B
+LobbyActivity -> ChallengeConfirmDialog : gọi
 ChallengeConfirmDialog -> A : hiển thị
 A -> ChallengeConfirmDialog : click xác nhận
-ChallengeConfirmDialog --> MainActivity : xác nhận
-MainActivity -> ServerConnection : send(INVITE)
-MainActivity -> A : hiển thị
+ChallengeConfirmDialog --> LobbyActivity : xác nhận
+LobbyActivity -> ServerConnection : send(INVITE)
+LobbyActivity -> A : hiển thị
 ServerConnection -> ClientHandler : INVITE (TCP)
 ClientHandler -> ChallengeController : handleInvite()
 ChallengeController -> OnlinePlayerManager : gọi
@@ -46,10 +73,10 @@ OnlinePlayerManager -> ClientHandler : send(INVITE_RECEIVED)
 OnlinePlayerManager --> ChallengeController : trả về
 deactivate OnlinePlayerManager
 ClientHandler -> ServerConnection : INVITE_RECEIVED (TCP)
-ServerConnection -> MainActivity : onMessage()
-MainActivity -> InvitationDialog : gọi
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> InvitationDialog : gọi
 InvitationDialog -> B : hiển thị
-B -> InvitationDialog : click OK
+B -> InvitationDialog : click accept
 InvitationDialog -> ServerConnection : send(INVITE_REPLY)
 ServerConnection -> ClientHandler : INVITE_REPLY (TCP)
 ClientHandler -> ChallengeController : handleInviteReply()
@@ -80,7 +107,7 @@ OnlinePlayerManager --> ChallengeController : trả về
 deactivate OnlinePlayerManager
 ChallengeController -> ClientHandler : send(MATCH_START)
 ClientHandler -> ServerConnection : MATCH_START (TCP)
-ServerConnection -> MainActivity : onMessage()
-MainActivity -> MatchActivity : gọi
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> MatchActivity : gọi
 MatchActivity -> A : hiển thị
 @enduml

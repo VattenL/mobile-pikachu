@@ -14,10 +14,10 @@ skinparam sequence {
   ActorBackgroundColor #F7F7F7
 }
 autonumber "<b>0:"
-autonumber 65 "<b>0:"
+autonumber 83 "<b>0:"
 
 actor "Người chơi A" as A
-boundary MainActivity
+boundary LobbyActivity
 boundary MatchActivity
 boundary ResultDialog
 control "Server\nConnection" as ServerConnection
@@ -44,7 +44,7 @@ MatchActivity -> ResultDialog : gọi
 ResultDialog -> A : hiển thị
 A -> ResultDialog : click dừng
 ResultDialog -> ServerConnection : send(REMATCH_REPLY)
-ResultDialog -> MainActivity : gọi
+ResultDialog -> LobbyActivity : gọi
 ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
 ClientHandler -> MatchController : handleRematchReply()
 MatchController -> OnlinePlayerManager : gọi
@@ -75,7 +75,7 @@ ChallengeController -> ClientHandler : send(ONLINE_LIST)
 deactivate ChallengeController
 ClientHandler -> ServerConnection : OPPONENT_LEFT,\nONLINE_LIST (TCP)
 ServerConnection -> ResultDialog : onMessage()
-ResultDialog -> MainActivity : gọi
-ServerConnection -> MainActivity : onMessage()
-MainActivity -> A : hiển thị
+ResultDialog -> LobbyActivity : gọi
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> A : hiển thị
 @enduml

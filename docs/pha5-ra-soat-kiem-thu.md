@@ -78,7 +78,7 @@ Thực hiện khi có code, theo các mục chính của checklist giáo trình 
 
 Rút từ Bảng 6.6 của giáo trình, áp dụng cho ứng dụng Android:
 
-- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.7, 3.9–3.11); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
+- Giao diện đúng với thiết kế (pha 3, Hình 3.3, 3.5, 3.6, 3.8, 3.10–3.14); không lỗi chính tả; định dạng số và thời gian (mm:ss) thống nhất.
 - Các màn hình gọi từ nút bấm hiển thị đúng; nút Quay lại của hệ thống Android cho kết quả giống nút Quay lại trên màn hình.
 - Xoay màn hình, ẩn ứng dụng rồi mở lại không làm mất trạng thái ván.
 - Trường bắt buộc (tên đăng nhập, mật khẩu) không cho phép rỗng; khoảng trắng đầu cuối được cắt bỏ.
@@ -103,22 +103,26 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | AC_7 | Đăng xuất | Thanh Tùng bấm Đăng xuất | Về màn đăng nhập; trên máy khác, Thanh Tùng biến khỏi danh sách online | |
 | AC_8 | Đăng nhập lại sau khi đăng xuất | Sau AC_7, đăng nhập lại `thanhtung` trên máy khác | Đăng nhập được (không bị báo đang đăng nhập ở máy khác) | |
 | AC_9 | Mất kết nối | Thanh Tùng đang online thì tắt mạng máy đó | Trên máy khác, Thanh Tùng biến khỏi danh sách online; bật mạng rồi đăng nhập lại được | |
+| AC_10 | Giao diện đăng nhập | Mở ứng dụng, bấm Đấu đối kháng | Có ô tên đăng nhập, ô mật khẩu (ẩn ký tự), nút Đăng nhập, nút Đăng ký; con trỏ ở ô tên đăng nhập | |
+| AC_11 | Đăng nhập đúng | Nhập `hoangnam` và mật khẩu đúng, bấm Đăng nhập | Vào màn hình đấu đối kháng, danh sách online không có chính mình | |
+| AC_12 | Đăng nhập sai mật khẩu | Nhập `hoangnam`, mật khẩu sai | Ở lại màn đăng nhập, báo "Sai tên đăng nhập hoặc mật khẩu" | |
+| AC_13 | Bỏ trống trường | Bỏ trống tên đăng nhập hoặc mật khẩu, bấm Đăng nhập | Báo trường bắt buộc, không gửi lên server | |
+| AC_14 | Một tài khoản đăng nhập ở hai máy | Đăng nhập `hoangnam` ở máy 1, rồi ở máy 2 | Máy 2 bị từ chối, báo tài khoản đang đăng nhập ở máy khác; máy 1 không bị ảnh hưởng | |
+| AC_15 | Nhiều client đăng nhập đồng thời | Đăng nhập 3 tài khoản khác nhau trên 3 máy gần như cùng lúc | Cả 3 vào được; danh sách online trên màn hình đấu đối kháng của mỗi máy có 2 người còn lại | |
 
 **Modul xem bảng xếp hạng.** Tiền điều kiện chung: server đang chạy, CSDL đã nạp dữ liệu mẫu.
 
 | Mã | Mục đích kiểm thử | Các bước thực hiện | Kết quả mong muốn | Kết quả |
 |---|---|---|---|---|
-| VR_1 | Giao diện đăng nhập | Mở ứng dụng | Có ô tên đăng nhập, ô mật khẩu (ẩn ký tự), nút Đăng nhập, nút Đăng ký; con trỏ ở ô tên đăng nhập | |
-| VR_2 | Đăng nhập đúng | Nhập `hoangnam` và mật khẩu đúng, bấm Đăng nhập | Vào giao diện chính, tiêu đề hiện tên và tổng điểm của Hoàng Nam, danh sách online không có chính mình | |
-| VR_3 | Đăng nhập sai mật khẩu | Nhập `hoangnam`, mật khẩu sai | Ở lại màn đăng nhập, báo "Sai tên đăng nhập hoặc mật khẩu" | |
-| VR_4 | Bỏ trống trường | Bỏ trống tên đăng nhập hoặc mật khẩu, bấm Đăng nhập | Báo trường bắt buộc, không gửi lên server | |
-| VR_5 | Một tài khoản đăng nhập ở hai máy | Đăng nhập `hoangnam` ở máy 1, rồi ở máy 2 | Máy 2 bị từ chối, báo tài khoản đang đăng nhập ở máy khác; máy 1 không bị ảnh hưởng | |
-| VR_6 | Nhiều client đăng nhập đồng thời | Đăng nhập 3 tài khoản khác nhau trên 3 máy gần như cùng lúc | Cả 3 vào được; danh sách online trên mỗi máy có 2 người còn lại | |
-| VR_7 | Xem bảng xếp hạng | Ở giao diện chính bấm Xem bảng xếp hạng | Hiện bảng 5 cột Hạng, Tên, Tổng điểm, TB điểm đối thủ, TB thời gian thắng, đúng dữ liệu mẫu | |
-| VR_8 | Bằng điểm ở tiêu chí 1 | Dữ liệu mẫu có hai người cùng tổng điểm | Người có TB điểm đối thủ cao hơn đứng trên | |
-| VR_9 | Bằng điểm ở tiêu chí 1 và 2 | Nạp `seed-tiebreak.sql` thay cho dữ liệu mẫu chung: có hai người cùng tổng điểm và cùng TB điểm đối thủ | Người có TB thời gian thắng nhỏ hơn đứng trên; người chưa thắng ván nào đứng dưới | |
-| VR_10 | Bảng xếp hạng rỗng | Dùng CSDL chưa có ván nào | Hiện thông báo chưa có dữ liệu xếp hạng | |
-| VR_11 | Quay lại | Bấm Quay lại ở bảng xếp hạng | Về giao diện chính | |
+| VR_1 | Giao diện chính khi là khách | Mở ứng dụng, chưa đăng nhập | Giao diện chính hiện "Khách" và bốn nút Chơi với máy, Đấu đối kháng, Xem bảng xếp hạng, Cài đặt | |
+| VR_2 | Khách xem bảng xếp hạng | Chưa đăng nhập, bấm Xem bảng xếp hạng | Hiện trang 1 với 5 cột Hạng, Tên, Tổng điểm, TB điểm đối thủ, TB thời gian thắng, đúng dữ liệu mẫu, "Trang 1/2"; không có nút Vị trí của tôi | |
+| VR_3 | Chuyển trang | Bấm Trang sau, rồi Trang trước | Hiện trang 2 (hạng 11, 12) rồi về trang 1; ở trang 1 nút Trang trước bị vô hiệu, ở trang cuối nút Trang sau bị vô hiệu | |
+| VR_4 | Vị trí của tôi | Đăng nhập `hoangnam` (hạng 12), vào bảng xếp hạng, bấm Vị trí của tôi | Chuyển sang trang 2, dòng của `hoangnam` được tô màu | |
+| VR_5 | Vị trí của tôi khi chưa có ván | Đăng nhập tài khoản chưa đấu ván nào, bấm Vị trí của tôi | Báo "Bạn chưa có trong bảng xếp hạng", giữ nguyên trang | |
+| VR_6 | Bằng điểm ở tiêu chí 1 | Dữ liệu mẫu có hai người cùng tổng điểm | Người có TB điểm đối thủ cao hơn đứng trên | |
+| VR_7 | Bằng điểm ở tiêu chí 1 và 2 | Nạp `seed-tiebreak.sql` thay cho dữ liệu mẫu chung: có hai người cùng tổng điểm và cùng TB điểm đối thủ | Người có TB thời gian thắng nhỏ hơn đứng trên | |
+| VR_8 | Bảng xếp hạng rỗng | Dùng CSDL chưa có ván nào | Hiện thông báo chưa có dữ liệu xếp hạng | |
+| VR_9 | Quay lại | Bấm Quay lại ở bảng xếp hạng | Về giao diện chính | |
 
 **Modul chơi với máy.** Tiền điều kiện: đã đăng nhập, đang ở giao diện chính.
 
@@ -139,16 +143,17 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | PB_12 | Không lưu kết quả | Chơi xong một ván với máy, xem bảng xếp hạng | Tổng điểm và bảng xếp hạng không đổi | |
 | PB_13 | Trạng thái khi chơi với máy | Người chơi khác xem danh sách online | Người đang chơi với máy hiện trạng thái Luyện tập, vẫn mời được | |
 
-**Modul thách đấu và đấu đối kháng.** Tiền điều kiện: A (`hoangnam`) và B (`minhanh`) đăng nhập trên hai máy, đều rỗi.
+**Modul thách đấu và đấu đối kháng.** Tiền điều kiện: A (`hoangnam`) và B (`minhanh`) đăng nhập trên hai máy, đều rỗi và đang ở màn hình đấu đối kháng.
 
 | Mã | Mục đích kiểm thử | Các bước thực hiện | Kết quả mong muốn | Kết quả |
 |---|---|---|---|---|
-| CP_1 | Danh sách online | Quan sát giao diện chính hai máy | Mỗi máy thấy người kia với tổng điểm và trạng thái Rỗi | |
-| CP_2 | Gửi lời mời | A click tên B, bấm Xác nhận | Sau khi click tên, máy A hiện dialog xác nhận thách đấu Minh Anh; sau khi xác nhận, máy A hiện "Đang chờ Minh Anh trả lời..."; máy B hiện dialog lời mời | |
-| CP_3 | Hủy thách đấu | A click tên B, bấm Hủy | Dialog xác nhận đóng; máy A vẫn ở giao diện chính, không hiện "Đang chờ"; máy B không nhận lời mời | |
+| CP_0 | Khách vào đấu đối kháng | Chưa đăng nhập, bấm Đấu đối kháng ở giao diện chính | Hiện màn đăng nhập; đăng nhập xong thì vào màn hình đấu đối kháng | |
+| CP_1 | Danh sách online | Quan sát màn hình đấu đối kháng hai máy | Mỗi máy thấy người kia với tổng điểm và trạng thái Rỗi | |
+| CP_2 | Gửi lời mời | A click tên B, bấm Xác nhận | Sau khi click tên, máy A hiện dialog xác nhận thách đấu `minhanh`; sau khi xác nhận, máy A hiện "Đang chờ minhanh trả lời..."; máy B hiện dialog lời mời | |
+| CP_3 | Hủy thách đấu | A click tên B, bấm Hủy | Dialog xác nhận đóng; máy A vẫn ở màn hình đấu đối kháng, không hiện "Đang chờ"; máy B không nhận lời mời | |
 | CP_4 | Từ chối | B bấm Reject | Máy A báo bị từ chối; hai người vẫn rỗi | |
 | CP_5 | Mời người đang bận | C đang trong ván với D; A click tên C, bấm Xác nhận | A được báo C đang bận; C không nhận lời mời | |
-| CP_6 | Chấp nhận | B bấm OK | Hai máy vào màn chơi với cùng đề, đồng hồ 10:00, "Đối thủ: 100"; máy thứ ba thấy A, B Bận | |
+| CP_6 | Chấp nhận | B bấm Accept | Hai máy vào màn chơi với cùng đề, đồng hồ 10:00, "Đối thủ: 100"; máy thứ ba thấy A, B Bận | |
 | CP_7 | Nối hợp lệ | A nối một cặp | Máy A xóa hai ô; trên máy B, bàn thu nhỏ của A mất đúng hai ô đó (có hiệu ứng nối) và hiện "98 ô"; bàn của B không đổi | |
 | CP_8 | Server là trọng tài | Gửi `MOVE` cho cặp không nối được bằng một client thử | Server trả `ok = false`, bàn trên server không đổi | |
 | CP_9 | Bế tắc riêng một người | Dùng đề thử để bàn của A bế tắc | Chỉ máy A nhận bàn xáo mới; bàn của B giữ nguyên; bàn thu nhỏ của A trên máy B cũng đổi theo bàn mới | |
@@ -157,23 +162,23 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | CP_12 | Hết giờ | Để hết 10 phút | Hai bên "Hòa"; lưu hai kết quả DRAW | |
 | CP_13 | Thoát giữa ván | A bấm Thoát | A thua, B thắng; B nhận dialog kết quả | |
 | CP_14 | Mất kết nối giữa ván | Tắt mạng máy A giữa ván | Server xử A thua, B thắng; A không còn trong danh sách online | |
-| CP_15 | Cả hai tiếp tục | Hai người bấm Tiếp tục | Bắt đầu ván mới với đề mới | |
-| CP_16 | Một bên dừng | A bấm Dừng | Hai máy về giao diện chính; B được báo "Hoàng Nam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
+| CP_15 | Cả hai tái đấu | Hai người bấm Tái đấu | Bắt đầu ván mới với đề mới | |
+| CP_16 | Một bên dừng | A bấm Dừng | Hai máy về màn hình đấu đối kháng; B được báo "hoangnam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
 | CP_17 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
-| CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm OK | C nhận dialog lời mời ngay trên màn chơi với máy; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
+| CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm Accept | C nhận dialog lời mời ngay trên màn chơi với máy; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
 
 ### c. Dữ liệu kiểm thử
 
 `server/db/seed.sql` tạo dữ liệu dùng chung, khớp bảng xếp hạng mẫu của kịch bản (pha 2):
 
-- Người chơi: Hoàng Nam (`hoangnam`), Minh Anh (`minhanh`), Quốc Bảo (`quocbao`), Thu Hà (`thuha`), Đức Long (`duclong`), mật khẩu mẫu chung.
+- Người chơi: 12 tài khoản ứng với người chơi A đến N của kịch bản xem bảng xếp hạng: `hoangnam` là A, `minhanh` là B, các người còn lại là `nguoichoic` đến `nguoichoin`; mật khẩu mẫu chung. Tên đăng nhập cũng là tên hiển thị.
 - Các ván đối kháng đã kết thúc, chọn sao cho:
-  - tổng điểm đúng như kịch bản: Minh Anh 12.5, Hoàng Nam 11, Quốc Bảo 10.5, Thu Hà 7.5, Đức Long 7.5. Mỗi ván phát ra đúng 1 điểm (1 + 0 hoặc 0.5 + 0.5), nên tổng điểm của mọi người (49) bằng đúng số ván;
-  - thứ tự xếp hạng đúng như kịch bản; Thu Hà và Đức Long cùng 7.5 nhưng khác TB điểm đối thủ để kiểm tra tiêu chí 2 (VR_8);
+  - tổng điểm đúng như kịch bản: B 12.5, C 10.5, D 9, E 8.5, G 8, H 7.5, I 7.5, K 6, L 5.5, M 5, N 4.5, A 3.5. Mỗi ván phát ra đúng 1 điểm (1 + 0 hoặc 0.5 + 0.5), nên tổng điểm của mọi người (88) bằng đúng số ván; 12 người nên bảng xếp hạng có 2 trang và A nằm ở trang 2 (VR_3, VR_4);
+  - thứ tự xếp hạng đúng như kịch bản; H và I cùng 7.5 nhưng khác TB điểm đối thủ để kiểm tra tiêu chí 2 (VR_6);
   - có một ván thắng do đối thủ bỏ cuộc (không có `finishTime`);
   - có một người gặp cùng một đối thủ hai lần.
-- `server/db/seed-tiebreak.sql`: bộ dữ liệu nhỏ riêng cho VR_9, có hai người cùng tổng điểm và cùng TB điểm đối thủ. Dữ liệu này không trộn vào `seed.sql` để bảng xếp hạng mẫu vẫn khớp kịch bản.
-- Một CSDL rỗng (chỉ chạy `schema.sql`) cho VR_10.
+- `server/db/seed-tiebreak.sql`: bộ dữ liệu nhỏ riêng cho VR_7, có hai người cùng tổng điểm và cùng TB điểm đối thủ. Dữ liệu này không trộn vào `seed.sql` để bảng xếp hạng mẫu vẫn khớp kịch bản.
+- Một CSDL rỗng (chỉ chạy `schema.sql`) cho VR_8.
 - Đề thử cố định cho PB_7, CP_9 (bàn gần bế tắc) được nạp bằng seed cố định trong chế độ thử của server.
 
 ### d. Thực hiện và ghi nhận

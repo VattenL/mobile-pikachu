@@ -16,19 +16,16 @@ skinparam class {
 }
 
 ' ===== Tang 1: lop bien =====
-class LoginScreen {
-  - inUsername
-  - inPassword
-  - outMessage
-  - subLogin
-}
-
 class MainScreen {
   - subViewRanking
 }
 
 class RankingScreen {
   - outRanking
+  - outPage
+  - subPrevPage
+  - subNextPage
+  - subMyRank
   - subBack
 }
 
@@ -36,9 +33,7 @@ class RankingScreen {
 class Player {
   - username
   - password
-  - name
   - status
-  + checkLogin()
 }
 
 class PlayerRanking {
@@ -46,11 +41,10 @@ class PlayerRanking {
   - avgOpponentPoint
   - avgWinTime
   + getRanking()
+  + getPlayerPage()
 }
 
-LoginScreen -right- MainScreen
 MainScreen -right- RankingScreen
-
-LoginScreen -down- Player
 RankingScreen -down- PlayerRanking
+PlayerRanking -left-|> Player
 @enduml

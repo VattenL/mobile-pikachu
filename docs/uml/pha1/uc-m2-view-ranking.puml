@@ -17,13 +17,17 @@ skinparam actor {
   BorderColor #4A4A4A
 }
 
+actor "Guest" as Guest
 actor "Player" as Player
 
 rectangle "Modul: View Ranking" {
   usecase "View Ranking" as UC04
+  usecase "Locate My Rank" as UC04_1
   usecase "Login" as UC02
 }
 
-Player --> UC04
-UC04 ..> UC02 : <<include>>
+Player -|> Guest
+Guest --> UC04
+UC04 <.. UC04_1 : <<extend>>
+UC04_1 ..> UC02 : <<include>>
 @enduml

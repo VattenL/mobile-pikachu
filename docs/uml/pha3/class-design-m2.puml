@@ -16,29 +16,29 @@ skinparam class {
 }
 
 ' ===== Client Android: tang giao dien =====
-class LoginActivity #E3F2FD {
-  - edtUsername : EditText
-  - edtPassword : EditText
-  - tvError : TextView
-  - btnLogin : Button
-  + onLoginClick(v : View) : void
-  + onMessage(msg : Message) : void
-}
-
 class MainActivity #E3F2FD {
   - tvPlayer : TextView
-  - rvOnlinePlayers : RecyclerView
-  - btnRanking : Button
   - btnPlayWithBot : Button
-  - btnLogout : Button
+  - btnMatch : Button
+  - btnRanking : Button
+  - btnSettings : Button
   - player : Player
   + onRankingClick(v : View) : void
 }
 
 class RankingActivity #E3F2FD {
   - rvRanking : RecyclerView
+  - tvPage : TextView
+  - btnPrevPage : Button
+  - btnNextPage : Button
+  - btnMyRank : Button
   - btnBack : Button
+  - page : int
+  - pageCount : int
   - listRanking : ArrayList<PlayerRanking>
+  + onPrevPageClick(v : View) : void
+  + onNextPageClick(v : View) : void
+  + onMyRankClick(v : View) : void
   + onMessage(msg : Message) : void
   + onBackClick(v : View) : void
 }
@@ -74,29 +74,15 @@ class ClientHandler #E8F5E9 {
   + send(msg : Message) : void
 }
 
-class LoginController #E8F5E9 {
-  + handleLogin(handler : ClientHandler, msg : Message) : void
-}
-
 class RankingController #E8F5E9 {
+  - PAGE_SIZE : int = 10
   + handleGetRanking(handler : ClientHandler, msg : Message) : void
-}
-
-class OnlinePlayerManager #E8F5E9 {
-  - onlineHandlers : HashMap<String, ClientHandler>
-  + getInstance() : OnlinePlayerManager
-  + addOnlinePlayer(handler : ClientHandler) : boolean
 }
 
 ' ===== Server: tang DAO =====
 class DAO #FFF8E1 {
   # con : Connection
   + DAO()
-}
-
-class PlayerDAO #FFF8E1 {
-  + PlayerDAO()
-  + checkLogin(username : String, password : String) : Player
 }
 
 class PlayerRankingDAO #FFF8E1 {
@@ -116,7 +102,6 @@ class Player #FFF3E0 {
   - id : int
   - username : String
   - password : String
-  - name : String
   - status : String
 }
 
@@ -127,33 +112,24 @@ class PlayerRanking #FFF3E0 {
 }
 
 ' giao dien
-LoginActivity -right- MainActivity
 MainActivity -right- RankingActivity
-LoginActivity ..|> MessageListener
 RankingActivity ..|> MessageListener
 
 ' giao dien - mang
-LoginActivity -down- ServerConnection
 RankingActivity -down- ServerConnection
-LoginActivity -down- ClientSession
 MainActivity -down- ClientSession
+RankingActivity -down- ClientSession
 ServerConnection -right- MessageListener
-ServerConnection -[hidden]right- ClientSession
 
 ' mang client - server (TCP)
 ServerConnection -down- ClientHandler : TCP
-ClientHandler -right- LoginController
 ClientHandler -right- RankingController
-LoginController -right- OnlinePlayerManager
 
 ' dieu khien - DAO
-LoginController -down- PlayerDAO
 RankingController -down- PlayerRankingDAO
-DAO <|-down- PlayerDAO
 DAO <|-down- PlayerRankingDAO
 
 ' DAO - thuc the
-PlayerDAO -down- Player
 PlayerRankingDAO -down- PlayerRanking
 PlayerRanking -left-|> Player
 ClientHandler -[norank]- Message

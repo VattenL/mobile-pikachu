@@ -13,7 +13,7 @@
 
 ### b. Bổ sung kiểu dữ liệu
 
-- `Player`: `id : int`, `username : String`, `password : String` (giá trị băm SHA-256 của mật khẩu, không lưu mật khẩu gốc), `name : String`, `status : String` (`IDLE`: rỗi, `TRAINING`: luyện tập, `BUSY`: bận).
+- `Player`: `id : int`, `username : String`, `password : String` (giá trị băm SHA-256 của mật khẩu, không lưu mật khẩu gốc), `status : String` (`IDLE`: rỗi, `TRAINING`: luyện tập, `BUSY`: bận).
 - `Match`: `id : int`, `startTime : Date`, `endTime : Date`, `timeLimit : int` (số giây, mặc định 600).
 - `MatchResult`: `id : int`, `result : String` (WIN, DRAW, LOSE), `point : float` (điểm của ván theo đề: thắng 1, hòa 0.5, thua 0; suy ra từ `result`), `finishTime : Integer` (số mili giây tính từ lúc bắt đầu ván, rỗng nếu người chơi chưa xóa hết ô). Dùng kiểu bọc `Integer` để biểu diễn được giá trị rỗng.
 - `Board`: `id : int`, `rowCount : int`, `columnCount : int`, `tiles : int[][]`. `rowCount`, `columnCount` là kích thước cả lưới (12 x 12): vùng chơi 10x10 ở giữa và một vòng viền trống để đường nối có thể đi vòng ra ngoài. Ô trống có giá trị 0, ô có hình mang mã hình từ 1 trở đi.
@@ -86,7 +86,7 @@ Kết quả thu được thiết kế cơ sở dữ liệu như Hình 3.2.
 
 | Bảng | Cột | Ghi chú |
 |---|---|---|
-| `tblPlayer` | `id`, `username`, `password`, `name` | `username` duy nhất; `password` là chuỗi băm SHA-256 dạng hex (64 ký tự) |
+| `tblPlayer` | `id`, `username`, `password` | `username` duy nhất; `password` là chuỗi băm SHA-256 dạng hex (64 ký tự) |
 | `tblMatch` | `id`, `startTime`, `endTime`, `timeLimit`, `tiles` | `tiles` là đề bài ban đầu của ván |
 | `tblMatchResult` | `id`, `result`, `finishTime`, `tiles`, `matchId`, `playerId` | `finishTime` rỗng nếu người chơi chưa xóa hết ô; `tiles` là bàn của người chơi lúc ván kết thúc (toàn ô trống nếu đã xóa hết); (`matchId`, `playerId`) duy nhất; xóa ván thì xóa kết quả |
 
@@ -107,6 +107,7 @@ Các phương thức của lớp thực thể ở pha phân tích được chuy�
 | `Player.checkLogin()` | `PlayerDAO.checkLogin()` | đọc CSDL |
 | `Player.addPlayer()` | `PlayerDAO.addPlayer()` | ghi CSDL |
 | `PlayerRanking.getRanking()`, `getTotalPoints()` | `PlayerRankingDAO` | truy vấn thống kê trên CSDL |
+| `PlayerRanking.getPlayerPage()` và phần lấy một trang của `getRanking()` | `RankingController.handleGetRanking()` (server) | cắt trang và tìm dòng của người chơi trên kết quả truy vấn, để mỗi lần chỉ gửi một trang cho client |
 | `Match.saveMatch()` | `MatchDAO.saveMatch()` | ghi CSDL |
 | `Player.getOnlinePlayers()`, `addOnlinePlayer()`, `removeOnlinePlayer()`, `sendInvitation()`, `updateStatus()` | `OnlinePlayerManager` (server) | danh sách online, lời mời, trạng thái chỉ nằm trong bộ nhớ server, không có trong CSDL, nên giao cho một lớp quản lý trong bộ nhớ thay cho DAO |
 | `Match.createMatch()` | `MatchManager.createMatch()` (server) | ván đang diễn ra chỉ nằm trong bộ nhớ server cho tới khi kết thúc mới được lưu |
@@ -129,13 +130,13 @@ Giao diện như Hình 3.3.
 *Hình 3.3: Thiết kế giao diện modul quản lý tài khoản*
 
 - `RegisterScreen` → `RegisterActivity`: bốn `EditText` (tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị), `TextView` báo lỗi, nút Đăng ký, nút Quay lại. Ô rỗng và mật khẩu nhập lại được kiểm tra ngay trên client trước khi gửi `REGISTER`. Khi nhận `REGISTER_RESULT` thành công thì quay lại `LoginActivity` kèm tên đăng nhập.
-- `LoginScreen` → `LoginActivity`: như modul xem bảng xếp hạng, thêm nút Đăng ký mở `RegisterActivity`; khi quay về sau khi đăng ký thì điền sẵn tên đăng nhập.
+- `LoginScreen` → `LoginActivity`: hai `EditText` nhập tên đăng nhập và mật khẩu, `TextView` báo lỗi, nút Đăng nhập, nút Đăng ký mở `RegisterActivity`; khi quay về sau khi đăng ký thì điền sẵn tên đăng nhập. `LoginActivity` cài đặt `MessageListener` để nhận `LOGIN_RESULT`.
 - `MainScreen` → `MainActivity`: nút Đăng xuất. `onLogoutClick()` gửi `LOGOUT`, xóa người chơi khỏi `ClientSession` và về `LoginActivity` ngay, không chờ server trả lời.
 - Trên server, `LoginController` gồm ba hàm:
   - `handleRegister()`: kiểm tra ba trường không rỗng, băm mật khẩu SHA-256, gọi `PlayerDAO.addPlayer()`; tên đăng nhập trùng thì CSDL báo vi phạm ràng buộc duy nhất và hàm trả về sai.
-  - `handleLogin()`: như modul xem bảng xếp hạng.
+  - `handleLogin()`: gọi `PlayerDAO.checkLogin()` rồi `OnlinePlayerManager.addOnlinePlayer()`; hàm này trả về sai nếu tài khoản đang online ở máy khác.
   - `handleLogout()`: gọi `OnlinePlayerManager.removeOnlinePlayer()` rồi `ChallengeController.broadcastOnlineList()` để những người chơi khác thấy danh sách mới. Khi client mất kết nối, `ClientHandler` cũng gọi `removeOnlinePlayer()`.
-- `PlayerDAO.addPlayer()` dùng chung kết nối của lớp `DAO` với `checkLogin()`.
+- `PlayerDAO` kế thừa lớp `DAO`; `addPlayer()` dùng chung kết nối với `checkLogin()`.
 
 ![Hình 3.4: Biểu đồ lớp thiết kế modul quản lý tài khoản](uml/pha3/class-design-m1.png)
 
@@ -143,72 +144,85 @@ Giao diện như Hình 3.3.
 
 ### b. Modul xem bảng xếp hạng
 
-Giao diện gồm ba màn hình, nối theo luồng như Hình 3.5.
+Giao diện gồm hai màn hình: giao diện chính như Hình 3.5 và giao diện bảng xếp hạng như Hình 3.6.
 
-![Hình 3.5: Thiết kế giao diện modul xem bảng xếp hạng](uml/pha3/ui-m2.png)
+![Hình 3.5: Thiết kế giao diện chính](uml/pha3/ui-m2-main.png)
 
-*Hình 3.5: Thiết kế giao diện modul xem bảng xếp hạng*
+*Hình 3.5: Thiết kế giao diện chính*
 
-- `LoginScreen` → `LoginActivity`: hai `EditText` nhập tên đăng nhập và mật khẩu, `TextView` báo lỗi, nút Đăng nhập. `LoginActivity` cài đặt `MessageListener` để nhận `LOGIN_RESULT`.
-- `MainScreen` → `MainActivity`: `RecyclerView` danh sách người chơi online, các nút Xem bảng xếp hạng, Chơi với máy, Đăng xuất; thuộc tính ẩn `player` là người chơi đang đăng nhập, lấy từ `ClientSession`.
-- `RankingScreen` → `RankingActivity`: `RecyclerView` bảng xếp hạng, nút Quay lại; thuộc tính ẩn `listRanking`.
-- Trên server, `LoginController.handleLogin()` gọi `PlayerDAO.checkLogin()` rồi `OnlinePlayerManager.addOnlinePlayer()`; hàm này trả về sai nếu tài khoản đang online ở máy khác (ngoại lệ 2b của kịch bản xem bảng xếp hạng). `RankingController.handleGetRanking()` gọi `PlayerRankingDAO.getRanking()`.
-- `PlayerDAO`, `PlayerRankingDAO` kế thừa lớp `DAO` để dùng chung một kết nối CSDL.
+![Hình 3.6: Thiết kế giao diện bảng xếp hạng](uml/pha3/ui-m2-ranking.png)
 
-![Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](vp/png/class-design-m2.png)
+*Hình 3.6: Thiết kế giao diện bảng xếp hạng*
 
-*Hình 3.6: Biểu đồ lớp thiết kế modul xem bảng xếp hạng*
+- `MainScreen` → `MainActivity`: giao diện chính, hiện ngay khi mở ứng dụng, dùng chung cho khách và người chơi: `TextView` tên người chơi (hoặc "Khách"), bốn nút Chơi với máy, Đấu đối kháng, Xem bảng xếp hạng, Cài đặt; thuộc tính ẩn `player` lấy từ `ClientSession`, rỗng khi là khách. Màn hình cài đặt không thuộc modul nào nên không thiết kế ở đây.
+- `RankingScreen` → `RankingActivity`: `RecyclerView` các dòng của trang đang xem, `TextView` số trang ("Trang 1/2"), nút Trang trước, Trang sau, Vị trí của tôi, Quay lại; thuộc tính ẩn `page`, `pageCount`, `listRanking`. Nút Vị trí của tôi chỉ hiện khi `ClientSession` có người chơi đã đăng nhập. Mỗi lần chuyển trang, `RankingActivity` gửi `GET_RANKING` với số trang; nút Vị trí của tôi gửi `GET_RANKING` với `mine = true`. Khi nhận `RANKING` thì hiện trang và tô màu dòng có thứ hạng `me`; `me` rỗng thì báo "Bạn chưa có trong bảng xếp hạng".
+- Khách không cần đăng nhập vẫn xem được: `ServerConnection` kết nối tới server ngay khi mở ứng dụng, và server trả lời `GET_RANKING` trên mọi kết nối.
+- Trên server, `RankingController.handleGetRanking()` gọi `PlayerRankingDAO.getRanking()` lấy cả bảng đã sắp xếp, đánh số hạng (mục 8d) rồi cắt ra trang được yêu cầu, mỗi trang `PAGE_SIZE` = 10 dòng, và gửi `RANKING`. Với `mine = true`, hàm tìm dòng của người chơi đang đăng nhập trên kết nối đó (`ClientHandler.player`) và trả trang chứa dòng đó, kèm `me` là thứ hạng của người chơi. Cả bảng được truy vấn lại mỗi lần vì số người chơi nhỏ; khi cần có thể chuyển sang `LIMIT`/`OFFSET` ngay trong truy vấn.
+- `PlayerRankingDAO` kế thừa lớp `DAO` để dùng chung một kết nối CSDL.
+
+![Hình 3.7: Biểu đồ lớp thiết kế modul xem bảng xếp hạng](vp/png/class-design-m2.png)
+
+*Hình 3.7: Biểu đồ lớp thiết kế modul xem bảng xếp hạng*
 
 ### c. Modul chơi với máy
 
-Ván với máy chạy hoàn toàn trên client và không lưu kết quả; client chỉ báo server trạng thái luyện tập để người khác vẫn thấy mình online và vẫn mời được: khi bắt đầu ván, `BotGameActivity` gửi `UPDATE_STATUS` với trạng thái luyện tập qua `ServerConnection`; khi ván kết thúc hoặc người chơi thoát thì gửi trạng thái rỗi. Phía server, `ChallengeController.handleUpdateStatus()` cập nhật trạng thái trong `OnlinePlayerManager` rồi gửi lại danh sách online (mục 4d). Giao diện như Hình 3.7 (màn hình ngang).
+Ván với máy chạy hoàn toàn trên client và không lưu kết quả; client chỉ báo server trạng thái luyện tập để người khác vẫn thấy mình online và vẫn mời được: khi bắt đầu ván, `BotGameActivity` gửi `UPDATE_STATUS` với trạng thái luyện tập qua `ServerConnection`; khi ván kết thúc hoặc người chơi thoát thì gửi trạng thái rỗi. Phía server, `ChallengeController.handleUpdateStatus()` cập nhật trạng thái trong `OnlinePlayerManager` rồi gửi lại danh sách online (mục 4d). Giao diện như Hình 3.8 (màn hình ngang).
 
-![Hình 3.7: Thiết kế giao diện modul chơi với máy](uml/pha3/ui-m3.png)
+![Hình 3.8: Thiết kế giao diện modul chơi với máy](uml/pha3/ui-m3.png)
 
-*Hình 3.7: Thiết kế giao diện modul chơi với máy*
+*Hình 3.8: Thiết kế giao diện modul chơi với máy*
 
 - `DifficultyScreen` → `DifficultyActivity`: nhóm ba thẻ chọn độ khó `rgDifficulty` (mỗi thẻ có hình và tên độ khó, chỉ chọn được một), nút Bắt đầu, nút Quay lại.
 - `BotGameScreen` → `BotGameActivity` và lớp vẽ `BoardView`. `BoardView` là một `View` tự vẽ: vẽ các ô hình, ô đang chọn và đường nối, nhận sự kiện chạm rồi gọi `BotGameActivity.onCellClick()`. `BotGameActivity` giữ các thuộc tính ẩn: bàn của người chơi `board`, bàn của máy `botBoard` (bản sao cùng đề), đối tượng `bot`, ô đã chọn trước `firstCell`, đồng hồ `timer` và `handler` để hẹn lượt của máy. Màn chơi có hai `BoardView`: bàn của người chơi ở giữa, bàn của máy thu nhỏ ở bên phải (`botBoardView`, chỉ để xem, `setInteractive(false)`); mỗi nước của máy được vẽ lên bàn thu nhỏ cùng hiệu ứng nối cặp.
 - `BotResultDialog`: `TextView` kết quả, nút OK.
 - Lớp xử lý trong `core`: `BoardGenerator` (sinh đề, xáo bàn), `PathFinder` (kiểm tra đường nối, tìm cặp còn nối được), `Bot` (chọn nước đi, thời gian chờ theo độ khó).
 
-![Hình 3.8: Biểu đồ lớp thiết kế modul chơi với máy](uml/pha3/class-design-m3.png)
+![Hình 3.9: Biểu đồ lớp thiết kế modul chơi với máy](uml/pha3/class-design-m3.png)
 
-*Hình 3.8: Biểu đồ lớp thiết kế modul chơi với máy*
+*Hình 3.9: Biểu đồ lớp thiết kế modul chơi với máy*
 
 ### d. Modul thách đấu và đấu đối kháng
 
-Giao diện được tách theo ba chức năng của modul. Thách đấu và trả lời lời mời như Hình 3.9: dialog xác nhận thách đấu hiện trên máy người thách đấu, dialog lời mời hiện trên máy người được mời. Chơi ván như Hình 3.10. Kết thúc ván và tái đấu như Hình 3.11: dialog kết quả hiện trên cả hai máy; người bấm Tiếp tục thấy thông báo chờ cho tới khi đối thủ trả lời.
+Mỗi màn hình của modul một hình: màn hình đấu đối kháng (Hình 3.10), dialog xác nhận thách đấu trên máy người thách đấu (Hình 3.11), dialog lời mời trên máy người được mời (Hình 3.12), giao diện chơi (Hình 3.13) và dialog kết quả trên cả hai máy (Hình 3.14). Giao diện chính như Hình 3.5.
 
-![Hình 3.9: Thiết kế giao diện chức năng thách đấu và trả lời lời mời](uml/pha3/ui-m4-1.png)
+![Hình 3.10: Thiết kế màn hình đấu đối kháng](uml/pha3/ui-m4-lobby.png)
 
-*Hình 3.9: Thiết kế giao diện chức năng thách đấu và trả lời lời mời*
+*Hình 3.10: Thiết kế màn hình đấu đối kháng*
 
-![Hình 3.10: Thiết kế giao diện chức năng chơi ván đối kháng](uml/pha3/ui-m4-2.png)
+![Hình 3.11: Thiết kế dialog xác nhận thách đấu](uml/pha3/ui-m4-confirm.png)
 
-*Hình 3.10: Thiết kế giao diện chức năng chơi ván đối kháng*
+*Hình 3.11: Thiết kế dialog xác nhận thách đấu*
 
-![Hình 3.11: Thiết kế giao diện chức năng kết thúc ván và tái đấu](uml/pha3/ui-m4-3.png)
+![Hình 3.12: Thiết kế dialog lời mời](uml/pha3/ui-m4-invitation.png)
 
-*Hình 3.11: Thiết kế giao diện chức năng kết thúc ván và tái đấu*
+*Hình 3.12: Thiết kế dialog lời mời*
 
-- `MainScreen` → `MainActivity`: thêm `TextView` thông báo (đang chờ, bị từ chối, đối thủ đã dừng) và xử lý click vào một người chơi trong danh sách: mở `ChallengeConfirmDialog`, chỉ gửi lời mời khi người chơi xác nhận. `MainActivity` nhận `ONLINE_LIST`, `INVITE_RESULT`; hai message `INVITE_RECEIVED`, `MATCH_START` do lớp cha `BaseActivity` xử lý.
-- `BaseActivity`: lớp cha trừu tượng của các Activity sau khi đăng nhập (`MainActivity`, `RankingActivity`, `DifficultyActivity`, `BotGameActivity`; trừ `MatchActivity` vì người đang đấu không nhận lời mời), cài đặt `MessageListener`. `onMessage()` xử lý chung hai message: `INVITE_RECEIVED` thì mở `InvitationDialog` ngay trên màn hình đang mở, nên người được mời nhận lời mời ở bất kỳ màn hình nào, kể cả khi đang chơi với máy; `MATCH_START` thì đóng màn hình hiện tại và mở `MatchActivity`. Nếu màn hình đó là `BotGameActivity` thì ván với máy dừng (hủy đồng hồ và lượt của máy, không lưu).
-- `ChallengeConfirmDialog`: `TextView` tên đối thủ, nút Xác nhận, nút Hủy; thuộc tính ẩn `opponent`. Xác nhận thì trả đối thủ về cho `MainActivity` để gửi `INVITE`; Hủy thì chỉ đóng dialog, không gửi gì lên server.
-- `InvitationDialog`: `TextView` tên người mời, nút OK, nút Reject; thuộc tính ẩn `challenger`.
+![Hình 3.13: Thiết kế giao diện chơi ván đối kháng](uml/pha3/ui-m4-2.png)
+
+*Hình 3.13: Thiết kế giao diện chơi ván đối kháng*
+
+![Hình 3.14: Thiết kế dialog kết quả](uml/pha3/ui-m4-result.png)
+
+*Hình 3.14: Thiết kế dialog kết quả*
+
+- `MainScreen` → `MainActivity`: như modul xem bảng xếp hạng. Nút Đấu đối kháng: nếu `ClientSession` chưa có người chơi thì mở `LoginActivity` (modul quản lý tài khoản), đăng nhập xong thì mở `LobbyActivity`; nếu đã đăng nhập thì mở thẳng `LobbyActivity`.
+- `LobbyScreen` → `LobbyActivity`: màn hình đấu đối kháng, gồm `RecyclerView` danh sách người chơi online, `TextView` thông báo (đang chờ, bị từ chối, đối thủ đã dừng), nút Quay lại; thuộc tính ẩn `onlinePlayers`. Khi mở, `LobbyActivity` gửi `GET_ONLINE_LIST` để lấy danh sách hiện tại, sau đó cập nhật theo `ONLINE_LIST` mà server tự đẩy. Click vào một người chơi thì mở `ChallengeConfirmDialog`, chỉ gửi `INVITE` khi người chơi xác nhận. `LobbyActivity` nhận `ONLINE_LIST`, `INVITE_RESULT`; hai message `INVITE_RECEIVED`, `MATCH_START` do lớp cha `BaseActivity` xử lý.
+- `BaseActivity`: lớp cha trừu tượng của các Activity mở được khi đã đăng nhập (`MainActivity`, `LobbyActivity`, `RankingActivity`, `DifficultyActivity`, `BotGameActivity`; trừ `MatchActivity` vì người đang đấu không nhận lời mời), cài đặt `MessageListener`. `onMessage()` xử lý chung hai message: `INVITE_RECEIVED` thì mở `InvitationDialog` ngay trên màn hình đang mở, nên người được mời nhận lời mời ở bất kỳ màn hình nào, kể cả khi đang chơi với máy; `MATCH_START` thì đóng màn hình hiện tại và mở `MatchActivity`. Nếu màn hình đó là `BotGameActivity` thì ván với máy dừng (hủy đồng hồ và lượt của máy, không lưu). Khách không nhận hai message này vì server chỉ gửi cho người đã đăng nhập.
+- `ChallengeConfirmDialog`: `TextView` tên đối thủ, nút Xác nhận, nút Hủy; thuộc tính ẩn `opponent`. Xác nhận thì trả đối thủ về cho `LobbyActivity` để gửi `INVITE`; Hủy thì chỉ đóng dialog, không gửi gì lên server.
+- `InvitationDialog`: `TextView` tên người mời, nút Accept, nút Reject; thuộc tính ẩn `challenger`.
 - `MatchScreen` → `MatchActivity`: bàn của mình (`BoardView`), bàn thu nhỏ của đối thủ (`opponentBoardView`, chỉ để xem), đồng hồ, số ô còn lại của hai bên, nút Thoát; thuộc tính ẩn `board`, `opponentBoard`, `matchId`, `opponent`, `firstCell`. Khác với ván với máy, `MatchActivity` không tự kiểm tra đường nối mà gửi `MOVE` lên server rồi cập nhật bàn theo `MOVE_RESULT`, thay bàn khi nhận `BOARD_SHUFFLED`; bàn của đối thủ được cập nhật theo `OPPONENT_PROGRESS` (cặp vừa xóa, đường nối và cả bàn hiện tại của đối thủ, gồm cả khi bàn đó vừa được xáo).
-- `ResultDialog`: `TextView` kết quả, nút Tiếp tục, nút Dừng. Bấm Tiếp tục thì gửi `REMATCH_REPLY` đồng ý và hiện thông báo chờ; nhận `MATCH_START` (cả hai đã đồng ý) thì đóng dialog và mở `MatchActivity` với ván mới; nhận `OPPONENT_LEFT` khi đối thủ dừng thì về `MainActivity`.
+- `ResultDialog`: `TextView` kết quả, nút Tái đấu, nút Dừng. Bấm Tái đấu thì gửi `REMATCH_REPLY` đồng ý và hiện thông báo "Đang chờ đối thủ trả lời..."; nhận `MATCH_START` (cả hai đã đồng ý) thì đóng dialog và mở `MatchActivity` với ván mới; nhận `OPPONENT_LEFT` khi đối thủ dừng thì về `LobbyActivity`. Bấm Dừng thì gửi `REMATCH_REPLY` từ chối và về `LobbyActivity`.
 - Trên server:
-  - `ChallengeController` xử lý `INVITE`, `INVITE_REPLY`, `UPDATE_STATUS` và gửi lại danh sách online (`broadcastOnlineList()`). Lời mời chỉ được gửi khi người được mời không bận (rỗi hoặc luyện tập).
+  - `ChallengeController` xử lý `GET_ONLINE_LIST` (`handleGetOnlineList()` gửi danh sách online hiện tại cho riêng người hỏi), `INVITE`, `INVITE_REPLY`, `UPDATE_STATUS` và gửi lại danh sách online cho mọi người khi có thay đổi (`broadcastOnlineList()`). Lời mời chỉ được gửi khi người được mời không bận (rỗi hoặc luyện tập).
   - `MatchController` xử lý `MOVE`, `LEAVE_MATCH`, `REMATCH_REPLY`, hết giờ (`onTimeout()`), mất kết nối (`handleDisconnect()`) và kết thúc ván (`endMatch()`). `handleRematchReply()` ghi câu trả lời vào `rematchReplies` của phòng: có người dừng thì chuyển hai người về rỗi, gửi `OPPONENT_LEFT` cho người kia và gửi lại danh sách online; cả hai đồng ý thì sinh đề mới, tạo phòng mới qua `MatchManager.createMatch()` và gửi `MATCH_START` cho cả hai, trạng thái vẫn là bận.
   - Mất kết nối: khi đọc socket báo lỗi, `ClientHandler.run()` gọi `MatchController.handleDisconnect()` rồi `OnlinePlayerManager.removeOnlinePlayer()`. `handleDisconnect()` xử lý theo tình huống ở mục 7: đang trong ván thì gọi `endMatch(room, "DISCONNECT")`, đang ở dialog kết quả thì coi như chọn Dừng. `removeOnlinePlayer()` gỡ người chơi khỏi danh sách online và báo `INVITE_RESULT` (`OFFLINE`) cho người đang chờ người đó trả lời lời mời; sau đó `ChallengeController.broadcastOnlineList()` gửi lại danh sách online.
   - `MatchManager` giữ các ván đang diễn ra; mỗi ván là một `MatchRoom` gồm `Match`, hai `ClientHandler`, **hai bản bàn chơi riêng** cho hai người (cùng đề ban đầu), thời điểm bắt đầu theo đồng hồ server và bộ hẹn giờ 10 phút.
   - `OnlinePlayerManager` giữ ánh xạ tên đăng nhập → `ClientHandler` của người đang online và trạng thái (rỗi, luyện tập, bận).
 - Các thao tác trên `MatchRoom` được đồng bộ (`synchronized`) vì hai luồng `ClientHandler` của hai người chơi cùng truy cập một phòng; ai hoàn thành trước được xác định theo thứ tự server xử lý message.
 
-![Hình 3.12: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](vp/png/class-design-m4.png)
+![Hình 3.15: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng](vp/png/class-design-m4.png)
 
-*Hình 3.12: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
+*Hình 3.15: Biểu đồ lớp thiết kế modul thách đấu và đấu đối kháng*
 
 ## 5. Thiết kế hoạt động cho bốn modul
 
@@ -216,9 +230,9 @@ Mỗi hành động trong biểu đồ hoạt động ứng với một phương
 
 ### a. Modul quản lý tài khoản
 
-![Hình 3.13: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m1.png)
+![Hình 3.16: Biểu đồ hoạt động modul quản lý tài khoản](uml/pha3/activity-m1.png)
 
-*Hình 3.13: Biểu đồ hoạt động modul quản lý tài khoản*
+*Hình 3.16: Biểu đồ hoạt động modul quản lý tài khoản*
 
 Kịch bản phiên bản 3:
 
@@ -268,66 +282,62 @@ Kịch bản phiên bản 3:
 43. Lớp `LoginController` gọi hàm `broadcastOnlineList()` của lớp `ChallengeController` để gửi lại danh sách online cho những người chơi khác.
 <!-- END v3-m1 -->
 
-![Hình 3.14: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m1.png)
+![Hình 3.17: Biểu đồ tuần tự modul quản lý tài khoản](uml/pha3/seq-m1.png)
 
-*Hình 3.14: Biểu đồ tuần tự modul quản lý tài khoản*
+*Hình 3.17: Biểu đồ tuần tự modul quản lý tài khoản*
 
 ### b. Modul xem bảng xếp hạng
 
-![Hình 3.15: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
+![Hình 3.18: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
 
-*Hình 3.15: Biểu đồ hoạt động modul xem bảng xếp hạng*
+*Hình 3.18: Biểu đồ hoạt động modul xem bảng xếp hạng*
 
 Kịch bản phiên bản 3:
 
 <!-- BEGIN v3-m2 -->
-1. Tại giao diện `LoginActivity`, người chơi nhập tên đăng nhập, mật khẩu và click nút Đăng nhập.
-2. Lớp `LoginActivity` gọi lớp `ServerConnection` yêu cầu gửi message `LOGIN`.
-3. Lớp `ServerConnection` gửi message `LOGIN` qua TCP tới lớp `ClientHandler` trên server.
-4. Lớp `ClientHandler` gọi hàm `handleLogin()` của lớp `LoginController`.
-5. Lớp `LoginController` gọi lớp `PlayerDAO` yêu cầu kiểm tra đăng nhập.
-6. Lớp `PlayerDAO` gọi hàm `checkLogin()`.
-7. Hàm `checkLogin()` gọi lớp `Player` để đóng gói thông tin.
-8. Lớp `Player` đóng gói thông tin thực thể.
-9. Lớp `Player` trả kết quả cho hàm `checkLogin()`.
-10. Hàm `checkLogin()` trả kết quả cho lớp `LoginController`.
-11. Lớp `LoginController` gọi lớp `OnlinePlayerManager` yêu cầu thêm người chơi vào danh sách online.
-12. Lớp `OnlinePlayerManager` gọi hàm `addOnlinePlayer()`.
-13. Hàm `addOnlinePlayer()` trả kết quả cho lớp `LoginController`.
-14. Lớp `LoginController` gọi lớp `ClientHandler` gửi message `LOGIN_RESULT`.
-15. Lớp `ClientHandler` gửi message `LOGIN_RESULT` qua TCP tới lớp `ServerConnection`.
-16. Lớp `ServerConnection` chuyển message cho lớp `LoginActivity`.
-17. Lớp `LoginActivity` lưu người chơi vào `ClientSession` và gọi lớp `MainActivity`.
-18. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
-19. Người chơi click nút Xem bảng xếp hạng.
-20. Lớp `MainActivity` gọi lớp `RankingActivity`.
-21. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING`.
-22. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler`.
-23. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
-24. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
-25. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
-26. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
-27. Lớp `PlayerRanking` đóng gói thông tin thực thể.
-28. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
-29. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
-30. Lớp `RankingController` gọi lớp `ClientHandler` gửi message `RANKING`.
-31. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
-32. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
-33. Lớp `RankingActivity` hiển thị bảng xếp hạng cho người chơi.
-34. Người chơi click nút Quay lại.
-35. Lớp `RankingActivity` gọi lại lớp `MainActivity`.
-36. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
+1. Tại giao diện `MainActivity`, người chơi click nút Xem bảng xếp hạng.
+2. Lớp `MainActivity` gọi lớp `RankingActivity`.
+3. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với trang 1.
+4. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler` trên server.
+5. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
+6. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
+7. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
+8. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+9. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+10. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
+11. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
+12. Lớp `RankingController` đánh số hạng, lấy các dòng của trang 1 và gọi lớp `ClientHandler` gửi message `RANKING`.
+13. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
+14. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
+15. Lớp `RankingActivity` hiển thị trang 1 của bảng xếp hạng và số trang cho người chơi.
+16. Người chơi click nút Vị trí của tôi.
+17. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với `mine = true`.
+18. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler`.
+19. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
+20. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
+21. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
+22. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+23. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+24. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
+25. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
+26. Lớp `RankingController` tìm dòng của người chơi đang đăng nhập trên `ClientHandler`, lấy các dòng của trang chứa dòng đó và gọi lớp `ClientHandler` gửi message `RANKING` kèm thứ hạng `me`.
+27. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
+28. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
+29. Lớp `RankingActivity` hiển thị trang chứa người chơi, tô màu dòng của người chơi.
+30. Người chơi click nút Quay lại.
+31. Lớp `RankingActivity` gọi lại lớp `MainActivity`.
+32. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m2 -->
 
-![Hình 3.16: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
+![Hình 3.19: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
 
-*Hình 3.16: Biểu đồ tuần tự modul xem bảng xếp hạng*
+*Hình 3.19: Biểu đồ tuần tự modul xem bảng xếp hạng*
 
 ### c. Modul chơi với máy
 
-![Hình 3.17: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
+![Hình 3.20: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
 
-*Hình 3.17: Biểu đồ hoạt động modul chơi với máy*
+*Hình 3.20: Biểu đồ hoạt động modul chơi với máy*
 
 Kịch bản phiên bản 3:
 
@@ -387,139 +397,157 @@ Kịch bản phiên bản 3:
 52. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m3 -->
 
-![Hình 3.18: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
+![Hình 3.21: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
 
-*Hình 3.18: Biểu đồ tuần tự modul chơi với máy*
+*Hình 3.21: Biểu đồ tuần tự modul chơi với máy*
 
 ### d. Modul thách đấu và đấu đối kháng
 
-![Hình 3.19: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
+![Hình 3.22: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
 
-*Hình 3.19: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
+*Hình 3.22: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
 
 Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; mỗi lớp giao diện và `ServerConnection` có một bản trên mỗi máy, mỗi người chơi có một `ClientHandler` riêng trên server):
 
 <!-- BEGIN v3-m4 -->
-1. Tại giao diện chính, người chơi A click vào tên người chơi B (không bận: rỗi hoặc luyện tập).
-2. Lớp `MainActivity` gọi lớp `ChallengeConfirmDialog`.
-3. Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A.
-4. A click nút Xác nhận.
-5. Lớp `ChallengeConfirmDialog` trả kết quả xác nhận cho lớp `MainActivity`.
-6. Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu gửi message `INVITE`.
-7. Lớp `MainActivity` hiển thị thông báo đang chờ B trả lời cho A.
-8. Lớp `ServerConnection` gửi message `INVITE` qua TCP tới lớp `ClientHandler` của A trên server.
-9. Lớp `ClientHandler` gọi hàm `handleInvite()` của lớp `ChallengeController`.
-10. Lớp `ChallengeController` gọi lớp `OnlinePlayerManager` yêu cầu gửi lời mời từ A tới B.
-11. Lớp `OnlinePlayerManager` gọi hàm `sendInvitation()`, kiểm tra B đang online và không bận.
-12. Hàm `sendInvitation()` gọi lớp `ClientHandler` của B gửi message `INVITE_RECEIVED`.
-13. Hàm `sendInvitation()` trả kết quả cho lớp `ChallengeController`.
-14. Lớp `ClientHandler` của B gửi message `INVITE_RECEIVED` qua TCP tới lớp `ServerConnection` trên máy B.
-15. Lớp `ServerConnection` chuyển message cho lớp `MainActivity` trên máy B.
-16. Lớp `MainActivity` gọi lớp `InvitationDialog`.
-17. Lớp `InvitationDialog` hiển thị lời mời cho B.
-18. B click nút OK.
-19. Lớp `InvitationDialog` gọi lớp `ServerConnection` yêu cầu gửi message `INVITE_REPLY` chấp nhận.
-20. Lớp `ServerConnection` gửi message `INVITE_REPLY` qua TCP tới lớp `ClientHandler` của B.
-21. Lớp `ClientHandler` gọi hàm `handleInviteReply()` của lớp `ChallengeController`.
-22. Lớp `ChallengeController` gọi lớp `BoardGenerator` yêu cầu sinh đề bài 10x10.
-23. Lớp `BoardGenerator` gọi hàm `generateBoard()`.
-24. Hàm `generateBoard()` gọi lớp `Board` để đóng gói đề bài.
-25. Lớp `Board` đóng gói thông tin thực thể.
-26. Lớp `Board` trả kết quả cho hàm `generateBoard()`.
-27. Hàm `generateBoard()` trả đề bài cho lớp `ChallengeController`.
-28. Lớp `ChallengeController` gọi lớp `MatchManager` yêu cầu tạo ván đấu cho A và B với đề bài vừa sinh.
-29. Lớp `MatchManager` gọi hàm `createMatch()`, tạo phòng chơi giữ hai bản sao đề bài cho hai người.
-30. Hàm `createMatch()` gọi lớp `Match` để đóng gói ván đấu.
-31. Lớp `Match` đóng gói thông tin thực thể.
-32. Lớp `Match` trả kết quả cho hàm `createMatch()`.
-33. Hàm `createMatch()` trả phòng chơi cho lớp `ChallengeController`.
-34. Lớp `ChallengeController` gọi lớp `OnlinePlayerManager` yêu cầu chuyển A và B sang bận.
-35. Lớp `OnlinePlayerManager` gọi hàm `updateStatus()`.
-36. Hàm `updateStatus()` trả kết quả cho lớp `ChallengeController`.
-37. Lớp `ChallengeController` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_START`.
-38. Lớp `ClientHandler` gửi message `MATCH_START` qua TCP tới lớp `ServerConnection` trên cả hai máy.
-39. Lớp `ServerConnection` chuyển message cho lớp `MainActivity` trên cả hai máy.
-40. Lớp `MainActivity` gọi lớp `MatchActivity`, kèm đề bài và thông tin đối thủ.
-41. Lớp `MatchActivity` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B.
-42. A click lần lượt hai ô cùng hình.
-43. Lớp `MatchActivity` gọi lớp `ServerConnection` yêu cầu gửi message `MOVE`.
-44. Lớp `ServerConnection` gửi message `MOVE` qua TCP tới lớp `ClientHandler` của A.
-45. Lớp `ClientHandler` gọi hàm `handleMove()` của lớp `MatchController`.
-46. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván.
-47. Lớp `MatchManager` gọi hàm `getRoom()`.
-48. Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`, từ đó lấy bàn của A.
-49. Lớp `MatchController` gọi lớp `PathFinder` yêu cầu kiểm tra đường nối trên bàn của A.
-50. Lớp `PathFinder` gọi hàm `checkPath()`.
-51. Hàm `checkPath()` trả đường nối cho lớp `MatchController`.
-52. Lớp `MatchController` gọi lớp `Board` của A yêu cầu xóa hai ô.
-53. Lớp `Board` gọi hàm `removePair()`.
-54. Hàm `removePair()` trả kết quả cho lớp `MatchController`.
-55. Lớp `MatchController` gọi lớp `Board` yêu cầu kiểm tra bàn của A đã hết ô chưa.
-56. Lớp `Board` gọi hàm `isCleared()`.
-57. Hàm `isCleared()` trả kết quả cho lớp `MatchController`.
-58. Lớp `MatchController` gọi lớp `PathFinder` yêu cầu tìm một cặp còn nối được trên bàn của A để kiểm tra bế tắc.
-59. Lớp `PathFinder` gọi hàm `findAvailablePair()`.
-60. Hàm `findAvailablePair()` trả cặp ô cho lớp `MatchController` (nếu trả về rỗng thì lớp `MatchController` gọi `BoardGenerator.shuffle()` xáo riêng bàn của A và gửi `BOARD_SHUFFLED` cho A).
-61. Lớp `MatchController` gọi lớp `ClientHandler` của A gửi message `MOVE_RESULT` và lớp `ClientHandler` của B gửi message `OPPONENT_PROGRESS`.
-62. Lớp `ClientHandler` gửi các message qua TCP tới lớp `ServerConnection` trên hai máy.
-63. Lớp `ServerConnection` chuyển message cho lớp `MatchActivity` trên hai máy.
-64. Lớp `MatchActivity` vẽ đường nối và bàn chơi mới cho A; trên máy B, vẽ nước đi của A lên bàn thu nhỏ của đối thủ và cập nhật số ô còn lại của A.
-(Lặp lại các bước 42 đến 64 cho đến khi bước 57 trả về bàn của A đã hết ô; B chơi song song theo cùng các bước trên máy của mình.)
-65. Khi bàn của A đã hết ô, lớp `MatchController` gọi hàm `endMatch()`, tính kết quả và điểm của hai người.
-66. Hàm `endMatch()` gọi lớp `MatchDAO` yêu cầu lưu ván đấu cùng hai kết quả.
-67. Lớp `MatchDAO` gọi hàm `saveMatch()`.
-68. Hàm `saveMatch()` trả kết quả cho hàm `endMatch()`.
-69. Hàm `endMatch()` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_END`.
-70. Lớp `ClientHandler` gửi message `MATCH_END` qua TCP tới lớp `ServerConnection` trên hai máy.
-71. Lớp `ServerConnection` chuyển message cho lớp `MatchActivity` trên hai máy.
-72. Lớp `MatchActivity` gọi lớp `ResultDialog`.
-73. Lớp `ResultDialog` hiển thị kết quả và câu hỏi có muốn tiếp tục không cho A và B.
-74. A click nút Dừng.
-75. Lớp `ResultDialog` gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` từ chối.
-76. Lớp `ResultDialog` gọi lớp `MainActivity` trên máy A.
-77. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của A.
-78. Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`.
-79. Lớp `MatchController` gọi lớp `OnlinePlayerManager` yêu cầu chuyển A và B về rỗi.
-80. Lớp `OnlinePlayerManager` gọi hàm `updateStatus()`.
-81. Hàm `updateStatus()` trả kết quả cho lớp `MatchController`.
-82. Lớp `MatchController` gọi lớp `ClientHandler` của B gửi message `OPPONENT_LEFT`.
-83. Lớp `MatchController` gọi lớp `ChallengeController` yêu cầu gửi lại danh sách người chơi online.
-84. Lớp `ChallengeController` gọi hàm `broadcastOnlineList()`.
-85. Hàm `broadcastOnlineList()` gọi lớp `OnlinePlayerManager` yêu cầu lấy danh sách người chơi online.
-86. Lớp `OnlinePlayerManager` gọi hàm `getOnlinePlayers()`.
-87. Hàm `getOnlinePlayers()` trả danh sách cho hàm `broadcastOnlineList()`.
-88. Hàm `broadcastOnlineList()` gọi lớp `PlayerRankingDAO` yêu cầu lấy tổng điểm của các người chơi trong danh sách.
-89. Lớp `PlayerRankingDAO` gọi hàm `getTotalPoints()`.
-90. Hàm `getTotalPoints()` gọi lớp `PlayerRanking` để đóng gói thông tin.
-91. Lớp `PlayerRanking` đóng gói thông tin thực thể.
-92. Lớp `PlayerRanking` trả kết quả cho hàm `getTotalPoints()`.
-93. Hàm `getTotalPoints()` trả kết quả cho hàm `broadcastOnlineList()`.
-94. Hàm `broadcastOnlineList()` gọi lớp `ClientHandler` của mọi người chơi rỗi gửi message `ONLINE_LIST`.
-95. Lớp `ClientHandler` gửi các message qua TCP tới lớp `ServerConnection` trên hai máy.
-96. Lớp `ServerConnection` chuyển message `OPPONENT_LEFT` cho lớp `ResultDialog` trên máy B.
-97. Lớp `ResultDialog` gọi lớp `MainActivity` trên máy B.
-98. Lớp `ServerConnection` chuyển message `ONLINE_LIST` cho lớp `MainActivity` trên hai máy.
-99. Lớp `MainActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
+1. Tại giao diện chính, người chơi A (đã đăng nhập) click nút Đấu đối kháng.
+2. Lớp `MainActivity` gọi lớp `LobbyActivity`.
+3. Lớp `LobbyActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_ONLINE_LIST`.
+4. Lớp `ServerConnection` gửi message `GET_ONLINE_LIST` qua TCP tới lớp `ClientHandler` của A trên server.
+5. Lớp `ClientHandler` gọi hàm `handleGetOnlineList()` của lớp `ChallengeController`.
+6. Lớp `ChallengeController` gọi lớp `OnlinePlayerManager` yêu cầu lấy danh sách người chơi online.
+7. Lớp `OnlinePlayerManager` gọi hàm `getOnlinePlayers()`.
+8. Hàm `getOnlinePlayers()` trả danh sách cho lớp `ChallengeController`.
+9. Lớp `ChallengeController` gọi lớp `PlayerRankingDAO` yêu cầu lấy tổng điểm của các người chơi trong danh sách.
+10. Lớp `PlayerRankingDAO` gọi hàm `getTotalPoints()`.
+11. Hàm `getTotalPoints()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+12. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+13. Lớp `PlayerRanking` trả kết quả cho hàm `getTotalPoints()`.
+14. Hàm `getTotalPoints()` trả kết quả cho lớp `ChallengeController`.
+15. Lớp `ChallengeController` gọi lớp `ClientHandler` của A gửi message `ONLINE_LIST`.
+16. Lớp `ClientHandler` gửi message `ONLINE_LIST` qua TCP tới lớp `ServerConnection` trên máy A.
+17. Lớp `ServerConnection` chuyển message cho lớp `LobbyActivity`.
+18. Lớp `LobbyActivity` hiển thị danh sách người chơi online cho A.
+19. A click vào tên người chơi B (không bận: rỗi hoặc luyện tập).
+20. Lớp `LobbyActivity` gọi lớp `ChallengeConfirmDialog`.
+21. Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A.
+22. A click nút Xác nhận.
+23. Lớp `ChallengeConfirmDialog` trả kết quả xác nhận cho lớp `LobbyActivity`.
+24. Lớp `LobbyActivity` gọi lớp `ServerConnection` yêu cầu gửi message `INVITE`.
+25. Lớp `LobbyActivity` hiển thị thông báo đang chờ B trả lời cho A.
+26. Lớp `ServerConnection` gửi message `INVITE` qua TCP tới lớp `ClientHandler` của A trên server.
+27. Lớp `ClientHandler` gọi hàm `handleInvite()` của lớp `ChallengeController`.
+28. Lớp `ChallengeController` gọi lớp `OnlinePlayerManager` yêu cầu gửi lời mời từ A tới B.
+29. Lớp `OnlinePlayerManager` gọi hàm `sendInvitation()`, kiểm tra B đang online và không bận.
+30. Hàm `sendInvitation()` gọi lớp `ClientHandler` của B gửi message `INVITE_RECEIVED`.
+31. Hàm `sendInvitation()` trả kết quả cho lớp `ChallengeController`.
+32. Lớp `ClientHandler` của B gửi message `INVITE_RECEIVED` qua TCP tới lớp `ServerConnection` trên máy B.
+33. Lớp `ServerConnection` chuyển message cho lớp `LobbyActivity` trên máy B (B đang ở màn hình đấu đối kháng).
+34. Lớp `LobbyActivity` gọi lớp `InvitationDialog`.
+35. Lớp `InvitationDialog` hiển thị lời mời cho B.
+36. B click nút Accept.
+37. Lớp `InvitationDialog` gọi lớp `ServerConnection` yêu cầu gửi message `INVITE_REPLY` chấp nhận.
+38. Lớp `ServerConnection` gửi message `INVITE_REPLY` qua TCP tới lớp `ClientHandler` của B.
+39. Lớp `ClientHandler` gọi hàm `handleInviteReply()` của lớp `ChallengeController`.
+40. Lớp `ChallengeController` gọi lớp `BoardGenerator` yêu cầu sinh đề bài 10x10.
+41. Lớp `BoardGenerator` gọi hàm `generateBoard()`.
+42. Hàm `generateBoard()` gọi lớp `Board` để đóng gói đề bài.
+43. Lớp `Board` đóng gói thông tin thực thể.
+44. Lớp `Board` trả kết quả cho hàm `generateBoard()`.
+45. Hàm `generateBoard()` trả đề bài cho lớp `ChallengeController`.
+46. Lớp `ChallengeController` gọi lớp `MatchManager` yêu cầu tạo ván đấu cho A và B với đề bài vừa sinh.
+47. Lớp `MatchManager` gọi hàm `createMatch()`, tạo phòng chơi giữ hai bản sao đề bài cho hai người.
+48. Hàm `createMatch()` gọi lớp `Match` để đóng gói ván đấu.
+49. Lớp `Match` đóng gói thông tin thực thể.
+50. Lớp `Match` trả kết quả cho hàm `createMatch()`.
+51. Hàm `createMatch()` trả phòng chơi cho lớp `ChallengeController`.
+52. Lớp `ChallengeController` gọi lớp `OnlinePlayerManager` yêu cầu chuyển A và B sang bận.
+53. Lớp `OnlinePlayerManager` gọi hàm `updateStatus()`.
+54. Hàm `updateStatus()` trả kết quả cho lớp `ChallengeController`.
+55. Lớp `ChallengeController` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_START`.
+56. Lớp `ClientHandler` gửi message `MATCH_START` qua TCP tới lớp `ServerConnection` trên cả hai máy.
+57. Lớp `ServerConnection` chuyển message cho lớp `LobbyActivity` trên cả hai máy.
+58. Lớp `LobbyActivity` gọi lớp `MatchActivity`, kèm đề bài và thông tin đối thủ.
+59. Lớp `MatchActivity` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B.
+60. A click lần lượt hai ô cùng hình.
+61. Lớp `MatchActivity` gọi lớp `ServerConnection` yêu cầu gửi message `MOVE`.
+62. Lớp `ServerConnection` gửi message `MOVE` qua TCP tới lớp `ClientHandler` của A.
+63. Lớp `ClientHandler` gọi hàm `handleMove()` của lớp `MatchController`.
+64. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván.
+65. Lớp `MatchManager` gọi hàm `getRoom()`.
+66. Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`, từ đó lấy bàn của A.
+67. Lớp `MatchController` gọi lớp `PathFinder` yêu cầu kiểm tra đường nối trên bàn của A.
+68. Lớp `PathFinder` gọi hàm `checkPath()`.
+69. Hàm `checkPath()` trả đường nối cho lớp `MatchController`.
+70. Lớp `MatchController` gọi lớp `Board` của A yêu cầu xóa hai ô.
+71. Lớp `Board` gọi hàm `removePair()`.
+72. Hàm `removePair()` trả kết quả cho lớp `MatchController`.
+73. Lớp `MatchController` gọi lớp `Board` yêu cầu kiểm tra bàn của A đã hết ô chưa.
+74. Lớp `Board` gọi hàm `isCleared()`.
+75. Hàm `isCleared()` trả kết quả cho lớp `MatchController`.
+76. Lớp `MatchController` gọi lớp `PathFinder` yêu cầu tìm một cặp còn nối được trên bàn của A để kiểm tra bế tắc.
+77. Lớp `PathFinder` gọi hàm `findAvailablePair()`.
+78. Hàm `findAvailablePair()` trả cặp ô cho lớp `MatchController` (nếu trả về rỗng thì lớp `MatchController` gọi `BoardGenerator.shuffle()` xáo riêng bàn của A và gửi `BOARD_SHUFFLED` cho A).
+79. Lớp `MatchController` gọi lớp `ClientHandler` của A gửi message `MOVE_RESULT` và lớp `ClientHandler` của B gửi message `OPPONENT_PROGRESS`.
+80. Lớp `ClientHandler` gửi các message qua TCP tới lớp `ServerConnection` trên hai máy.
+81. Lớp `ServerConnection` chuyển message cho lớp `MatchActivity` trên hai máy.
+82. Lớp `MatchActivity` vẽ đường nối và bàn chơi mới cho A; trên máy B, vẽ nước đi của A lên bàn thu nhỏ của đối thủ và cập nhật số ô còn lại của A.
+(Lặp lại các bước 60 đến 82 cho đến khi bước 75 trả về bàn của A đã hết ô; B chơi song song theo cùng các bước trên máy của mình.)
+83. Khi bàn của A đã hết ô, lớp `MatchController` gọi hàm `endMatch()`, tính kết quả và điểm của hai người.
+84. Hàm `endMatch()` gọi lớp `MatchDAO` yêu cầu lưu ván đấu cùng hai kết quả.
+85. Lớp `MatchDAO` gọi hàm `saveMatch()`.
+86. Hàm `saveMatch()` trả kết quả cho hàm `endMatch()`.
+87. Hàm `endMatch()` gọi lớp `ClientHandler` của A và của B gửi message `MATCH_END`.
+88. Lớp `ClientHandler` gửi message `MATCH_END` qua TCP tới lớp `ServerConnection` trên hai máy.
+89. Lớp `ServerConnection` chuyển message cho lớp `MatchActivity` trên hai máy.
+90. Lớp `MatchActivity` gọi lớp `ResultDialog`.
+91. Lớp `ResultDialog` hiển thị kết quả và câu hỏi có muốn tái đấu không cho A và B.
+92. A click nút Dừng.
+93. Lớp `ResultDialog` gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` từ chối.
+94. Lớp `ResultDialog` gọi lớp `LobbyActivity` trên máy A.
+95. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của A.
+96. Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`.
+97. Lớp `MatchController` gọi lớp `OnlinePlayerManager` yêu cầu chuyển A và B về rỗi.
+98. Lớp `OnlinePlayerManager` gọi hàm `updateStatus()`.
+99. Hàm `updateStatus()` trả kết quả cho lớp `MatchController`.
+100. Lớp `MatchController` gọi lớp `ClientHandler` của B gửi message `OPPONENT_LEFT`.
+101. Lớp `MatchController` gọi lớp `ChallengeController` yêu cầu gửi lại danh sách người chơi online.
+102. Lớp `ChallengeController` gọi hàm `broadcastOnlineList()`.
+103. Hàm `broadcastOnlineList()` gọi lớp `OnlinePlayerManager` yêu cầu lấy danh sách người chơi online.
+104. Lớp `OnlinePlayerManager` gọi hàm `getOnlinePlayers()`.
+105. Hàm `getOnlinePlayers()` trả danh sách cho hàm `broadcastOnlineList()`.
+106. Hàm `broadcastOnlineList()` gọi lớp `PlayerRankingDAO` yêu cầu lấy tổng điểm của các người chơi trong danh sách.
+107. Lớp `PlayerRankingDAO` gọi hàm `getTotalPoints()`.
+108. Hàm `getTotalPoints()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+109. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+110. Lớp `PlayerRanking` trả kết quả cho hàm `getTotalPoints()`.
+111. Hàm `getTotalPoints()` trả kết quả cho hàm `broadcastOnlineList()`.
+112. Hàm `broadcastOnlineList()` gọi lớp `ClientHandler` của mọi người chơi rỗi gửi message `ONLINE_LIST`.
+113. Lớp `ClientHandler` gửi các message qua TCP tới lớp `ServerConnection` trên hai máy.
+114. Lớp `ServerConnection` chuyển message `OPPONENT_LEFT` cho lớp `ResultDialog` trên máy B.
+115. Lớp `ResultDialog` gọi lớp `LobbyActivity` trên máy B.
+116. Lớp `ServerConnection` chuyển message `ONLINE_LIST` cho lớp `LobbyActivity` trên hai máy.
+117. Lớp `LobbyActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
 <!-- END v3-m4 -->
 
-Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.20), phần 2 là vòng lặp chơi ván (Hình 3.21), phần 3 từ lúc kết thúc ván tới khi về giao diện chính (Hình 3.22). Nhánh tái đấu ở cuối mục.
+Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.23), phần 2 là vòng lặp chơi ván (Hình 3.24), phần 3 từ lúc kết thúc ván tới khi về màn hình đấu đối kháng (Hình 3.25). Nhánh tái đấu ở cuối mục.
 
-![Hình 3.20: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
+![Hình 3.23: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
 
-*Hình 3.20: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
+*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
 
-![Hình 3.21: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
+![Hình 3.24: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
 
-*Hình 3.21: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
+*Hình 3.24: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
 
-![Hình 3.22: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
+![Hình 3.25: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
 
-*Hình 3.22: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván*
+*Hình 3.25: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván*
 
-Ngoại lệ 12a của kịch bản v1 (cả hai người chơi chọn tiếp tục) có kịch bản phiên bản 3 riêng, thay cho phần 3 từ bước 74 (sau khi `ResultDialog` hiện lên ở bước 73). Kịch bản đánh số lại từ 1:
+Ngoại lệ 14a của kịch bản v1 (cả hai người chơi chọn tái đấu) có kịch bản phiên bản 3 riêng, thay cho phần 3 từ bước 92 (sau khi `ResultDialog` hiện lên ở bước 91). Kịch bản đánh số lại từ 1:
 
 <!-- BEGIN v3-m4-rematch -->
-1. Tại dialog kết quả, A click nút Tiếp tục.
+1. Tại dialog kết quả, A click nút Tái đấu.
 2. Lớp `ResultDialog` gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý.
 3. Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A.
 4. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của A trên server.
@@ -527,7 +555,7 @@ Ngoại lệ 12a của kịch bản v1 (cả hai người chơi chọn tiếp t�
 6. Lớp `MatchController` gọi lớp `MatchManager` yêu cầu lấy phòng chơi của ván vừa kết thúc.
 7. Lớp `MatchManager` gọi hàm `getRoom()`.
 8. Hàm `getRoom()` trả phòng chơi cho lớp `MatchController`; lớp `MatchController` ghi nhận A đồng ý vào `rematchReplies` của phòng và chờ vì B chưa trả lời.
-9. Trên máy của mình, B click nút Tiếp tục.
+9. Trên máy của mình, B click nút Tái đấu.
 10. Lớp `ResultDialog` trên máy B gọi lớp `ServerConnection` yêu cầu gửi message `REMATCH_REPLY` đồng ý.
 11. Lớp `ServerConnection` gửi message `REMATCH_REPLY` qua TCP tới lớp `ClientHandler` của B.
 12. Lớp `ClientHandler` gọi hàm `handleRematchReply()` của lớp `MatchController`.
@@ -553,46 +581,48 @@ Ngoại lệ 12a của kịch bản v1 (cả hai người chơi chọn tiếp t�
 32. Lớp `MatchActivity` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B.
 <!-- END v3-m4-rematch -->
 
-Biểu đồ tuần tự của nhánh tái đấu như Hình 3.23.
+Biểu đồ tuần tự của nhánh tái đấu như Hình 3.26.
 
-![Hình 3.23: Biểu đồ tuần tự modul thách đấu, nhánh tái đấu](vp/png/seq-m4-4.png)
+![Hình 3.26: Biểu đồ tuần tự modul thách đấu, nhánh tái đấu](vp/png/seq-m4-4.png)
 
-*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh tái đấu*
+*Hình 3.26: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh tái đấu*
 
-Các cách kết thúc ván khác (hết giờ, bấm Thoát, mất kết nối) đi theo phần 3 kể từ hàm `endMatch()`: bộ hẹn giờ gọi `MatchController.onTimeout()`, message `LEAVE_MATCH` vào `MatchController.handleLeaveMatch()`, lỗi đọc socket vào `MatchController.handleDisconnect()`; ba hàm này đều gọi `endMatch()` với lý do tương ứng (mục 8d), phần sau giống bước 66 trở đi.
+Các cách kết thúc ván khác (hết giờ, bấm Thoát, mất kết nối) đi theo phần 3 kể từ hàm `endMatch()`: bộ hẹn giờ gọi `MatchController.onTimeout()`, message `LEAVE_MATCH` vào `MatchController.handleLeaveMatch()`, lỗi đọc socket vào `MatchController.handleDisconnect()`; ba hàm này đều gọi `endMatch()` với lý do tương ứng (mục 8d), phần sau giống bước 84 trở đi.
 
 ## 6. Thiết kế triển khai
 
-Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.24.
+Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.27.
 
-![Hình 3.24: Biểu đồ gói](vp/png/package.png)
+![Hình 3.27: Biểu đồ gói](vp/png/package.png)
 
-*Hình 3.24: Biểu đồ gói*
+*Hình 3.27: Biểu đồ gói*
 
-Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.25.
+Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.28.
 
-![Hình 3.25: Biểu đồ triển khai](vp/png/deployment.png)
+![Hình 3.28: Biểu đồ triển khai](vp/png/deployment.png)
 
-*Hình 3.25: Biểu đồ triển khai*
+*Hình 3.28: Biểu đồ triển khai*
 
 ## 7. Thiết kế giao thức truyền thông
 
 - Dùng TCP thay vì UDP: game theo lượt click, không cần tốc độ khung hình cao, nhưng không được mất hay đảo thứ tự nước đi và kết quả ván. TCP bảo đảm cả hai điều này.
 - Mỗi message là một đối tượng JSON nằm trên một dòng (kết thúc bằng ký tự xuống dòng), trường `type` cho biết loại message, các trường còn lại là dữ liệu. Ví dụ: `{"type":"MOVE","matchId":12,"a":{"row":3,"col":5},"b":{"row":7,"col":2}}`. Lớp `Message` trong `core` chuyển đổi giữa đối tượng và chuỗi JSON (thư viện Gson) để client và server dùng chung một định dạng.
-- Server tự đẩy `ONLINE_LIST` cho mọi client đang rỗi mỗi khi có thay đổi (đăng nhập, đăng xuất, đổi trạng thái, đổi điểm), nên client không phải hỏi định kỳ.
+- Client kết nối tới server ngay khi mở ứng dụng. Kết nối chưa đăng nhập (khách) chỉ được gửi `REGISTER`, `LOGIN`, `GET_RANKING`; server bỏ qua các message khác trên kết nối đó.
+- Khi mở màn hình đấu đối kháng, client gửi `GET_ONLINE_LIST` một lần để lấy danh sách hiện tại; sau đó server tự đẩy `ONLINE_LIST` cho mọi client đang rỗi mỗi khi có thay đổi (đăng nhập, đăng xuất, đổi trạng thái, đổi điểm), nên client không phải hỏi định kỳ.
 - Toạ độ ô trong message là toạ độ trên lưới 12x12 có viền.
 
 | Chiều | `type` | Nội dung chính |
 |---|---|---|
-| C → S | `REGISTER` | `username`, `password`, `name` |
+| C → S | `REGISTER` | `username`, `password` |
 | S → C | `REGISTER_RESULT` | `ok`, `error` |
 | C → S | `LOGIN` | `username`, `password` |
 | S → C | `LOGIN_RESULT` | `ok`, `error`, `player` |
 | C → S | `LOGOUT` | không có dữ liệu; server gỡ người chơi khỏi danh sách online, không trả lời |
 | C → S | `UPDATE_STATUS` | `status`: `TRAINING` khi bắt đầu ván với máy, `IDLE` khi ván kết thúc hoặc thoát; server bỏ qua nếu đang `BUSY` |
-| S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `name`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`) |
-| C → S | `GET_RANKING` | |
-| S → C | `RANKING` | danh sách `{rank, name, totalPoint, avgOpponentPoint, avgWinTime}` |
+| C → S | `GET_ONLINE_LIST` | không có dữ liệu; server trả `ONLINE_LIST` cho riêng người hỏi |
+| S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`) |
+| C → S | `GET_RANKING` | `page` (số trang, bắt đầu từ 1) hoặc `mine` (`true`: trang chứa người chơi đang đăng nhập) |
+| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi khi `mine`, rỗng nếu chưa có trong bảng), danh sách `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}` của trang |
 | C → S | `INVITE` | `to` |
 | S → C | `INVITE_RECEIVED` | `from` |
 | C → S | `INVITE_REPLY` | `from`, `accept` |
@@ -607,28 +637,28 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `REMATCH_REPLY` | `matchId`, `accept` |
 | S → C | `OPPONENT_LEFT` | |
 
-Luồng message chính giữa hai client và server như Hình 3.26.
+Luồng message chính giữa hai client và server như Hình 3.29.
 
-![Hình 3.26: Luồng message giữa hai client và server](vp/png/protocol.png)
+![Hình 3.29: Luồng message giữa hai client và server](vp/png/protocol.png)
 
-*Hình 3.26: Luồng message giữa hai client và server*
+*Hình 3.29: Luồng message giữa hai client và server*
 
 Xử lý các tình huống bất thường:
 
 - Mất kết nối giữa ván (luồng `ClientHandler` gặp lỗi đọc): server coi như người đó thoát, kết thúc ván với lý do `DISCONNECT`, người còn lại thắng.
 - Mất kết nối khi đang có lời mời chờ: server gửi `INVITE_RESULT` với `reason = OFFLINE` cho người mời.
-- Mất kết nối khi đang ở dialog tiếp tục: coi như chọn Dừng, gửi `OPPONENT_LEFT` cho người còn lại.
+- Mất kết nối khi đang ở dialog kết quả: coi như chọn Dừng, gửi `OPPONENT_LEFT` cho người còn lại.
 - Hết giờ: bộ hẹn giờ của `MatchRoom` gọi `MatchController.onTimeout()`, kết thúc ván hòa với lý do `TIMEOUT`.
 
 ## 8. Thuật toán
 
 ### a. Kiểm tra đường nối hai ô
 
-Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.27.
+Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.30.
 
-![Hình 3.27: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
+![Hình 3.30: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
 
-*Hình 3.27: Các dạng đường nối hai ô*
+*Hình 3.30: Các dạng đường nối hai ô*
 
 `PathFinder.checkPath()` dùng tìm kiếm theo chiều rộng, mỗi trạng thái là một ô kèm hướng đi và số đoạn đã dùng. Từ mỗi trạng thái, thuật toán đi thẳng theo từng hướng qua các ô trống; đổi hướng thì tăng số đoạn; dừng nhánh khi số đoạn vượt 3, gặp ô có hình, ra khỏi lưới, hoặc ô đó đã được tới bằng số đoạn không lớn hơn.
 
@@ -701,7 +731,7 @@ Kết quả ván do `MatchController.endMatch()` quyết định theo lý do k�
 | Hết 10 phút (`TIMEOUT`) | DRAW | DRAW |
 | A bấm Thoát (`QUIT`) hoặc mất kết nối (`DISCONNECT`) | LOSE | WIN, `finishTime` rỗng |
 
-Điểm mỗi ván theo đề: thắng 1, hòa 0.5, thua 0. Điểm không lưu trong CSDL mà tính từ `result` ngay trong truy vấn (bảng tạm `r`). Bảng xếp hạng chỉ gồm người chơi đã có ít nhất một ván đối kháng (khớp ngoại lệ 4a của kịch bản xem bảng xếp hạng), được tính bằng một truy vấn trong `PlayerRankingDAO.getRanking()`:
+Điểm mỗi ván theo đề: thắng 1, hòa 0.5, thua 0. Điểm không lưu trong CSDL mà tính từ `result` ngay trong truy vấn (bảng tạm `r`). Bảng xếp hạng chỉ gồm người chơi đã có ít nhất một ván đối kháng (khớp ngoại lệ 2a và 4a của kịch bản xem bảng xếp hạng), được tính bằng một truy vấn trong `PlayerRankingDAO.getRanking()`:
 
 ```sql
 WITH r AS (SELECT matchId, playerId, result, finishTime,
@@ -709,7 +739,7 @@ WITH r AS (SELECT matchId, playerId, result, finishTime,
                               ELSE 0 END AS point
            FROM tblMatchResult),
      t AS (SELECT playerId, SUM(point) AS totalPoint FROM r GROUP BY playerId)
-SELECT p.id, p.username, p.name,
+SELECT p.id, p.username,
        t.totalPoint,
        o.avgOpponentPoint,
        w.avgWinTime
@@ -725,10 +755,11 @@ LEFT JOIN (SELECT playerId, AVG(finishTime) AS avgWinTime
            WHERE result = 'WIN' AND finishTime IS NOT NULL
            GROUP BY playerId) w ON w.playerId = p.id
 ORDER BY t.totalPoint DESC, o.avgOpponentPoint DESC,
-         w.avgWinTime IS NULL, w.avgWinTime ASC, p.name ASC;
+         w.avgWinTime IS NULL, w.avgWinTime ASC, p.username ASC;
 ```
 
 - Trung bình điểm đối thủ lấy tổng điểm **hiện tại** của đối thủ ở mỗi ván, gặp cùng một người nhiều ván thì tính nhiều lần.
 - Trung bình thời gian thắng chỉ tính các ván thắng có `finishTime`; ván thắng do đối thủ bỏ cuộc không tính (đề xuất). Người chưa có ván thắng nào có giá trị rỗng và đứng sau ở tiêu chí thứ ba (`avgWinTime IS NULL` sắp xếp sai trước đúng).
-- Số hạng do `RankingController` đánh theo thứ tự truy vấn trả về. Hai người trùng cả ba tiêu chí thì cùng hạng (đánh số kiểu 1, 2, 2, 4) và được liệt kê theo tên; `p.name` ở cuối `ORDER BY` chỉ để thứ tự hiển thị cố định.
+- Số hạng do `RankingController` đánh theo thứ tự truy vấn trả về. Hai người trùng cả ba tiêu chí thì cùng hạng (đánh số kiểu 1, 2, 2, 4) và được liệt kê theo tên đăng nhập; `p.username` ở cuối `ORDER BY` chỉ để thứ tự hiển thị cố định.
+- Phân trang: dòng thứ i (đếm từ 1 theo thứ tự truy vấn) nằm ở trang ⌈i / 10⌉; số trang là ⌈số dòng / 10⌉, tối thiểu 1. Trang chứa người chơi tính theo vị trí dòng của người đó, nên hai người cùng hạng ở ranh giới trang vẫn mỗi người nằm đúng một trang.
 - `getTotalPoints(listPlayer)` tính tổng điểm như bảng tạm `t` nhưng chỉ cho các người chơi trong danh sách online. Truy vấn đi từ `tblPlayer` và `LEFT JOIN` sang `tblMatchResult`, tổng điểm lấy `COALESCE(..., 0)`, nên người chưa có ván nào vẫn hiện trong danh sách với 0 điểm.

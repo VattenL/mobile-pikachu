@@ -16,45 +16,34 @@ skinparam sequence {
 autonumber "<b>0:"
 
 actor "Người chơi" as Player
-boundary LoginActivity
 boundary MainActivity
 boundary RankingActivity
 control ServerConnection
 control ClientHandler
-control LoginController
-control OnlinePlayerManager
 control RankingController
-control PlayerDAO
 control PlayerRankingDAO
 entity "Player\nRanking" as PlayerRanking
-entity "Player" as PlayerE
 
-Player -> LoginActivity : nhập, click đăng nhập
-LoginActivity -> ServerConnection : send(LOGIN)
-ServerConnection -> ClientHandler : LOGIN (TCP)
-ClientHandler -> LoginController : handleLogin()
-LoginController -> PlayerDAO : gọi
-PlayerDAO -> PlayerDAO : checkLogin()
-activate PlayerDAO
-PlayerDAO -> PlayerE : gọi
-PlayerE -> PlayerE : Player()
-activate PlayerE
-PlayerE --> PlayerDAO : trả về
-deactivate PlayerE
-PlayerDAO --> LoginController : trả về
-deactivate PlayerDAO
-LoginController -> OnlinePlayerManager : gọi
-OnlinePlayerManager -> OnlinePlayerManager : addOnlinePlayer()
-activate OnlinePlayerManager
-OnlinePlayerManager --> LoginController : trả về
-deactivate OnlinePlayerManager
-LoginController -> ClientHandler : send(LOGIN_RESULT)
-ClientHandler -> ServerConnection : LOGIN_RESULT (TCP)
-ServerConnection -> LoginActivity : onMessage()
-LoginActivity -> MainActivity : gọi
-MainActivity -> Player : hiển thị
 Player -> MainActivity : click xem bảng xếp hạng
 MainActivity -> RankingActivity : gọi
+RankingActivity -> ServerConnection : send(GET_RANKING)
+ServerConnection -> ClientHandler : GET_RANKING (TCP)
+ClientHandler -> RankingController : handleGetRanking()
+RankingController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getRanking()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> RankingController : trả về
+deactivate PlayerRankingDAO
+RankingController -> ClientHandler : send(RANKING)
+ClientHandler -> ServerConnection : RANKING (TCP)
+ServerConnection -> RankingActivity : onMessage()
+RankingActivity -> Player : hiển thị
+Player -> RankingActivity : click vị trí của tôi
 RankingActivity -> ServerConnection : send(GET_RANKING)
 ServerConnection -> ClientHandler : GET_RANKING (TCP)
 ClientHandler -> RankingController : handleGetRanking()

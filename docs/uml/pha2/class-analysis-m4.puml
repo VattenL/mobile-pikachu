@@ -17,9 +17,14 @@ skinparam class {
 
 ' ===== Tang 1: lop bien =====
 class MainScreen {
+  - subMatch
+}
+
+class LobbyScreen {
   - outOnlinePlayerList
   - outMessage
   - subSelectOpponent
+  - subBack
 }
 
 class ChallengeConfirmDialog {
@@ -44,7 +49,7 @@ class MatchScreen {
 
 class ResultDialog {
   - outResult
-  - subContinue
+  - subRematch
   - subStop
 }
 
@@ -52,7 +57,6 @@ class ResultDialog {
 class Player {
   - username
   - password
-  - name
   - status
   + getOnlinePlayers()
   + sendInvitation()
@@ -92,14 +96,15 @@ class MatchResult {
   - finishTime
 }
 
-MainScreen -left- ChallengeConfirmDialog
-MainScreen -right- InvitationDialog
+MainScreen -right- LobbyScreen
+LobbyScreen -left- ChallengeConfirmDialog
+LobbyScreen -right- InvitationDialog
 InvitationDialog -right- MatchScreen
 MatchScreen -right- ResultDialog
-ResultDialog -[norank]- MainScreen
+ResultDialog -[norank]- LobbyScreen
 
-MainScreen -down- Player
-MainScreen -down- PlayerRanking
+LobbyScreen -down- Player
+LobbyScreen -down- PlayerRanking
 InvitationDialog -down- Board
 InvitationDialog -down- Match
 InvitationDialog -down- Player
