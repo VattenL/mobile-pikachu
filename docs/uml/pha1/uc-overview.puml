@@ -25,9 +25,9 @@ rectangle "Game Pikachu" {
   usecase "Logout" as UC03
   usecase "View Ranking" as UC04
   usecase "Play With Bot" as UC05
-  usecase "Play Online Match" as UC08
   usecase "Challenge Player" as UC06
   usecase "Respond To Challenge" as UC07
+  usecase "Play Online Match" as UC08
 }
 
 Player --> UC01
@@ -35,8 +35,7 @@ Player --> UC02
 Player --> UC03
 Player --> UC04
 Player --> UC05
+Player --> UC06
+Player --> UC07
 Player --> UC08
-
-UC08 ..> UC06 : <<include>>
-UC08 ..> UC07 : <<include>>
 @enduml

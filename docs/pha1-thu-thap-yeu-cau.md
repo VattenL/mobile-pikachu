@@ -115,7 +115,7 @@ Từ bước 2 của mục 2, mọi chức năng đều do người chơi thực
 
 Mỗi chức năng ở bước 2 được đề xuất thành một use case. Sau khi mịn hóa:
 
-- Thách đấu, trả lời lời mời và chơi ván là các bước của cùng một phiên đấu đối kháng giữa hai người chơi: người thách đấu gửi lời mời, người được mời trả lời, rồi cả hai cùng chơi. Vì vậy chức năng này là một use case chính `Play Online Match` có cả hai người chơi tham gia, include `Challenge Player` (phần của người thách đấu) và `Respond To Challenge` (phần của người được mời). Mỗi lần thực hiện gồm đúng một lời mời và một lần trả lời: bị từ chối thì dừng sớm, cả hai chọn tiếp tục thì đấu thêm ván mà không mời lại.
+- Thách đấu, trả lời lời mời và chơi ván do những người chơi khác nhau thực hiện: người thách đấu gửi lời mời, người được mời trả lời, rồi cả hai cùng chơi. Nếu gộp thành một use case include cả hai việc đầu thì sẽ bị hiểu là một người chơi phải tự gửi và tự trả lời lời mời mới chơi được. Vì vậy chức năng này được tách thành ba use case nối thẳng với `Player`: `Challenge Player` (gửi lời mời thách đấu), `Respond To Challenge` (chấp nhận hoặc từ chối lời mời) và `Play Online Match` (chơi ván đối kháng, bắt đầu khi lời mời được chấp nhận; cả hai chọn tiếp tục thì đấu thêm ván mà không mời lại).
 - Xem danh sách người chơi online không tách thành use case riêng vì đây là giao diện chính sau khi đăng nhập, dùng để chọn đối thủ trong `Challenge Player`.
 
 Biểu đồ use case tổng quan như Hình 1.1.
@@ -131,7 +131,7 @@ Biểu đồ use case tổng quan như Hình 1.1.
 | 3 | `Logout` | Cho phép người chơi đăng xuất khỏi hệ thống |
 | 4 | `View Ranking` | Cho phép người chơi xem bảng xếp hạng toàn bộ người chơi |
 | 5 | `Play With Bot` | Cho phép người chơi chọn độ khó và chơi một ván với máy |
-| 6 | `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu đối kháng trên cùng đề bài, server làm trọng tài |
+| 6 | `Play Online Match` | Cho phép hai người chơi đấu đối kháng trên cùng đề bài sau khi lời mời được chấp nhận, server làm trọng tài |
 | 7 | `Challenge Player` | Cho phép người chơi chọn một người chơi không bận, xác nhận và gửi lời mời đấu |
 | 8 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời thách đấu |
 
@@ -212,7 +212,9 @@ Trong chức năng thách đấu, hai người chơi tương tác với các gia
 - Dialog lời mời trên máy người được mời → thống nhất với UC `Respond To Challenge`.
 - Giao diện bàn chơi → đề xuất UC `Match Tiles`; nút Thoát → đề xuất UC `Quit Match`.
 - Dialog kết quả hỏi có muốn tiếp tục không → đề xuất UC `Decide To Continue`.
-- Mỗi phiên đấu luôn cần hai người chơi đã đăng nhập, một lời mời, một lần trả lời, các lượt nối cặp ô và lựa chọn tiếp tục hay dừng ở cuối mỗi ván, do đó `Play Online Match` include `Login`, `Challenge Player`, `Respond To Challenge`, `Match Tiles` và `Decide To Continue`.
+- `Challenge Player`, `Respond To Challenge` và `Play Online Match` giữ là ba use case nối thẳng với `Player` như ở biểu đồ tổng quan, vì người thách đấu chỉ gửi lời mời còn người được mời chỉ trả lời.
+- Phải đăng nhập mới thách đấu hoặc nhận lời mời được, do đó `Challenge Player` và `Respond To Challenge` include `Login`. `Play Online Match` chỉ bắt đầu khi lời mời đã được chấp nhận nên không include `Login` lần nữa.
+- Mỗi ván đối kháng luôn gồm các lượt nối cặp ô và lựa chọn tiếp tục hay dừng khi ván kết thúc, do đó `Play Online Match` include `Match Tiles` và `Decide To Continue`. Cả hai chọn tiếp tục thì đấu thêm ván với cùng đối thủ mà không mời lại.
 - Thoát giữa ván không bắt buộc và có thể xảy ra bất cứ lúc nào trong ván, kể cả trước khi nối cặp nào, do đó `Quit Match` extend `Play Online Match`.
 - `Match Tiles` và `Quit Match` dùng chung với modul chơi với máy.
 
@@ -224,8 +226,8 @@ Biểu đồ use case chi tiết như Hình 1.5.
 
 | Use case | Mô tả |
 |---|---|
-| `Play Online Match` | Cho phép hai người chơi thách đấu nhau và đấu một phiên đối kháng trên cùng đề bài, server làm trọng tài, lưu kết quả và cập nhật điểm |
-| `Login` | Cho phép người chơi đăng nhập trước khi thách đấu hoặc nhận lời mời |
+| `Play Online Match` | Cho phép hai người chơi đấu đối kháng trên cùng đề bài sau khi lời mời được chấp nhận, server làm trọng tài, lưu kết quả và cập nhật điểm |
+| `Login` | Cho phép người chơi đăng nhập trước khi thách đấu hoặc trả lời lời mời |
 | `Challenge Player` | Cho phép người chơi chọn một đối thủ không bận trong danh sách người chơi online, xác nhận rồi gửi lời mời |
 | `Respond To Challenge` | Cho phép người được mời chấp nhận hoặc từ chối lời mời |
 | `Match Tiles` | Cho phép người chơi click lần lượt hai ô cùng hình để xóa chúng nếu nối được bằng tối đa 3 đoạn thẳng |
