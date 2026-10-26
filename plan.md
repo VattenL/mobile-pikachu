@@ -248,7 +248,7 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 
 - **Hạ tầng chung do Dev 2 dựng trước:** `GameServer`, `ClientHandler`, `ServerConnection`, `MessageListener`, `Message`, lớp `DAO`, script tạo CSDL và dữ liệu mẫu. Dev 1 đã nhận phần thuật toán nặng nhất (`core`, bot, trọng tài) nên không nhận thêm hạ tầng.
 - **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
-  - Dev 1: `handleMove()`, `MatchManager`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
+  - Dev 1: `handleMove()`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
   - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `MatchDAO`, `ResultDialog`.
   - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.12, kịch bản v3 và biểu đồ tuần tự M4 cho khớp.
 - `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
@@ -296,12 +296,12 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 ### Dev 1: chơi ván và trọng tài
 
 - `MatchActivity`: nhận đề từ server thay vì tự sinh; gửi `MOVE`, cập nhật bàn theo `MOVE_RESULT`; thay bàn khi nhận `BOARD_SHUFFLED`; vẽ bàn thu nhỏ và số ô còn lại của đối thủ theo `OPPONENT_PROGRESS`; nút Thoát gửi `LEAVE_MATCH`.
-- `MatchManager`, `MatchRoom`: tạo phòng với một bản bàn riêng cho mỗi người (cùng đề ban đầu), các thao tác trên phòng được đồng bộ.
+- `MatchRoom`: giữ một bản bàn riêng cho mỗi người (cùng đề ban đầu), các thao tác trên phòng được đồng bộ. Phòng do `MatchManager.createMatch()` của Dev 2 tạo.
 - `MatchController.handleMove()`: kiểm tra nước đi bằng `PathFinder` trên bàn của chính người gửi, ghi nhận thời điểm hoàn thành theo đồng hồ server; bàn của ai bế tắc thì xáo riêng bàn đó và gửi `BOARD_SHUFFLED` cho người đó; hết ô thì gọi `endMatch()` của Dev 2.
 
 ### Dev 2: thách đấu, kết thúc ván và tái đấu
 
-- Thách đấu và trả lời lời mời: `ChallengeConfirmDialog`, `InvitationDialog`, `BaseActivity` (nhận lời mời ở mọi màn hình), `ChallengeController` (`INVITE`, `INVITE_REPLY`, `UPDATE_STATUS`, người được mời đang bận, hai người mời nhau cùng lúc); khi đồng ý thì sinh đề, gọi `MatchManager.createMatch()` của Dev 1, gửi `MATCH_START`.
+- Thách đấu và trả lời lời mời: `ChallengeConfirmDialog`, `InvitationDialog`, `BaseActivity` (nhận lời mời ở mọi màn hình), `ChallengeController` (`INVITE`, `INVITE_REPLY`, `UPDATE_STATUS`, người được mời đang bận, hai người mời nhau cùng lúc); khi đồng ý thì sinh đề bằng `generateBoard()` của `core`, tạo ván bằng `MatchManager.createMatch()` (Dev 2 cài `MatchManager`: tạo, tra cứu và bỏ phòng chơi), chuyển hai người sang bận bằng `updateStatus()`, gửi `MATCH_START`.
 - Kết thúc ván: `endMatch()` xác định kết quả theo lý do (xóa hết ô, hết giờ, thoát, mất kết nối) và chỉ kết thúc một lần dù hai người về đích gần như cùng lúc; bộ hẹn giờ 10 phút và `onTimeout()`; `handleLeaveMatch()`; mất kết nối giữa ván bị xử thua; `MatchDAO.saveMatch()` lưu ván và hai kết quả trong một giao dịch; gửi `MATCH_END`.
 - Tái đấu: `ResultDialog`, `handleRematchReply()`: cả hai tiếp tục thì bắt đầu ván mới; một người dừng (hoặc mất kết nối ở dialog tiếp tục) thì gửi `OPPONENT_LEFT`, trả hai người về rỗi, gửi lại danh sách online.
 
