@@ -430,15 +430,15 @@ Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2
 
 ### d. Biểu đồ tuần tự modul thách đấu và đấu đối kháng
 
-Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ chia theo kịch bản phiên bản 2: phần thách đấu (bước 1–32) ở Hình 2.13, phần kết thúc ván khi một người dừng (bước 44–60) ở Hình 2.14, nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15. Phần chơi ván (bước 33–43) thuộc modul của Dev 1, chưa vẽ.
+Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, thuộc modul của Dev 1); vì dài nên ảnh được cắt thành hai phần, mỗi phần lặp lại hàng đầu lifeline (Hình 2.13, 2.14). Nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15.
 
-![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần thách đấu](vp/png/seq-analysis-m4-1.png)
+![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 1/2](vp/png/seq-analysis-m4-full-1.png)
 
-*Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần thách đấu*
+*Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 1/2)*
 
-![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần kết thúc ván](vp/png/seq-analysis-m4-2.png)
+![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 2/2](vp/png/seq-analysis-m4-full-2.png)
 
-*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng, phần kết thúc ván*
+*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 2/2)*
 
 ![Hình 2.15: Biểu đồ tuần tự pha phân tích của modul thách đấu, nhánh tái đấu](vp/png/seq-analysis-m4-3.png)
 

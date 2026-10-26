@@ -545,7 +545,6 @@ SEQA_M4_3 = [  # nhánh 14a (cả hai chọn tái đấu), đánh số riêng t�
     ("call", "ResultDialog", "MatchScreen", "gọi"),
     ("msg2", "MatchScreen", ["Người chơi A", "Người chơi B"], "hiển thị"),
 ]
-SEQA_M4_2_START = 1 + sum(1 for st in SEQA_M4_1 + SEQA_M4_PLAY if st[0] not in ("loop", "end"))
 
 # ---- Pha 2: vị trí các trạng thái M4 (layout tự động làm rối nhãn)
 
@@ -560,9 +559,8 @@ STATE_M4_POS = {
     "Hiển thị ResultDialog": (420, 800),
 }
 
-# ---- Pha 3: biểu đồ tuần tự M4 phần 3 (kết thúc ván và tái đấu) đánh số tiếp sau phần 2 (chơi ván, Dev 1)
+# ---- Pha 3: biểu đồ tuần tự M4 đầy đủ (Hình 3.23-3.25): mọi lifeline của các phần, actor đứng trước
 
-M4C_START = gen_seq.count(gen_seq.M4A) + gen_seq.count(gen_seq.M4B) + 1
 M4_FULL_PARTS = sorted(gen_seq.M4A_PARTS + [p for p in gen_seq.M4BC_PARTS if p[1] not in {q[1] for q in gen_seq.M4A_PARTS}],
                        key=lambda p: ["actor", "boundary", "control", "entity"].index(p[0]))
 
@@ -847,10 +845,6 @@ DIAGRAMS = [
     ("state-m2", "2.7 Trạng thái M2", lambda n: build_state(n, "pha2/state-m2.puml")),
     ("state-m4", "2.9 Trạng thái M4", lambda n: build_state(n, "pha2/state-m4.puml", STATE_M4_POS)),
     ("seq-analysis-m2", "2.11 Tuần tự phân tích M2", lambda n: build_sequence(n, SEQA_M2_PARTS, SEQA_M2)),
-    ("seq-analysis-m4-1", "2.13 Tuần tự phân tích M4 (thách đấu)",
-     lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_1)),
-    ("seq-analysis-m4-2", "2.14 Tuần tự phân tích M4 (kết thúc ván)",
-     lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_2, SEQA_M4_2_START)),
     ("seq-analysis-m4-3", "2.15 Tuần tự phân tích M4 (tái đấu)",
      lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_3)),
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế",
@@ -862,23 +856,31 @@ DIAGRAMS = [
     ("seq-m2", "3.19 Tuần tự thiết kế M2",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
     ("activity-m4", "3.22 Hoạt động M4", lambda n: build_activity(n, ACT_M4, ACT_M4_FLOWS)),
-    ("seq-m4-1", "3.23 Tuần tự thiết kế M4 (thách đấu)",
-     lambda n: build_sequence(n, seq_parts(gen_seq.M4A_PARTS), seq_steps(gen_seq.M4A_PARTS, gen_seq.M4A))),
-    ("seq-m4-3", "3.25 Tuần tự thiết kế M4 (kết thúc ván)",
-     lambda n: build_sequence(n, seq_parts(gen_seq.M4C_PARTS), seq_steps(gen_seq.M4C_PARTS, gen_seq.M4C), M4C_START)),
     ("seq-m4-4", "3.26 Tuần tự thiết kế M4 (tái đấu)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),
     ("package", "3.27 Biểu đồ gói", build_package),
     ("deployment", "3.28 Biểu đồ triển khai", build_deployment),
     ("protocol", "3.29 Luồng message", build_protocol),
-    # không có trong pha3-thiet-ke.md: bản hoạt động M4 cho tài liệu của Dev 2 (docs/dev2/build_gdoc.py), và hai
-    # bản tuần tự M4 đầy đủ mọi bước trong một hình (bản thử, để so với cách chia phần)
+    # bản hoạt động M4 cho tài liệu của Dev 2 (docs/dev2/build_gdoc.py, không có trong md); hai biểu đồ tuần tự M4
+    # vẽ đủ mọi bước trong một hình, ảnh được cắt thành nhiều phần theo SLICES (Hình 2.13-2.14, 3.23-3.25).
+    # Tên biểu đồ trong VP còn chữ "Thử:" từ lần dựng đầu; giữ nguyên để --export tìm được trong pikachu.vpp đã chỉnh tay
     ("activity-m4-dev2", "Hoạt động M4 (bản Dev 2)", lambda n: build_activity(n, ACT_M4_DEV2, ACT_M4_DEV2_FLOWS)),
     ("seq-analysis-m4-full", "Thử: tuần tự phân tích M4 đầy đủ",
      lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_1 + SEQA_M4_PLAY + SEQA_M4_2)),
     ("seq-m4-full", "Thử: tuần tự thiết kế M4 đầy đủ",
      lambda n: build_sequence(n, seq_parts(M4_FULL_PARTS), seq_steps(M4_FULL_PARTS, gen_seq.M4A + gen_seq.M4B + gen_seq.M4C))),
 ]
+
+
+# ảnh tuần tự dài: số phần cắt (docs/vp/slice_seq.py), mỗi phần lặp lại hàng đầu lifeline
+SLICES = {"seq-analysis-m4-full": 2, "seq-m4-full": 3}
+
+
+def export(name, key):
+    vp("exportDiagramImage", diagramName=name, filePath=str(PNG / f"{key}.png"))
+    if key in SLICES:
+        import slice_seq
+        slice_seq.slice_png(key, SLICES[key])
 
 
 def main():
@@ -891,7 +893,7 @@ def main():
     names = {k: n for k, n, _ in DIAGRAMS}
     if a.export:
         for key in a.export.split(","):
-            vp("exportDiagramImage", diagramName=names[key], filePath=str(PNG / f"{key}.png"))
+            export(names[key], key)
             print("exported", key)
         return
     only = set(a.only.split(",")) if a.only else None
@@ -924,7 +926,7 @@ def main():
             continue
         name += RUN
         build(name)
-        vp("exportDiagramImage", diagramName=name, filePath=str(PNG / f"{key}.png"))
+        export(name, key)
         print("ok", key)
     if not only:
         vp("saveProjectAs", filePath=str(VPP))

@@ -103,7 +103,7 @@ def fold_play_steps(md):
     return md
 
 
-DEV1_FIGURES = ["uml/pha3/ui-m4-2.png", "uml/pha3/seq-m4-2.png"]  # giao diện và tuần tự phần chơi ván (Dev 1)
+DEV1_FIGURES = ["uml/pha3/ui-m4-2.png"]  # giao diện phần chơi ván (Dev 1)
 # hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): hoạt động M4 không có vòng lặp chơi ván
 DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png"}
 
@@ -117,8 +117,6 @@ def adjust(md):
     for old, new in [
         (r"giao diện chơi \(Hình 3\.\d+\)", "giao diện chơi (thuộc phần của Dev 1)"),
         (r"^- `MatchScreen` → `MatchActivity`: .*$", "- `MatchScreen` → `MatchActivity`: thuộc phần của Dev 1."),
-        (r"phần 2 là vòng lặp chơi ván \(Hình 3\.\d+\)", "phần 2 là vòng lặp chơi ván (thuộc phần của Dev 1)"),
-        (r"thuộc modul của Dev 1, chưa vẽ\.", "thuộc phần của Dev 1."),
     ]:
         md, n = re.subn(old, new, md, flags=re.M)
         if n != 1:

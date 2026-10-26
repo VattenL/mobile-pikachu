@@ -530,19 +530,19 @@ Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; m�
 117. Lớp `LobbyActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
 <!-- END v3-m4 -->
 
-Biểu đồ tuần tự được chia làm ba phần: phần 1 từ lúc thách đấu tới khi ván bắt đầu (Hình 3.23), phần 2 là vòng lặp chơi ván (Hình 3.24), phần 3 từ lúc kết thúc ván tới khi về màn hình đấu đối kháng (Hình 3.25). Nhánh tái đấu ở cuối mục.
+Biểu đồ tuần tự vẽ đủ các bước 1–117 ở trên trong một biểu đồ, kể cả vòng lặp chơi ván (bước 60–82, thuộc phần của Dev 1); vì dài nên ảnh được cắt thành ba phần, mỗi phần lặp lại hàng đầu lifeline (Hình 3.23, 3.24, 3.25). Nhánh tái đấu ở cuối mục.
 
-![Hình 3.23: Biểu đồ tuần tự modul thách đấu, phần 1](vp/png/seq-m4-1.png)
+![Hình 3.23: Biểu đồ tuần tự modul thách đấu, phần 1/3](vp/png/seq-m4-full-1.png)
 
-*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 1: thách đấu*
+*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 1/3)*
 
-![Hình 3.24: Biểu đồ tuần tự modul thách đấu, phần 2](uml/pha3/seq-m4-2.png)
+![Hình 3.24: Biểu đồ tuần tự modul thách đấu, phần 2/3](vp/png/seq-m4-full-2.png)
 
-*Hình 3.24: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 2: chơi ván*
+*Hình 3.24: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 2/3)*
 
-![Hình 3.25: Biểu đồ tuần tự modul thách đấu, phần 3](vp/png/seq-m4-3.png)
+![Hình 3.25: Biểu đồ tuần tự modul thách đấu, phần 3/3](vp/png/seq-m4-full-3.png)
 
-*Hình 3.25: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, phần 3: kết thúc ván*
+*Hình 3.25: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 3/3)*
 
 Ngoại lệ 14a của kịch bản v1 (cả hai người chơi chọn tái đấu) có kịch bản phiên bản 3 riêng, thay cho phần 3 từ bước 92 (sau khi `ResultDialog` hiện lên ở bước 91). Kịch bản đánh số lại từ 1:
 
