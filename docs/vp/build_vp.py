@@ -64,9 +64,11 @@ def label(s):
 
 # ---------------------------------------------------------------- use case (.puml)
 
-def build_usecase(name, src, straight=False):
-    """straight: vẽ đường actor - use case thẳng (xiên) thay cho vuông góc, như bản Dev 1 chỉnh Hình 1.1.
-    Tool setConnectorStyle là bản vá cục bộ của plugin."""
+def build_usecase(name, src, straight=None):
+    """Đường thẳng (xiên) thay cho vuông góc, như bản Dev 1 chỉnh Hình 1.1 (tool setConnectorStyle là bản vá
+    cục bộ của plugin). straight="fan": xếp lại kiểu Hình 1.1 (chỉ có actor - use case); straight="lines": giữ
+    vị trí của layout, chỉ đổi đường actor - use case thành đường thẳng (include, extend giữ vuông góc để nhãn
+    nằm cạnh đường)."""
     text = (UML / src).read_text(encoding="utf-8")
     ids, system = {}, None
     vp("createUseCaseDiagram", diagramName=name)
@@ -90,7 +92,9 @@ def build_usecase(name, src, straight=False):
             vp("addRelationship", diagramName=name, sourceName=ids[m[2]], targetName=ids[m[1]], relationshipType="Extend")
     if system:
         vp("addSystemBoundary", diagramName=name, systemName=system)
-    if straight:
+    if straight == "lines":
+        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="Association", pairs="")
+    elif straight == "fan":
         # như bản Dev 1: hộp system rộng, use case xếp theo vòng cung, actor đứng giữa theo chiều dọc
         # để các đường toả ra hai phía. Bước dọc 88 = cao 40 + khoảng cách tối thiểu 48 của plugin
         # giữa hai shape ghim tay; ghim thẳng vào chỗ mới sẽ đụng shape chưa dời, nên dời tạm xuống dưới trước.
@@ -108,7 +112,7 @@ def build_usecase(name, src, straight=False):
         for actor, (_, _, _, h) in shape_bounds(name, "Actor").items():
             vp("setElementBounds", diagramName=name, elementName=actor, x=max(bx - 150, 20),
                y=by + box_h // 2 - h // 2, width=0, height=0)
-        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="Association")
+        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="Association", pairs="")
 
 
 # ---------------------------------------------------------------- class (.puml)
@@ -162,6 +166,29 @@ def layout_tiers(name, tiers, max_width=1500, gap_x=60, gap_y=90):
     place(name, pos)
 
 
+def line_blocked(boxes, a, b, margin=6):
+    """Đoạn thẳng nối tâm hai shape a, b có cắt qua shape nào khác không (Liang-Barsky với từng hình chữ nhật)."""
+    (ax, ay, aw, ah), (bx, by, bw, bh) = boxes[a], boxes[b]
+    x0, y0, x1, y1 = ax + aw / 2, ay + ah / 2, bx + bw / 2, by + bh / 2
+    for name, (x, y, w, h) in boxes.items():
+        if name in (a, b):
+            continue
+        lo, hi = 0.0, 1.0
+        for p, q in ((-(x1 - x0), x0 - (x - margin)), (x1 - x0, x + w + margin - x0),
+                     (-(y1 - y0), y0 - (y - margin)), (y1 - y0, y + h + margin - y0)):
+            if p == 0:
+                if q < 0:
+                    break
+            elif p < 0:
+                lo = max(lo, q / p)
+            else:
+                hi = min(hi, q / p)
+        else:
+            if lo <= hi:
+                return True
+    return False
+
+
 def place(name, pos):
     """Ghim shape vào vị trí cho trước. Hai lượt: ở lượt đầu VP còn đẩy shape tránh các shape chưa ghim."""
     for _ in range(2):
@@ -170,8 +197,26 @@ def place(name, pos):
     vp("rerouteConnectors", diagramName=name)
 
 
-def build_class(name, src, package, pos=None):
-    """pos: {tên lớp: (x, y)} để ghim vị trí thay cho layout theo tầng hoặc tự động."""
+def place_rows(name, rows, gap_x=60):
+    """rows: [(y, x đầu hàng, [lớp...])]: ghim các lớp thành hàng, trái sang phải theo bề rộng thật.
+    Dời tạm các lớp xuống dưới trước để chỗ mới không bị shape cũ chiếm (plugin giữ khoảng cách 48 px)."""
+    size = shape_bounds(name, "Class")
+    moved = [c for _, _, row in rows for c in row]
+    for i, c in enumerate(moved):
+        vp("setElementBounds", diagramName=name, elementName=c, x=40 + (i % 4) * 450, y=3000 + (i // 4) * 300,
+           width=0, height=0)
+    for y, x, row in rows:
+        for c in row:
+            vp("setElementBounds", diagramName=name, elementName=c, x=x, y=y, width=0, height=0)
+            x += size[c][2] + gap_x
+    vp("rerouteConnectors", diagramName=name)
+
+
+def build_class(name, src, package, pos=None, oblique_up=False, rows=None):
+    """pos: {tên lớp: (x, y)} để ghim vị trí thay cho layout theo tầng hoặc tự động.
+    rows: xếp lại một số hàng sau layout theo tầng (xem place_rows).
+    oblique_up: đường nối hai lớp ở hai hàng khác nhau vẽ thẳng (xiên) nếu đoạn thẳng đó không cắt qua lớp nào
+    khác; đường trong cùng hàng và đường sẽ cắt qua lớp khác giữ vuông góc."""
     package += RUN
     text = (UML / src).read_text(encoding="utf-8")
     classes, rels, cur, tiers = [], [], None, []
@@ -236,9 +281,21 @@ def build_class(name, src, package, pos=None):
         place(name, pos)
     elif tiers:
         layout_tiers(name, tiers)
+        if rows:
+            place_rows(name, rows)
     else:
         vp("autoLayoutDiagram", diagramName=name)
     vp("layoutConnectorLabels", diagramName=name)
+    if oblique_up:
+        boxes = shape_bounds(name, "Class")
+
+        def other_row(a, b):  # hai lớp không cùng hàng (layout_tiers cho tầng quá rộng xuống dòng)
+            (_, ay, _, ah), (_, by, _, bh) = boxes[a], boxes[b]
+            return ay + ah < by or by + bh < ay
+
+        pairs = ";".join(f"{left}|{right}" for left, _, arrow, _, right, _ in rels
+                         if "hidden" not in arrow and other_row(left, right) and not line_blocked(boxes, left, right))
+        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="", pairs=pairs)
 
 
 # ---------------------------------------------------------------- state (.puml)
@@ -624,10 +681,19 @@ def build_protocol(name):
            fromSeq=first, toSeq=last, operandStarts=starts)
 
 
-# ---- Pha 3: lớp thực thể pha thiết kế, xếp ngang theo bản Dev 1 chỉnh trên Google Doc
+# ---- lớp thực thể (Hình 2.1 và 3.1), xếp ngang theo bản Dev 1 chỉnh Hình 3.1 trên Google Doc
 
 ENTITY_POS = {"Board": (40, 40), "MatchResult": (300, 80), "Match": (40, 260), "Player": (330, 270),
-              "PlayerRanking": (560, 280)}
+              "PlayerRanking": (560, 250)}  # PlayerRanking cao hơn Player để watermark của VP không đè lên
+
+
+# ---- Pha 3: lớp thiết kế M4 (Hình 3.12): thứ tự các hàng dưới chọn bằng cách thử mọi hoán vị, lấy phương án
+# có ít đường thẳng bị lớp khác chắn nhất (các đường đó phải đi vòng vuông góc)
+
+M4_ROWS = [(367, 200, ["ServerConnection"]), (367, 500, ["MessageListener"]),
+           (766, 40, ["BoardGenerator", "MatchManager", "MatchRoom"]),
+           (990, 240, ["PlayerRankingDAO", "DAO", "MatchDAO", "PathFinder"]),
+           (1130, 340, ["PlayerRanking", "Player", "MatchResult", "Match", "Board"])]
 
 
 # ---- Pha 3: CSDL (erd.puml)
@@ -637,12 +703,12 @@ def build_erd(name):
     nếu không VP đổi sang kiểu chung integer, timestamp."""
     vp("createErd", diagramName=name)
     tables = {
-        "tblPlayer": [("id", "int(10)", True, False, False), ("username", "varchar(50)", False, False, True),
+        "tblPlayer": [("id", "int(10)", True, False, True), ("username", "varchar(50)", False, False, True),
                       ("password", "varchar(64)", False, False, False), ("name", "varchar(100)", False, False, False)],
-        "tblMatch": [("id", "int(10)", True, False, False), ("startTime", "datetime", False, False, False),
+        "tblMatch": [("id", "int(10)", True, False, True), ("startTime", "datetime", False, False, False),
                      ("endTime", "datetime", False, False, False), ("timeLimit", "int(10)", False, False, False),
                      ("tiles", "varchar(300)", False, False, False)],
-        "tblMatchResult": [("id", "int(10)", True, False, False), ("result", "varchar(10)", False, False, False),
+        "tblMatchResult": [("id", "int(10)", True, False, True), ("result", "varchar(10)", False, False, False),
                            ("finishTime", "int(10)", False, True, False), ("tiles", "varchar(300)", False, False, False)],
     }
     for table, cols in tables.items():
@@ -717,11 +783,11 @@ def build_deployment(name):
 # (khoá = tên file ảnh, tên biểu đồ trong VP, hàm dựng)
 
 DIAGRAMS = [
-    ("uc-overview", "1.1 Use case tổng quan", lambda n: build_usecase(n, "pha1/uc-overview.puml", straight=True)),
-    ("uc-m2-view-ranking", "1.3 Use case M2 View Ranking", lambda n: build_usecase(n, "pha1/uc-m2-view-ranking.puml")),
+    ("uc-overview", "1.1 Use case tổng quan", lambda n: build_usecase(n, "pha1/uc-overview.puml", "fan")),
+    ("uc-m2-view-ranking", "1.3 Use case M2 View Ranking", lambda n: build_usecase(n, "pha1/uc-m2-view-ranking.puml", "lines")),
     ("uc-m4-play-online-match", "1.5 Use case M4 Play Online Match",
-     lambda n: build_usecase(n, "pha1/uc-m4-play-online-match.puml")),
-    ("class-entity", "2.1 Lớp thực thể pha phân tích", lambda n: build_class(n, "pha2/class-entity.puml", "pha2_entity")),
+     lambda n: build_usecase(n, "pha1/uc-m4-play-online-match.puml", "lines")),
+    ("class-entity", "2.1 Lớp thực thể pha phân tích", lambda n: build_class(n, "pha2/class-entity.puml", "pha2_entity", ENTITY_POS)),
     ("class-analysis-m2", "2.3 Lớp phân tích M2", lambda n: build_class(n, "pha2/class-analysis-m2.puml", "pha2_m2")),
     ("class-analysis-m4", "2.5 Lớp phân tích M4", lambda n: build_class(n, "pha2/class-analysis-m4.puml", "pha2_m4")),
     ("state-m2", "2.7 Trạng thái M2", lambda n: build_state(n, "pha2/state-m2.puml")),
@@ -737,7 +803,7 @@ DIAGRAMS = [
      lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity", ENTITY_POS)),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
     ("class-design-m2", "3.6 Lớp thiết kế M2", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2")),
-    ("class-design-m4", "3.12 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4")),
+    ("class-design-m4", "3.12 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4", oblique_up=True, rows=M4_ROWS)),
     ("activity-m2", "3.15 Hoạt động M2", lambda n: build_activity(n, ACT_M2, ACT_M2_FLOWS)),
     ("seq-m2", "3.16 Tuần tự thiết kế M2",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
