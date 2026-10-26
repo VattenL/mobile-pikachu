@@ -246,9 +246,11 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 
 *Hình 2.9: Biểu đồ trạng thái của modul thách đấu và đấu đối kháng*
 
-## 5. Kịch bản chi tiết phiên bản 2 cho bốn modul
+## 5. Kịch bản chi tiết phiên bản 2 và biểu đồ tương tác cho bốn modul
 
-### a. Kịch bản phiên bản 2 cho modul quản lý tài khoản
+Sau kịch bản phiên bản 2 của mỗi modul là biểu đồ tương tác của modul đó. Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2 cùng số thứ tự, và chỉ đi giữa hai lớp có liên kết trong biểu đồ lớp phân tích của modul. Modul xem bảng xếp hạng và modul thách đấu dùng biểu đồ tuần tự cho dễ đọc; modul quản lý tài khoản và modul chơi với máy dùng biểu đồ giao tiếp, trong đó dấu `*` đánh dấu các bước nằm trong vòng lặp.
+
+### a. Kịch bản phiên bản 2 và biểu đồ giao tiếp modul quản lý tài khoản
 
 1. Tại giao diện đăng nhập, người chơi click nút Đăng ký.
 2. Lớp `LoginScreen` gọi lớp `RegisterScreen`.
@@ -275,7 +277,11 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 23. Lớp `MainScreen` gọi lớp `LoginScreen`.
 24. Lớp `LoginScreen` hiển thị cho người chơi.
 
-### b. Kịch bản phiên bản 2 cho modul xem bảng xếp hạng
+![Hình 2.10: Biểu đồ giao tiếp của modul quản lý tài khoản](uml/pha2/comm-m1.png)
+
+*Hình 2.10: Biểu đồ giao tiếp của modul quản lý tài khoản*
+
+### b. Kịch bản phiên bản 2 và biểu đồ tuần tự modul xem bảng xếp hạng
 
 1. Tại giao diện chính, người chơi click nút Xem bảng xếp hạng.
 2. Lớp `MainScreen` gọi lớp `RankingScreen`.
@@ -292,7 +298,11 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 13. Lớp `RankingScreen` gọi lớp `MainScreen`.
 14. Lớp `MainScreen` hiển thị cho người chơi.
 
-### c. Kịch bản phiên bản 2 cho modul chơi với máy
+![Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng](vp/png/seq-analysis-m2.png)
+
+*Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng*
+
+### c. Kịch bản phiên bản 2 và biểu đồ giao tiếp modul chơi với máy
 
 1. Tại giao diện chính, người chơi click nút Chơi với máy.
 2. Lớp `MainScreen` gọi lớp `DifficultyScreen`.
@@ -328,7 +338,11 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 31. Lớp `BotResultDialog` gọi lớp `MainScreen`.
 32. Lớp `MainScreen` hiển thị cho người chơi.
 
-### d. Kịch bản phiên bản 2 cho modul thách đấu và đấu đối kháng
+![Hình 2.12: Biểu đồ giao tiếp của modul chơi với máy](uml/pha2/comm-m3.png)
+
+*Hình 2.12: Biểu đồ giao tiếp của modul chơi với máy*
+
+### d. Kịch bản phiên bản 2 và biểu đồ tuần tự modul thách đấu và đấu đối kháng
 
 1. Tại giao diện chính, người chơi A click nút Đấu đối kháng.
 2. Lớp `MainScreen` gọi lớp `LobbyScreen`.
@@ -392,6 +406,16 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 59. Lớp `PlayerRanking` trả kết quả cho lớp `LobbyScreen`.
 60. Lớp `LobbyScreen` hiển thị danh sách người chơi online đã cập nhật cho A và B, kèm thông báo đối thủ đã dừng chơi cho B.
 
+Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, thuộc modul của Dev 1); vì dài nên ảnh được cắt thành hai phần, mỗi phần lặp lại hàng đầu lifeline (Hình 2.13, 2.14). Nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15.
+
+![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 1/2](vp/png/seq-analysis-m4-full-1.png)
+
+*Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 1/2)*
+
+![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 2/2](vp/png/seq-analysis-m4-full-2.png)
+
+*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 2/2)*
+
 Nhánh 14a của kịch bản v1 (cả hai người chơi chọn tái đấu) thay cho các bước 49–60:
 
 1. Tại dialog kết quả, A click nút Tái đấu.
@@ -405,40 +429,6 @@ Nhánh 14a của kịch bản v1 (cả hai người chơi chọn tái đấu) th
 9. Lớp `Match` trả ván đấu cho lớp `ResultDialog`.
 10. Lớp `ResultDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
 11. Lớp `MatchScreen` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B; trạng thái hai người vẫn là bận.
-
-## 6. Biểu đồ tương tác cho bốn modul
-
-Mỗi thông điệp ứng với một bước của kịch bản phiên bản 2 cùng số thứ tự, và chỉ đi giữa hai lớp có liên kết trong biểu đồ lớp phân tích của modul. Modul xem bảng xếp hạng và modul thách đấu dùng biểu đồ tuần tự cho dễ đọc; modul quản lý tài khoản và modul chơi với máy dùng biểu đồ giao tiếp, trong đó dấu `*` đánh dấu các bước nằm trong vòng lặp.
-
-### a. Biểu đồ giao tiếp modul quản lý tài khoản
-
-![Hình 2.10: Biểu đồ giao tiếp của modul quản lý tài khoản](uml/pha2/comm-m1.png)
-
-*Hình 2.10: Biểu đồ giao tiếp của modul quản lý tài khoản*
-
-### b. Biểu đồ tuần tự modul xem bảng xếp hạng
-
-![Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng](vp/png/seq-analysis-m2.png)
-
-*Hình 2.11: Biểu đồ tuần tự pha phân tích của modul xem bảng xếp hạng*
-
-### c. Biểu đồ giao tiếp modul chơi với máy
-
-![Hình 2.12: Biểu đồ giao tiếp của modul chơi với máy](uml/pha2/comm-m3.png)
-
-*Hình 2.12: Biểu đồ giao tiếp của modul chơi với máy*
-
-### d. Biểu đồ tuần tự modul thách đấu và đấu đối kháng
-
-Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, thuộc modul của Dev 1); vì dài nên ảnh được cắt thành hai phần, mỗi phần lặp lại hàng đầu lifeline (Hình 2.13, 2.14). Nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15.
-
-![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 1/2](vp/png/seq-analysis-m4-full-1.png)
-
-*Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 1/2)*
-
-![Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 2/2](vp/png/seq-analysis-m4-full-2.png)
-
-*Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 2/2)*
 
 ![Hình 2.15: Biểu đồ tuần tự pha phân tích của modul thách đấu, nhánh tái đấu](vp/png/seq-analysis-m4-3.png)
 

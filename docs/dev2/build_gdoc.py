@@ -28,7 +28,7 @@ TITLE = "BTL Mobile - Thiết kế hệ thống và các modul của Dev 2"
 # file -> {số mục cấp 2: None (lấy cả mục) hoặc các chữ cái mục cấp 3 được lấy (kèm đoạn mở đầu của mục cấp 2)}
 SELECT = {
     "pha1-thu-thap-yeu-cau.md": {"1": None, "2": None, "3": "ace"},
-    "pha2-phan-tich.md": {"1": "bd", "2": None, "3": "bd", "4": "bd", "5": "bd", "6": "bd"},
+    "pha2-phan-tich.md": {"1": "bd", "2": None, "3": "bd", "4": "bd", "5": "bd"},
     "pha3-thiet-ke.md": {"1": None, "2": None, "3": None, "4": "bd", "5": "bd", "6": None, "7": None, "8": "d"},
 }
 
