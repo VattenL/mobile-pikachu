@@ -1,0 +1,3 @@
+-- Tạo lại các bảng tblPlayer, tblMatch, tblMatchResult theo Hình 3.2.
+-- Xem docs/pha4-cai-dat.md, mục 1d. Phụ trách: Dev 2.
+-- TODO

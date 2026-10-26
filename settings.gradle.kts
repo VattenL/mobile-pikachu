@@ -23,4 +23,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "pikachu"
-include(":app")
+include(":app", ":core", ":server")

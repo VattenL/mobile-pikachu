@@ -1,0 +1,3 @@
+-- Dữ liệu mẫu cho các trường hợp bằng điểm ở bảng xếp hạng.
+-- Xem docs/pha4-cai-dat.md, mục 1d. Phụ trách: Dev 2.
+-- TODO

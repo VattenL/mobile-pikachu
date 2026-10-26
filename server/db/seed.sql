@@ -1,0 +1,3 @@
+-- Dữ liệu mẫu dùng chung cho kiểm thử đơn vị và kiểm thử chức năng.
+-- Xem docs/pha4-cai-dat.md, mục 1d. Phụ trách: Dev 2.
+-- TODO
