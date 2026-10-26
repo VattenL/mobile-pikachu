@@ -1,0 +1,5 @@
+# Chép thành server.properties (không commit) rồi điền thông tin thật.
+port=9999
+db.url=jdbc:mysql://localhost:3306/pikachu?useUnicode=true&characterEncoding=utf8
+db.user=pikachu
+db.password=
