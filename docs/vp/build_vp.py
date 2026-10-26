@@ -67,8 +67,8 @@ def label(s):
 def build_usecase(name, src, straight=None):
     """Đường thẳng (xiên) thay cho vuông góc, như bản Dev 1 chỉnh Hình 1.1 (tool setConnectorStyle là bản vá
     cục bộ của plugin). straight="fan": xếp lại kiểu Hình 1.1 (chỉ có actor - use case); straight="lines": giữ
-    vị trí của layout, chỉ đổi đường actor - use case thành đường thẳng (include, extend giữ vuông góc để nhãn
-    nằm cạnh đường)."""
+    vị trí của layout, đổi mọi đường (actor - use case, include, extend) thành đường thẳng; plugin dời nhãn
+    stereotype về cạnh đoạn giữa của đường mới."""
     text = (UML / src).read_text(encoding="utf-8")
     ids, system = {}, None
     vp("createUseCaseDiagram", diagramName=name)
@@ -93,7 +93,7 @@ def build_usecase(name, src, straight=None):
     if system:
         vp("addSystemBoundary", diagramName=name, systemName=system)
     if straight == "lines":
-        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="Association", pairs="")
+        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="", pairs="")
     elif straight == "fan":
         # như bản Dev 1: hộp system rộng, use case xếp theo vòng cung, actor đứng giữa theo chiều dọc
         # để các đường toả ra hai phía. Bước dọc 88 = cao 40 + khoảng cách tối thiểu 48 của plugin
@@ -788,8 +788,8 @@ DIAGRAMS = [
     ("uc-m4-play-online-match", "1.5 Use case M4 Play Online Match",
      lambda n: build_usecase(n, "pha1/uc-m4-play-online-match.puml", "lines")),
     ("class-entity", "2.1 Lớp thực thể pha phân tích", lambda n: build_class(n, "pha2/class-entity.puml", "pha2_entity", ENTITY_POS)),
-    ("class-analysis-m2", "2.3 Lớp phân tích M2", lambda n: build_class(n, "pha2/class-analysis-m2.puml", "pha2_m2")),
-    ("class-analysis-m4", "2.5 Lớp phân tích M4", lambda n: build_class(n, "pha2/class-analysis-m4.puml", "pha2_m4")),
+    ("class-analysis-m2", "2.3 Lớp phân tích M2", lambda n: build_class(n, "pha2/class-analysis-m2.puml", "pha2_m2", oblique_up=True)),
+    ("class-analysis-m4", "2.5 Lớp phân tích M4", lambda n: build_class(n, "pha2/class-analysis-m4.puml", "pha2_m4", oblique_up=True)),
     ("state-m2", "2.7 Trạng thái M2", lambda n: build_state(n, "pha2/state-m2.puml")),
     ("state-m4", "2.9 Trạng thái M4", lambda n: build_state(n, "pha2/state-m4.puml", STATE_M4_POS)),
     ("seq-analysis-m2", "2.11 Tuần tự phân tích M2", lambda n: build_sequence(n, SEQA_M2_PARTS, SEQA_M2)),
@@ -802,7 +802,7 @@ DIAGRAMS = [
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế",
      lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity", ENTITY_POS)),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
-    ("class-design-m2", "3.6 Lớp thiết kế M2", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2")),
+    ("class-design-m2", "3.6 Lớp thiết kế M2", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2", oblique_up=True)),
     ("class-design-m4", "3.12 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4", oblique_up=True, rows=M4_ROWS)),
     ("activity-m2", "3.15 Hoạt động M2", lambda n: build_activity(n, ACT_M2, ACT_M2_FLOWS)),
     ("seq-m2", "3.16 Tuần tự thiết kế M2",
