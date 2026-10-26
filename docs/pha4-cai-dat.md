@@ -89,7 +89,7 @@ CREATE TABLE tblMatchResult (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 ```
 
-Hình 3.2 ghi kiểu SQL chung của công cụ vẽ (`integer`, `timestamp`); script viết theo MySQL: `INT` (không ghi độ rộng vì MySQL 8 đã bỏ độ rộng hiển thị của kiểu số nguyên) và `DATETIME` (không dùng `TIMESTAMP` của MySQL vì kiểu này đổi múi giờ khi đọc ghi và chỉ đến năm 2038). Chương trình kết nối CSDL cũng dùng bảng mã `utf8mb4`.
+Hình 3.2 ghi kiểu của MySQL (`int(10)`, `datetime`). Script ghi `INT` không kèm độ rộng vì MySQL 8 đã bỏ độ rộng hiển thị của kiểu số nguyên (`int(10)` và `INT` là cùng một kiểu), và dùng `DATETIME` chứ không dùng `TIMESTAMP` vì `TIMESTAMP` đổi múi giờ khi đọc ghi và chỉ đến năm 2038. Chương trình kết nối CSDL cũng dùng bảng mã `utf8mb4`.
 
 `server/db/seed.sql` nhập dữ liệu mẫu dùng chung cho kiểm thử đơn vị và kiểm thử chức năng (mô tả ở pha 5, mục 2c).
 

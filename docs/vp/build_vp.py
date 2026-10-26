@@ -15,6 +15,7 @@ Lần dựng lại toàn bộ sẽ xoá pikachu.vpp cũ: sửa biểu đồ ở 
 import argparse
 import importlib.util
 import json
+import math
 import re
 import sys
 import time
@@ -63,7 +64,9 @@ def label(s):
 
 # ---------------------------------------------------------------- use case (.puml)
 
-def build_usecase(name, src):
+def build_usecase(name, src, straight=False):
+    """straight: vẽ đường actor - use case thẳng (xiên) thay cho vuông góc, như bản Dev 1 chỉnh Hình 1.1.
+    Tool setConnectorStyle là bản vá cục bộ của plugin."""
     text = (UML / src).read_text(encoding="utf-8")
     ids, system = {}, None
     vp("createUseCaseDiagram", diagramName=name)
@@ -87,6 +90,25 @@ def build_usecase(name, src):
             vp("addRelationship", diagramName=name, sourceName=ids[m[2]], targetName=ids[m[1]], relationshipType="Extend")
     if system:
         vp("addSystemBoundary", diagramName=name, systemName=system)
+    if straight:
+        # như bản Dev 1: hộp system rộng, use case xếp theo vòng cung, actor đứng giữa theo chiều dọc
+        # để các đường toả ra hai phía. Bước dọc 88 = cao 40 + khoảng cách tối thiểu 48 của plugin
+        # giữa hai shape ghim tay; ghim thẳng vào chỗ mới sẽ đụng shape chưa dời, nên dời tạm xuống dưới trước.
+        ucs = list(shape_bounds(name, "UseCase").items())
+        bx, by, _, _ = shape_bounds(name, "System")[system]
+        k, step = len(ucs), 88
+        for i, (uc, _) in enumerate(ucs):
+            vp("setElementBounds", diagramName=name, elementName=uc, x=0, y=by + 60 + (k + i) * 100, width=0, height=0)
+        for i, (uc, (_, _, w, _)) in enumerate(ucs):
+            cx = bx + 160 + int(130 * math.sin(math.pi * i / (k - 1)))
+            vp("setElementBounds", diagramName=name, elementName=uc, x=cx - w // 2, y=by + 40 + i * step,
+               width=0, height=0)
+        box_h = 40 + (k - 1) * step + 40 + 40
+        vp("setElementBounds", diagramName=name, elementName=system, x=0, y=0, width=460, height=box_h)
+        for actor, (_, _, _, h) in shape_bounds(name, "Actor").items():
+            vp("setElementBounds", diagramName=name, elementName=actor, x=max(bx - 150, 20),
+               y=by + box_h // 2 - h // 2, width=0, height=0)
+        vp("setConnectorStyle", diagramName=name, style="oblique", relationshipType="Association")
 
 
 # ---------------------------------------------------------------- class (.puml)
@@ -148,7 +170,8 @@ def place(name, pos):
     vp("rerouteConnectors", diagramName=name)
 
 
-def build_class(name, src, package):
+def build_class(name, src, package, pos=None):
+    """pos: {tên lớp: (x, y)} để ghim vị trí thay cho layout theo tầng hoặc tự động."""
     package += RUN
     text = (UML / src).read_text(encoding="utf-8")
     classes, rels, cur, tiers = [], [], None, []
@@ -209,7 +232,9 @@ def build_class(name, src, package):
                toMultiplicity=rmul, name=text_)
         else:
             raise ValueError(f"{src}: mũi tên lạ {arrow}")
-    if tiers:
+    if pos:
+        place(name, pos)
+    elif tiers:
         layout_tiers(name, tiers)
     else:
         vp("autoLayoutDiagram", diagramName=name)
@@ -599,18 +624,26 @@ def build_protocol(name):
            fromSeq=first, toSeq=last, operandStarts=starts)
 
 
+# ---- Pha 3: lớp thực thể pha thiết kế, xếp ngang theo bản Dev 1 chỉnh trên Google Doc
+
+ENTITY_POS = {"Board": (40, 40), "MatchResult": (300, 80), "Match": (40, 260), "Player": (330, 270),
+              "PlayerRanking": (560, 280)}
+
+
 # ---- Pha 3: CSDL (erd.puml)
 
 def build_erd(name):
+    """Kiểu cột theo MySQL (int(10), datetime): main() đặt CSDL mặc định của project là MySQL trước,
+    nếu không VP đổi sang kiểu chung integer, timestamp."""
     vp("createErd", diagramName=name)
     tables = {
-        "tblPlayer": [("id", "int", True, False, False), ("username", "varchar(50)", False, False, True),
+        "tblPlayer": [("id", "int(10)", True, False, False), ("username", "varchar(50)", False, False, True),
                       ("password", "varchar(64)", False, False, False), ("name", "varchar(100)", False, False, False)],
-        "tblMatch": [("id", "int", True, False, False), ("startTime", "datetime", False, False, False),
-                     ("endTime", "datetime", False, False, False), ("timeLimit", "int", False, False, False),
+        "tblMatch": [("id", "int(10)", True, False, False), ("startTime", "datetime", False, False, False),
+                     ("endTime", "datetime", False, False, False), ("timeLimit", "int(10)", False, False, False),
                      ("tiles", "varchar(300)", False, False, False)],
-        "tblMatchResult": [("id", "int", True, False, False), ("result", "varchar(10)", False, False, False),
-                           ("finishTime", "int", False, True, False), ("tiles", "varchar(300)", False, False, False)],
+        "tblMatchResult": [("id", "int(10)", True, False, False), ("result", "varchar(10)", False, False, False),
+                           ("finishTime", "int(10)", False, True, False), ("tiles", "varchar(300)", False, False, False)],
     }
     for table, cols in tables.items():
         vp("addTable", diagramName=name, tableName=table)
@@ -684,7 +717,7 @@ def build_deployment(name):
 # (khoá = tên file ảnh, tên biểu đồ trong VP, hàm dựng)
 
 DIAGRAMS = [
-    ("uc-overview", "1.1 Use case tổng quan", lambda n: build_usecase(n, "pha1/uc-overview.puml")),
+    ("uc-overview", "1.1 Use case tổng quan", lambda n: build_usecase(n, "pha1/uc-overview.puml", straight=True)),
     ("uc-m2-view-ranking", "1.3 Use case M2 View Ranking", lambda n: build_usecase(n, "pha1/uc-m2-view-ranking.puml")),
     ("uc-m4-play-online-match", "1.5 Use case M4 Play Online Match",
      lambda n: build_usecase(n, "pha1/uc-m4-play-online-match.puml")),
@@ -701,7 +734,7 @@ DIAGRAMS = [
     ("seq-analysis-m4-3", "2.15 Tuần tự phân tích M4 (tái đấu)",
      lambda n: build_sequence(n, SEQA_M4_3_PARTS, SEQA_M4_3)),
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế",
-     lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity")),
+     lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity", ENTITY_POS)),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
     ("class-design-m2", "3.6 Lớp thiết kế M2", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2")),
     ("class-design-m4", "3.12 Lớp thiết kế M4", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4")),
@@ -743,6 +776,8 @@ def main():
         vp("newProject")
         if VPP.exists():
             VPP.unlink()
+    # kiểu cột MySQL (int(10), datetime) cho Hình 3.2; project mới chưa có CSDL mặc định (tool vá cục bộ)
+    vp("setDefaultDatabase", databaseType="MySQL")
     PNG.mkdir(exist_ok=True)
     for key, name, build in DIAGRAMS:
         if only and key not in only:
