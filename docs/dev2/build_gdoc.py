@@ -131,6 +131,10 @@ def adjust(md):
         if md.count(old) != 1:
             raise SystemExit(f"không khớp: {old}")
         md = md.replace(old, new)
+    # ngoại lệ 10a, 10b của kịch bản v1 M4 xảy ra trong lúc chơi ván (phần của Dev 1)
+    md, n = re.subn(r"<br>10[ab]\. [^<|]*", "", md)
+    if n != 2:
+        raise SystemExit(f"bỏ ngoại lệ 10a, 10b: {n} chỗ, cần 2")
     for old, new in [
         (r"giao diện chơi \(Hình 3\.\d+\)", "giao diện chơi (thuộc phần của Dev 1)"),
         (r"^- `MatchScreen` → `MatchActivity`: .*$", "- `MatchScreen` → `MatchActivity`: thuộc phần của Dev 1."),
