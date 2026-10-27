@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Timer;
 import ptit.e23cnpm01.pikachu.core.protocol.Message;
 
 /**
@@ -16,6 +17,8 @@ public class ServerConnection {
     private ArrayList<MessageListener> listeners;
     private BufferedReader reader;
     private PrintWriter writer;
+    /** Gửi PING mỗi 5 giây. */
+    private Timer pingTimer;
 
     public static ServerConnection getInstance() {
         throw new UnsupportedOperationException("TODO");

@@ -25,7 +25,7 @@ public class MatchActivity extends AppCompatActivity implements MessageListener 
     private Button btnQuit;
     private Board board;
     private Board opponentBoard;
-    private int matchId;
+    private int roomId;
     private Player opponent;
     private Cell firstCell;
 

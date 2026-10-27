@@ -14,6 +14,8 @@ import ptit.e23cnpm01.pikachu.core.protocol.Message;
 public class ClientHandler implements Runnable {
     private Socket socket;
     private Player player;
+    /** Phòng chơi hiện tại (đang chơi hoặc ở dialog kết quả), rỗng nếu không có. */
+    private Integer roomId;
     private BufferedReader reader;
     private PrintWriter writer;
 

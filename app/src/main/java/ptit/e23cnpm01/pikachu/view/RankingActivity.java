@@ -24,6 +24,8 @@ public class RankingActivity extends BaseActivity {
     private int page;
     private int pageCount;
     private ArrayList<PlayerRanking> listRanking;
+    /** Thứ hạng của người chơi (me trong RANKING); dòng được tô theo tên đăng nhập. */
+    private Integer myRank;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

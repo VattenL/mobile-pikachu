@@ -24,11 +24,20 @@ public class MatchController {
         // TODO
     }
 
+    public void onRematchTimeout(MatchRoom room) {
+        // TODO
+    }
+
     public void handleDisconnect(ClientHandler handler) {
         // TODO
     }
 
     private void endMatch(MatchRoom room, String reason) {
+        // TODO
+    }
+
+    /** Người stopper dừng (chọn Dừng, Về sảnh, thoát, hết giờ trả lời hoặc mất kết nối ở dialog kết quả). */
+    private void stopRematch(MatchRoom room, ClientHandler stopper) {
         // TODO
     }
 }

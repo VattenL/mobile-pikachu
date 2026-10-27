@@ -1,6 +1,7 @@
 package ptit.e23cnpm01.pikachu.view;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,7 +16,9 @@ public class InvitationDialog extends AppCompatDialog {
     private TextView tvChallenger;
     private Button btnAccept;
     private Button btnReject;
+    private TextView tvCountdown;
     private String challenger;
+    private CountDownTimer countDown;
 
     public InvitationDialog(Context context) {
         super(context);

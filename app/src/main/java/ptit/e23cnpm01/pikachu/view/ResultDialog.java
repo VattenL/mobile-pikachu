@@ -1,6 +1,7 @@
 package ptit.e23cnpm01.pikachu.view;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,7 +18,9 @@ public class ResultDialog extends AppCompatDialog implements MessageListener {
     private TextView tvResult;
     private Button btnRematch;
     private Button btnStop;
-    private int matchId;
+    private TextView tvCountdown;
+    private int roomId;
+    private CountDownTimer countDown;
 
     public ResultDialog(Context context) {
         super(context);

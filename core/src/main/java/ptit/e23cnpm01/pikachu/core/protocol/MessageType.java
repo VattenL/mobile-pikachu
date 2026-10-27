@@ -11,6 +11,7 @@ public final class MessageType {
     public static final String LOGIN = "LOGIN";
     public static final String LOGIN_RESULT = "LOGIN_RESULT";
     public static final String LOGOUT = "LOGOUT";
+    public static final String PING = "PING";
     public static final String UPDATE_STATUS = "UPDATE_STATUS";
     public static final String GET_ONLINE_LIST = "GET_ONLINE_LIST";
     public static final String ONLINE_LIST = "ONLINE_LIST";
@@ -18,8 +19,10 @@ public final class MessageType {
     public static final String RANKING = "RANKING";
     public static final String INVITE = "INVITE";
     public static final String INVITE_RECEIVED = "INVITE_RECEIVED";
+    public static final String INVITE_CANCEL = "INVITE_CANCEL";
     public static final String INVITE_REPLY = "INVITE_REPLY";
     public static final String INVITE_RESULT = "INVITE_RESULT";
+    public static final String INVITE_CLOSED = "INVITE_CLOSED";
     public static final String MATCH_START = "MATCH_START";
     public static final String MOVE = "MOVE";
     public static final String MOVE_RESULT = "MOVE_RESULT";

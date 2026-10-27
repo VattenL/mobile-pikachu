@@ -8,7 +8,8 @@ package ptit.e23cnpm01.pikachu.core.model;
 public class Player {
     private int id;
     private String username;
-    private String password;
+    /** Chuỗi băm SHA-256; transient để Gson không gửi qua mạng khi đối tượng nằm trong một message. */
+    private transient String password;
     private String status;
 
     public Player() {

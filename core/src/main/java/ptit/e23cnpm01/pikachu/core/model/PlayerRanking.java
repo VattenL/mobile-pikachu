@@ -6,11 +6,20 @@ package ptit.e23cnpm01.pikachu.core.model;
  * <p>Phụ trách: dùng chung.
  */
 public class PlayerRanking extends Player {
+    private int rank;
     private float totalPoint;
     private float avgOpponentPoint;
     private Float avgWinTime;
 
     public PlayerRanking() {
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public float getTotalPoint() {
