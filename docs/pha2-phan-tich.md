@@ -63,15 +63,15 @@ Hệ thống là trò chơi Pikachu nhiều người chơi trên thiết bị An
 ### c. Bước 3: Đánh giá và lựa chọn các danh từ làm lớp thực thể hoặc thuộc tính
 
 - Các danh từ trừu tượng hoặc thuộc về hạ tầng: hệ thống, thiết bị Android, server, client → **loại**.
-- Người chơi → lớp `Player`: tên đăng nhập, mật khẩu, trạng thái. Tên đăng nhập cũng là tên hiển thị trong danh sách online và bảng xếp hạng, nên không cần thuộc tính tên riêng. *Tài khoản* không tách thành lớp riêng vì mỗi người chơi có đúng một tài khoản. *Trạng thái* (rỗi, luyện tập, bận) chỉ có ý nghĩa khi người chơi đang online, nhưng vẫn là thông tin của người chơi nên đặt làm thuộc tính.
-- *Đối thủ* là vai trò của một người chơi trong ván, không đề xuất lớp. *Máy* là một thuật toán của hệ thống: ván với máy không được lưu và không tính điểm, nên máy không có dữ liệu cần quản lý và không đề xuất lớp; *độ khó* chỉ là lựa chọn của người chơi cho ván với máy.
-- *Khách* là người dùng chưa đăng nhập: không có tài khoản, chỉ chơi với máy (không lưu) và xem bảng xếp hạng, nên không có thông tin nào cần quản lý và không đề xuất lớp. Khách được biểu diễn bằng actor `Guest` ở biểu đồ use case.
-- Ván đấu → lớp `Match`: thời điểm bắt đầu, thời điểm kết thúc, thời gian giới hạn.
-- Kết quả → lớp `MatchResult`: kết quả (thắng, hòa, thua), điểm nhận được, thời gian hoàn thành. Kết quả tách thành lớp riêng thay vì đặt trên `Match` vì mỗi ván có hai người chơi, mỗi người một kết quả, một số điểm và một thời gian hoàn thành riêng.
-- Đề bài, bàn chơi → lớp `Board`: số hàng, số cột, các ô hình. Đề bài và bàn chơi riêng của mỗi người có cùng cấu trúc nên dùng chung một lớp: đề bài là bàn lúc bắt đầu ván, bàn chơi riêng là bản của từng người, khác nhau ngay sau nước đi đầu tiên. *Ô hình* là phần tử của bàn chơi nên là thuộc tính `tiles` của `Board`. *Đường nối* được tính ra mỗi lần người chơi chọn hai ô, không lưu nên không đề xuất lớp.
-- *Lời mời* chỉ tồn tại trong lúc chờ người được mời trả lời, không cần lưu, nên không đề xuất lớp.
-- *Danh sách người chơi online* là tập các `Player` đang online, không đề xuất lớp.
-- *Tổng điểm*, *trung bình điểm đối thủ*, *trung bình thời gian thắng* là thông tin dẫn xuất của một người chơi, tính ra từ các kết quả ván, nên đề xuất lớp thống kê `PlayerRanking` kế thừa `Player`, thêm ba thuộc tính: tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng.
+- Người chơi → **lớp `Player`**: tên đăng nhập, mật khẩu, trạng thái. Tên đăng nhập cũng là tên hiển thị trong danh sách online và bảng xếp hạng, nên không cần thuộc tính tên riêng. *Tài khoản* **không tách thành lớp riêng** vì mỗi người chơi có đúng một tài khoản. *Trạng thái* (rỗi, luyện tập, bận) chỉ có ý nghĩa khi người chơi đang online, nhưng vẫn là thông tin của người chơi nên **đặt làm thuộc tính**.
+- *Đối thủ* là vai trò của một người chơi trong ván, **không đề xuất lớp**. *Máy* là một thuật toán của hệ thống: ván với máy không được lưu và không tính điểm, nên máy không có dữ liệu cần quản lý và **không đề xuất lớp**; *độ khó* chỉ là lựa chọn của người chơi cho ván với máy.
+- *Khách* là người dùng chưa đăng nhập: không có tài khoản, chỉ chơi với máy (không lưu) và xem bảng xếp hạng, nên không có thông tin nào cần quản lý và **không đề xuất lớp**. Khách được biểu diễn bằng actor `Guest` ở biểu đồ use case.
+- Ván đấu → **lớp `Match`**: thời điểm bắt đầu, thời điểm kết thúc, thời gian giới hạn.
+- Kết quả → **lớp `MatchResult`**: kết quả (thắng, hòa, thua), điểm nhận được, thời gian hoàn thành. Kết quả tách thành lớp riêng thay vì đặt trên `Match` vì mỗi ván có hai người chơi, mỗi người một kết quả, một số điểm và một thời gian hoàn thành riêng.
+- Đề bài, bàn chơi → **lớp `Board`**: số hàng, số cột, các ô hình. Đề bài và bàn chơi riêng của mỗi người có cùng cấu trúc nên dùng chung một lớp: đề bài là bàn lúc bắt đầu ván, bàn chơi riêng là bản của từng người, khác nhau ngay sau nước đi đầu tiên. *Ô hình* là phần tử của bàn chơi nên là **thuộc tính `tiles` của `Board`**. *Đường nối* được tính ra mỗi lần người chơi chọn hai ô, không lưu nên **không đề xuất lớp**.
+- *Lời mời* chỉ tồn tại trong lúc chờ người được mời trả lời, không cần lưu, nên **không đề xuất lớp**.
+- *Danh sách người chơi online* là tập các `Player` đang online, **không đề xuất lớp**.
+- *Tổng điểm*, *trung bình điểm đối thủ*, *trung bình thời gian thắng* là thông tin dẫn xuất của một người chơi, tính ra từ các kết quả ván, nên **đề xuất lớp thống kê `PlayerRanking`** kế thừa `Player`, thêm ba thuộc tính: tổng điểm, trung bình điểm đối thủ, trung bình thời gian thắng.
 
 ### d. Bước 4: Quan hệ số lượng giữa các thực thể
 
@@ -129,10 +129,10 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.2.
 
 ### b. Phân tích tĩnh modul xem bảng xếp hạng
 
-- Bước 1 của kịch bản, giao diện chính đề xuất lớp `MainScreen`, trong modul này chỉ cần nút xem bảng xếp hạng, kiểu submit.
-- Bước 2, giao diện bảng xếp hạng đề xuất lớp `RankingScreen`, cần có: bảng xếp hạng của trang đang xem và số trang, kiểu output; nút trang trước, trang sau, vị trí của tôi và quay lại, kiểu submit.
+- Giao diện chính đề xuất lớp `MainScreen`, trong modul này chỉ cần nút xem bảng xếp hạng, kiểu submit.
+- Giao diện bảng xếp hạng đề xuất lớp `RankingScreen`, cần có: bảng xếp hạng của trang đang xem và số trang, kiểu output; nút trang trước, trang sau, vị trí của tôi và quay lại, kiểu submit.
 - Để có một trang bảng xếp hạng, cần xử lý dưới hệ thống: tính ba chỉ số của mọi người chơi, sắp xếp rồi lấy các dòng của trang. Input: số trang. Output: danh sách `PlayerRanking` của trang và tổng số trang. Đầu ra là lớp `PlayerRanking` nên đề xuất phương thức `getRanking()`, gán cho lớp `PlayerRanking`.
-- Bước 3, để chuyển tới vị trí của mình, cần: tìm thứ hạng của người chơi rồi lấy trang chứa thứ hạng đó. Input: người chơi. Output: trang chứa người chơi, hoặc rỗng nếu người chơi chưa có trong bảng xếp hạng. Đầu ra là các `PlayerRanking` nên đề xuất phương thức `getPlayerPage()`, gán cho lớp `PlayerRanking`. Người chơi là một `Player`, và `PlayerRanking` kế thừa `Player`.
+- Để chuyển tới vị trí của mình, cần: tìm thứ hạng của người chơi rồi lấy trang chứa thứ hạng đó. Input: người chơi. Output: trang chứa người chơi, hoặc rỗng nếu người chơi chưa có trong bảng xếp hạng. Đầu ra là các `PlayerRanking` nên đề xuất phương thức `getPlayerPage()`, gán cho lớp `PlayerRanking`. Người chơi là một `Player`, và `PlayerRanking` kế thừa `Player`.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.3.
 
@@ -175,19 +175,19 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.4.
 
 ### d. Phân tích tĩnh modul thách đấu và đấu đối kháng
 
-- Bước 1 của kịch bản, giao diện chính đề xuất lớp `MainScreen`, trong modul này cần nút đấu đối kháng, kiểu submit.
-- Bước 2, màn hình đấu đối kháng đề xuất lớp `LobbyScreen`, cần có: danh sách người chơi online, kiểu output; thông báo (bị từ chối, đối thủ bận, không trả lời, đã dừng chơi), kiểu output; tên đối thủ để click và nút quay lại, kiểu submit.
+- Giao diện chính đề xuất lớp `MainScreen`, trong modul này cần nút đấu đối kháng, kiểu submit.
+- Màn hình đấu đối kháng đề xuất lớp `LobbyScreen`, cần có: danh sách người chơi online, kiểu output; thông báo (bị từ chối, đối thủ bận, không trả lời, đã dừng chơi), kiểu output; tên đối thủ để click và nút quay lại, kiểu submit.
 - Để hiện danh sách online, cần: lấy các người chơi đang online, output là danh sách `Player` → `getOnlinePlayers()`, gán cho `Player`; lấy tổng điểm của các người chơi đó, output là các `PlayerRanking` → `getTotalPoints()`, gán cho `PlayerRanking`.
-- Bước 4, dialog xác nhận thách đấu trên máy người thách đấu đề xuất lớp `ChallengeConfirmDialog`. Sau khi xác nhận, chính dialog này đổi thành popup chờ (bước 6) để người mời hủy được lời mời. Cần có: tên đối thủ, thông báo đang chờ và thời gian còn lại, kiểu output; nút Xác nhận và nút Hủy (sau khi xác nhận là nút Hủy lời mời), kiểu submit.
-- Bước 5, khi click Xác nhận, cần: ghi nhận và gửi lời mời, input là người mời và người được mời, đều là `Player`, output là gửi được hay lý do không gửi được (người được mời bận hoặc không online) → `sendInvitation()`, gán cho `Player`.
-- Ngoại lệ 7a, khi người mời click Hủy lời mời, cần: hủy lời mời đang chờ, input là người mời và người được mời → `cancelInvitation()`, gán cho `Player`.
-- Bước 6, popup lời mời trên máy người được mời đề xuất lớp `InvitationDialog`, cần có: tên người mời và thời gian còn lại, kiểu output; nút Accept và nút Reject, kiểu submit.
-- Bước 7, khi người được mời click Accept (hoặc Reject ở ngoại lệ 7b), cần: ghi nhận câu trả lời, kiểm tra lời mời còn hiệu lực (chưa bị hủy, chưa hết 30 giây) và báo cho người mời; input là người mời, người được mời và câu trả lời; output là lời mời còn hiệu lực hay không → `replyInvitation()`, gán cho `Player`.
-- Bước 8, khi người được mời chấp nhận, cần: sinh đề bài → `Board.generateBoard()`; tạo ván đấu cho hai người với đề bài vừa sinh, output là `Match` → `createMatch()`, gán cho `Match`; chuyển trạng thái hai người sang bận, input là các `Player` → `updateStatus()`, gán cho `Player`.
-- Bước 8, giao diện chơi đề xuất lớp `MatchScreen`, cần có: bàn chơi, đồng hồ, số ô còn lại của đối thủ, kiểu output; ô người chơi click, kiểu input; nút thoát, kiểu submit. Các xử lý khi chọn hai ô dùng lại `checkPath()`, `removePair()`, `isCleared()`, `findAvailablePair()`, `shuffle()` của `Board`.
-- Bước 12, khi ván kết thúc, cần: xác định kết quả và điểm của hai người theo cách kết thúc (xóa hết ô, hết giờ, thoát, mất kết nối), input là ván và cách kết thúc, output là hai kết quả → `endMatch()`; lưu ván cùng hai kết quả, input là ván và kết quả của hai người → `saveMatch()`. Cả hai gán cho `Match` vì `Match` gắn chặt với hai `MatchResult`.
-- Bước 12, dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, điểm nhận được và thời gian còn lại để trả lời, kiểu output; nút tái đấu và nút dừng, kiểu submit.
-- Bước 13, khi người chơi chọn tái đấu hoặc dừng, cần: ghi nhận lựa chọn của người đó trong ván, input là ván, người chơi và lựa chọn, output là cả hai đã đồng ý, có người dừng, hoặc còn chờ người kia → `replyRematch()`, gán cho `Match`. Có người dừng thì chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()` rồi về `LobbyScreen`. Khi cả hai chọn tái đấu (ngoại lệ 13a), dùng lại `Board.generateBoard()` và `Match.createMatch()` để tạo ván mới, nên `ResultDialog` liên kết với `Board` và `Match`.
+- Dialog xác nhận thách đấu trên máy người thách đấu đề xuất lớp `ChallengeConfirmDialog`. Sau khi xác nhận, chính dialog này đổi thành popup chờ để người mời hủy được lời mời. Cần có: tên đối thủ, thông báo đang chờ và thời gian còn lại, kiểu output; nút Xác nhận và nút Hủy (sau khi xác nhận là nút Hủy lời mời), kiểu submit.
+- Khi người thách đấu click Xác nhận, cần: ghi nhận và gửi lời mời, input là người mời và người được mời, đều là `Player`, output là gửi được hay lý do không gửi được (người được mời bận hoặc không online) → `sendInvitation()`, gán cho `Player`.
+- Khi người mời click Hủy lời mời, cần: hủy lời mời đang chờ, input là người mời và người được mời → `cancelInvitation()`, gán cho `Player`.
+- Popup lời mời trên máy người được mời đề xuất lớp `InvitationDialog`, cần có: tên người mời và thời gian còn lại, kiểu output; nút Accept và nút Reject, kiểu submit.
+- Khi người được mời click Accept hoặc Reject, cần: ghi nhận câu trả lời, kiểm tra lời mời còn hiệu lực (chưa bị hủy, chưa hết 30 giây) và báo cho người mời; input là người mời, người được mời và câu trả lời; output là lời mời còn hiệu lực hay không → `replyInvitation()`, gán cho `Player`.
+- Khi người được mời chấp nhận, cần: sinh đề bài → `Board.generateBoard()`; tạo ván đấu cho hai người với đề bài vừa sinh, output là `Match` → `createMatch()`, gán cho `Match`; chuyển trạng thái hai người sang bận, input là các `Player` → `updateStatus()`, gán cho `Player`.
+- Giao diện chơi đề xuất lớp `MatchScreen`, cần có: bàn chơi, đồng hồ, số ô còn lại của đối thủ, kiểu output; ô người chơi click, kiểu input; nút thoát, kiểu submit. Các xử lý khi chọn hai ô dùng lại `checkPath()`, `removePair()`, `isCleared()`, `findAvailablePair()`, `shuffle()` của `Board`.
+- Khi ván kết thúc, cần: xác định kết quả và điểm của hai người theo cách kết thúc (xóa hết ô, hết giờ, thoát, mất kết nối), input là ván và cách kết thúc, output là hai kết quả → `endMatch()`; lưu ván cùng hai kết quả, input là ván và kết quả của hai người → `saveMatch()`. Cả hai gán cho `Match` vì `Match` gắn chặt với hai `MatchResult`.
+- Dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, điểm nhận được và thời gian còn lại để trả lời, kiểu output; nút tái đấu và nút dừng, kiểu submit.
+- Khi người chơi chọn tái đấu hoặc dừng, cần: ghi nhận lựa chọn của người đó trong ván, input là ván, người chơi và lựa chọn, output là cả hai đã đồng ý, có người dừng, hoặc còn chờ người kia → `replyRematch()`, gán cho `Match`. Có người dừng thì chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()` rồi về `LobbyScreen`. Khi cả hai chọn tái đấu, dùng lại `Board.generateBoard()` và `Match.createMatch()` để tạo ván mới, nên `ResultDialog` liên kết với `Board` và `Match`.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 

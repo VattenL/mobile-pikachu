@@ -104,9 +104,8 @@ def fold_play_steps(md):
 
 
 DEV1_FIGURES = ["uml/pha3/ui-m4-2.png"]  # giao diện phần chơi ván (Dev 1)
-# hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): hoạt động và tuần tự M4 không có vòng lặp chơi ván
-DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png",
-                **{f"vp/png/seq-analysis-m4-full-{i}.png": f"vp/png/seq-analysis-m4-dev2-{i}.png" for i in (1, 2)},
+# hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): tuần tự M4 không có vòng lặp chơi ván
+DEV2_FIGURES = {**{f"vp/png/seq-analysis-m4-full-{i}.png": f"vp/png/seq-analysis-m4-dev2-{i}.png" for i in (1, 2)},
                 **{f"vp/png/seq-m4-full-{i}.png": f"vp/png/seq-m4-dev2-{i}.png" for i in (1, 2, 3)}}
 # đoạn dẫn của các hình tuần tự M4 nói theo bản Dev 2: (mẫu, hàm thay); số bước lấy từ chính câu trong md
 DEV2_TEXT = [
@@ -120,6 +119,9 @@ DEV2_TEXT = [
      lambda m: f"Biểu đồ tuần tự vẽ các bước 1–{int(m[2]) - 1} (thách đấu) và {int(m[3]) + 1}–{m[1]} (kết thúc ván) ở "
                f"trên trong một biểu đồ; vòng lặp chơi ván (bước {m[2]}–{m[3]}) thuộc phần của Dev 1 nên không vẽ, số "
                f"bước giữ như kịch bản. Vì dài"),
+    # biểu đồ hoạt động chỉ có ở M1, M3 (Dev 1); các modul của Dev 2 dùng biểu đồ tuần tự
+    (r"Modul quản lý tài khoản và modul chơi với máy có biểu đồ hoạt động; .*?ghi chú bên cạnh\.",
+     "Mỗi modul trình bày kịch bản phiên bản 3 và biểu đồ tuần tự."),
 ]
 
 
@@ -168,7 +170,7 @@ def style(html):
     html = re.sub(r"<p><em>(Hình [^<]*)</em></p>",
                   rf'<p style="{FONT}font-size:13pt;text-align:center;font-style:italic;margin:6pt 0">\1</p>', html)
     html = re.sub(r"<p>", f'<p style="{FONT}font-size:13pt;margin:6pt 0;text-align:justify">', html)
-    html = re.sub(r"<li>", f'<li style="{FONT}font-size:13pt;margin:3pt 0">', html)
+    html = re.sub(r"<li>", f'<li style="{FONT}font-size:13pt;margin:3pt 0;text-align:justify">', html)
     for tag, size in (("h1", 16), ("h2", 14), ("h3", 13), ("h4", 13)):
         html = html.replace(f"<{tag}>", f'<{tag} style="{FONT}font-size:{size}pt;font-weight:bold;margin:12pt 0 6pt">')
     # dòng tiêu đề trong <thead> bị Google Docs ghim lại: chuyển thành dòng thường, chữ đậm
@@ -177,7 +179,8 @@ def style(html):
     html = html.replace("<table>", '<table style="border-collapse:collapse;width:100%">')
     for tag in ("td", "th"):
         html = re.sub(rf"<{tag}( [^>]*)?>",
-                      f'<{tag} style="{FONT}font-size:12pt;border:1px solid #000000;padding:3pt 5pt;vertical-align:top">',
+                      f'<{tag} style="{FONT}font-size:12pt;border:1px solid #000000;padding:3pt 5pt;vertical-align:top;'
+                      f'text-align:justify">',
                       html)
     html = html.replace("<code>", "<code style=\"font-family:'Courier New';font-size:11pt\">")
     return html

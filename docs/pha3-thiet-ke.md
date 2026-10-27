@@ -148,11 +148,11 @@ Giao diện như Hình 3.3.
 
 Giao diện gồm hai màn hình: giao diện chính như Hình 3.5 và giao diện bảng xếp hạng như Hình 3.6.
 
-![Hình 3.5: Thiết kế giao diện chính](uml/pha3/ui-m2-main.png)
+![Hình 3.5: Thiết kế giao diện chính](ui/png/ui-main.png)
 
 *Hình 3.5: Thiết kế giao diện chính*
 
-![Hình 3.6: Thiết kế giao diện bảng xếp hạng](uml/pha3/ui-m2-ranking.png)
+![Hình 3.6: Thiết kế giao diện bảng xếp hạng](ui/png/ui-ranking.png)
 
 *Hình 3.6: Thiết kế giao diện bảng xếp hạng*
 
@@ -187,15 +187,15 @@ Ván với máy chạy hoàn toàn trên client và không lưu kết quả; cli
 
 Mỗi màn hình của modul một hình: màn hình đấu đối kháng (Hình 3.10), dialog xác nhận thách đấu và popup chờ trên máy người thách đấu (Hình 3.11), popup lời mời trên máy người được mời (Hình 3.12), giao diện chơi (Hình 3.13) và dialog kết quả (Hình 3.14, gồm cả trường hợp đối thủ đã thoát). Giao diện chính như Hình 3.5.
 
-![Hình 3.10: Thiết kế màn hình đấu đối kháng](uml/pha3/ui-m4-lobby.png)
+![Hình 3.10: Thiết kế màn hình đấu đối kháng](ui/png/ui-lobby.png)
 
 *Hình 3.10: Thiết kế màn hình đấu đối kháng*
 
-![Hình 3.11: Thiết kế dialog xác nhận thách đấu](uml/pha3/ui-m4-confirm.png)
+![Hình 3.11: Thiết kế dialog xác nhận thách đấu](ui/png/ui-confirm.png)
 
 *Hình 3.11: Thiết kế dialog xác nhận thách đấu*
 
-![Hình 3.12: Thiết kế dialog lời mời](uml/pha3/ui-m4-invitation.png)
+![Hình 3.12: Thiết kế dialog lời mời](ui/png/ui-invitation.png)
 
 *Hình 3.12: Thiết kế dialog lời mời*
 
@@ -203,7 +203,7 @@ Mỗi màn hình của modul một hình: màn hình đấu đối kháng (Hình
 
 *Hình 3.13: Thiết kế giao diện chơi ván đối kháng*
 
-![Hình 3.14: Thiết kế dialog kết quả](uml/pha3/ui-m4-result.png)
+![Hình 3.14: Thiết kế dialog kết quả](ui/png/ui-result.png)
 
 *Hình 3.14: Thiết kế dialog kết quả*
 
@@ -239,7 +239,7 @@ Mỗi màn hình của modul một hình: màn hình đấu đối kháng (Hình
 
 ## 5. Thiết kế hoạt động cho bốn modul
 
-Mỗi hành động trong biểu đồ hoạt động ứng với một phương thức đã thiết kế ở mục 4. Phần xử lý tại mỗi lớp là một khung (M1, M3) hoặc một làn (M2, M4); phương thức của lớp DAO, lớp quản lý và lớp xử lý được ghi ở ghi chú bên cạnh (M1, M3) hoặc ở một nút riêng nối hai chiều với hành động gọi nó (M2, M4). Trong kịch bản phiên bản 3 và biểu đồ tuần tự, các bước gán từng thuộc tính khi đóng gói lớp thực thể được lược bỏ cho gọn. Tên hành động là tên phương thức đã thiết kế; khung kích hoạt thể hiện phạm vi hoạt động của từng phương thức.
+Modul quản lý tài khoản và modul chơi với máy có biểu đồ hoạt động; modul xem bảng xếp hạng và modul thách đấu và đấu đối kháng chỉ trình bày kịch bản phiên bản 3 và biểu đồ tuần tự. Mỗi hành động trong biểu đồ hoạt động ứng với một phương thức đã thiết kế ở mục 4; phần xử lý tại mỗi lớp là một khung, phương thức của lớp DAO, lớp quản lý và lớp xử lý được ghi ở ghi chú bên cạnh. Trong kịch bản phiên bản 3 và biểu đồ tuần tự, các bước gán từng thuộc tính khi đóng gói lớp thực thể được lược bỏ cho gọn. Tên hành động là tên phương thức đã thiết kế; khung kích hoạt thể hiện phạm vi hoạt động của từng phương thức.
 
 ### a. Modul quản lý tài khoản
 
@@ -301,10 +301,6 @@ Kịch bản phiên bản 3:
 
 ### b. Modul xem bảng xếp hạng
 
-![Hình 3.18: Biểu đồ hoạt động modul xem bảng xếp hạng](vp/png/activity-m2.png)
-
-*Hình 3.18: Biểu đồ hoạt động modul xem bảng xếp hạng*
-
 Kịch bản phiên bản 3:
 
 <!-- BEGIN v3-m2 -->
@@ -342,15 +338,15 @@ Kịch bản phiên bản 3:
 32. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m2 -->
 
-![Hình 3.19: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
+![Hình 3.18: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
 
-*Hình 3.19: Biểu đồ tuần tự modul xem bảng xếp hạng*
+*Hình 3.18: Biểu đồ tuần tự modul xem bảng xếp hạng*
 
 ### c. Modul chơi với máy
 
-![Hình 3.20: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
+![Hình 3.19: Biểu đồ hoạt động modul chơi với máy](uml/pha3/activity-m3.png)
 
-*Hình 3.20: Biểu đồ hoạt động modul chơi với máy*
+*Hình 3.19: Biểu đồ hoạt động modul chơi với máy*
 
 Kịch bản phiên bản 3:
 
@@ -410,15 +406,11 @@ Kịch bản phiên bản 3:
 52. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m3 -->
 
-![Hình 3.21: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
+![Hình 3.20: Biểu đồ tuần tự modul chơi với máy](uml/pha3/seq-m3.png)
 
-*Hình 3.21: Biểu đồ tuần tự modul chơi với máy*
+*Hình 3.20: Biểu đồ tuần tự modul chơi với máy*
 
 ### d. Modul thách đấu và đấu đối kháng
-
-![Hình 3.22: Biểu đồ hoạt động modul thách đấu và đấu đối kháng](vp/png/activity-m4.png)
-
-*Hình 3.22: Biểu đồ hoạt động modul thách đấu và đấu đối kháng*
 
 Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; mỗi lớp giao diện và `ServerConnection` có một bản trên mỗi máy, mỗi người chơi có một `ClientHandler` riêng trên server):
 
@@ -564,19 +556,19 @@ Kịch bản phiên bản 3 (người chơi A thách đấu người chơi B; m�
 138. Lớp `LobbyActivity` hiển thị danh sách người chơi online đã cập nhật điểm cho A và B, kèm thông báo "A đã dừng chơi" cho B.
 <!-- END v3-m4 -->
 
-Biểu đồ tuần tự vẽ đủ các bước 1–138 ở trên trong một biểu đồ, kể cả vòng lặp chơi ván (bước 74–96, thuộc phần của Dev 1); vì dài nên ảnh được cắt thành ba phần, mỗi phần lặp lại hàng đầu lifeline (Hình 3.23, 3.24, 3.25). Nhánh tái đấu và nhánh thoát ván ở cuối mục.
+Biểu đồ tuần tự vẽ đủ các bước 1–138 ở trên trong một biểu đồ, kể cả vòng lặp chơi ván (bước 74–96, thuộc phần của Dev 1); vì dài nên ảnh được cắt thành ba phần, mỗi phần lặp lại hàng đầu lifeline (Hình 3.21, 3.22, 3.23). Nhánh tái đấu và nhánh thoát ván ở cuối mục.
 
-![Hình 3.23: Biểu đồ tuần tự modul thách đấu, phần 1/3](vp/png/seq-m4-full-1.png)
+![Hình 3.21: Biểu đồ tuần tự modul thách đấu, phần 1/3](vp/png/seq-m4-full-1.png)
 
-*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 1/3)*
+*Hình 3.21: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 1/3)*
 
-![Hình 3.24: Biểu đồ tuần tự modul thách đấu, phần 2/3](vp/png/seq-m4-full-2.png)
+![Hình 3.22: Biểu đồ tuần tự modul thách đấu, phần 2/3](vp/png/seq-m4-full-2.png)
 
-*Hình 3.24: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 2/3)*
+*Hình 3.22: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 2/3)*
 
-![Hình 3.25: Biểu đồ tuần tự modul thách đấu, phần 3/3](vp/png/seq-m4-full-3.png)
+![Hình 3.23: Biểu đồ tuần tự modul thách đấu, phần 3/3](vp/png/seq-m4-full-3.png)
 
-*Hình 3.25: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 3/3)*
+*Hình 3.23: Biểu đồ tuần tự modul thách đấu và đấu đối kháng (phần 3/3)*
 
 Ngoại lệ 13a của kịch bản v1 (cả hai người chơi chọn tái đấu) có kịch bản phiên bản 3 riêng, thay cho phần 3 từ bước 106 (sau khi `ResultDialog` hiện lên ở bước 105). Kịch bản đánh số lại từ 1:
 
@@ -618,11 +610,11 @@ Ngoại lệ 13a của kịch bản v1 (cả hai người chơi chọn tái đ�
 35. Lớp `MatchActivity` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B.
 <!-- END v3-m4-rematch -->
 
-Biểu đồ tuần tự của nhánh tái đấu như Hình 3.26.
+Biểu đồ tuần tự của nhánh tái đấu như Hình 3.24.
 
-![Hình 3.26: Biểu đồ tuần tự modul thách đấu, nhánh tái đấu](vp/png/seq-m4-4.png)
+![Hình 3.24: Biểu đồ tuần tự modul thách đấu, nhánh tái đấu](vp/png/seq-m4-4.png)
 
-*Hình 3.26: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh tái đấu*
+*Hình 3.24: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh tái đấu*
 
 Ngoại lệ 9a của kịch bản v1 (A bấm Thoát giữa ván) có kịch bản phiên bản 3 riêng, thay cho vòng lặp chơi ván và phần 3: người thoát được coi như đã chọn dừng nên không được hỏi tái đấu, còn người thắng chỉ có nút Về sảnh. Kịch bản đánh số lại từ 1:
 
@@ -695,11 +687,11 @@ Ngoại lệ 9a của kịch bản v1 (A bấm Thoát giữa ván) có kịch b�
 66. Lớp `LobbyActivity` hiển thị danh sách người chơi online đã cập nhật cho A và B.
 <!-- END v3-m4-quit -->
 
-Biểu đồ tuần tự của nhánh thoát ván như Hình 3.27.
+Biểu đồ tuần tự của nhánh thoát ván như Hình 3.25.
 
-![Hình 3.27: Biểu đồ tuần tự modul thách đấu, nhánh thoát ván](vp/png/seq-m4-5.png)
+![Hình 3.25: Biểu đồ tuần tự modul thách đấu, nhánh thoát ván](vp/png/seq-m4-5.png)
 
-*Hình 3.27: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh thoát ván*
+*Hình 3.25: Biểu đồ tuần tự modul thách đấu và đấu đối kháng, nhánh thoát ván*
 
 Các cách kết thúc ván còn lại:
 
@@ -709,17 +701,17 @@ Các cách kết thúc ván còn lại:
 
 ## 6. Thiết kế triển khai
 
-Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.28.
+Các lớp được chia vào gói theo tầng: phía client là `view` và `network`; phía server là `controller` và `dao`; phần dùng chung `core` gồm `model` (lớp thực thể), `logic` (xử lý bàn chơi) và `protocol` (message). Gói gốc là `ptit.e23cnpm01.pikachu`. Biểu đồ gói như Hình 3.26.
 
-![Hình 3.28: Biểu đồ gói](vp/png/package.png)
+![Hình 3.26: Biểu đồ gói](vp/png/package.png)
 
-*Hình 3.28: Biểu đồ gói*
+*Hình 3.26: Biểu đồ gói*
 
-Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.29.
+Mỗi người chơi cài ứng dụng trên một thiết bị Android; các thiết bị kết nối tới máy chủ game qua TCP; máy chủ game truy cập CSDL qua JDBC. Biểu đồ triển khai như Hình 3.27.
 
-![Hình 3.29: Biểu đồ triển khai](vp/png/deployment.png)
+![Hình 3.27: Biểu đồ triển khai](vp/png/deployment.png)
 
-*Hình 3.29: Biểu đồ triển khai*
+*Hình 3.27: Biểu đồ triển khai*
 
 ## 7. Thiết kế giao thức truyền thông
 
@@ -760,11 +752,11 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `REMATCH_REPLY` | `roomId`, `accept`; gửi lại được để đổi từ đồng ý sang từ chối |
 | S → C | `OPPONENT_LEFT` | không có dữ liệu; gửi cho người còn ở dialog kết quả khi đối thủ chọn Dừng, hết thời gian trả lời hoặc mất kết nối |
 
-Luồng message chính giữa hai client và server như Hình 3.30.
+Luồng message chính giữa hai client và server như Hình 3.28.
 
-![Hình 3.30: Luồng message giữa hai client và server](vp/png/protocol.png)
+![Hình 3.28: Luồng message giữa hai client và server](vp/png/protocol.png)
 
-*Hình 3.30: Luồng message giữa hai client và server*
+*Hình 3.28: Luồng message giữa hai client và server*
 
 Xử lý các tình huống bất thường:
 
@@ -782,11 +774,11 @@ Xử lý các tình huống bất thường:
 
 ### a. Kiểm tra đường nối hai ô
 
-Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.31.
+Hai ô nối được khi cùng hình và có một đường gồm tối đa 3 đoạn thẳng (tối đa 2 lần rẽ) đi theo hàng, cột, chỉ qua các ô trống; đường được phép đi trên vòng viền trống của lưới 12x12. Các dạng đường hợp lệ và một ví dụ không hợp lệ như Hình 3.29.
 
-![Hình 3.31: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
+![Hình 3.29: Các dạng đường nối hai ô](uml/pha3/path-examples.png)
 
-*Hình 3.31: Các dạng đường nối hai ô*
+*Hình 3.29: Các dạng đường nối hai ô*
 
 `PathFinder.checkPath()` dùng tìm kiếm theo chiều rộng, mỗi trạng thái là một ô kèm hướng đi và số đoạn đã dùng. Từ mỗi trạng thái, thuật toán đi thẳng theo từng hướng qua các ô trống; đổi hướng thì tăng số đoạn; dừng nhánh khi số đoạn vượt 3, gặp ô có hình, ra khỏi lưới, hoặc ô đó đã được tới bằng số đoạn không lớn hơn.
 

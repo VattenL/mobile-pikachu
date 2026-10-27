@@ -28,6 +28,7 @@ Mọi tài nguyên lấy từ bên ngoài (thư viện, hình ảnh, phông ch�
 | PlantUML (máy chủ plantuml.com) | Vẽ sơ đồ trong `docs/uml/` | https://plantuml.com | Mã nguồn sơ đồ do nhóm viết; ảnh PNG được máy chủ PlantUML sinh ra |
 | Visual Paradigm Community Edition 17.3 | Vẽ sơ đồ trong `docs/vp/` (`pikachu.vpp`, ảnh `docs/vp/png/`) | https://www.visual-paradigm.com | Bản miễn phí cho mục đích phi thương mại; ảnh xuất ra có watermark "Powered By Visual Paradigm Community Edition" |
 | Plugin MCP cho Visual Paradigm (fork `thanhtrnnn/vp-mcp` của plugin của Manoel Brunnen) | `docs/vp/build_vp.py` gọi plugin để dựng sơ đồ | https://github.com/thanhtrnnn/vp-mcp | Apache License 2.0; bản cài trên máy đã sửa để chỉ nhận kết nối từ localhost |
+| Microsoft Excel (Microsoft 365), openpyxl 3.1.5, pywin32, PyMuPDF | Vẽ giao diện các màn hình của Dev 2 trong `docs/ui/` (`giao-dien.xlsx`, ảnh `docs/ui/png/`) bằng `docs/ui/build_ui.py` | https://openpyxl.readthedocs.io, https://github.com/mhammond/pywin32, https://pymupdf.readthedocs.io | openpyxl: MIT; pywin32: PSF; PyMuPDF: AGPL 3.0 (chỉ dùng trong script dựng tài liệu, không nằm trong ứng dụng); Excel dùng bản quyền của người dùng |
 | Bài giảng *Thực tập tốt nghiệp 2: Công nghệ phần mềm* (BG HP TTTN 2 CNPM), PTIT, 2020 | Phương pháp, khuôn các pha trong `docs/`; checklist rà soát và kiểm thử ở `docs/pha5-ra-soat-kiem-thu.md` rút gọn từ Bảng 6.x của bài giảng | Tài liệu học phần | Tài liệu nội bộ của học phần |
 | Đề bài | `de_bai.md` | Đề bài tập lớn của học phần | Luật chơi, cách tính điểm, tiêu chí xếp hạng |
 

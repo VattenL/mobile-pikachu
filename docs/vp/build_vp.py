@@ -3,7 +3,7 @@
 Nguồn nội dung, không chép tay:
 - use case, lớp, trạng thái: đọc từ các file .puml trong docs/uml/pha<N>/;
 - biểu đồ tuần tự pha thiết kế: danh sách bước trong docs/uml/pha3/gen_seq.py;
-- biểu đồ tuần tự pha phân tích (kịch bản v2), hoạt động, gói, triển khai, CSDL: khai báo ở cuối file này.
+- biểu đồ tuần tự pha phân tích (kịch bản v2), gói, triển khai, CSDL: khai báo ở cuối file này.
 
 Cần Visual Paradigm đang mở với plugin MCP (http://127.0.0.1:2026/mcp).
 
@@ -435,45 +435,6 @@ def place_lifelines(name, ref, kinds):
            width=width[lifeline], height=height[lifeline])
 
 
-# ---------------------------------------------------------------- activity
-
-def lane_of(title):
-    """"Xử lí tại server: MatchController.endMatch()" -> làn "server: MatchController";
-    "Xử lí tại MainActivity (máy A)" -> làn "MainActivity"."""
-    rest = title.removeprefix("Xử lí tại ")
-    return re.sub(r"\.\w+\(\)|\s*\(.*\)$", "", rest).strip()
-
-
-def build_activity(name, frames, flows):
-    """frames: [(tiêu đề "Xử lí tại ...", [(kiểu, tên)...])]; kiểu: action | initial | final | decision | merge | dao.
-    "dao" là nút "XxxDAO: method()" nối hai chiều với nút đứng trước nó. flows: (từ, tới, điều kiện).
-    Mỗi lớp xử lí là một làn (swimlane); khung không tiêu đề (nút bắt đầu, kết thúc) theo làn kề nó."""
-    lanes = [lane_of(t) if t else None for t, _ in frames]
-    for i in range(len(lanes)):
-        if lanes[i] is None:
-            lanes[i] = lanes[i + 1] if i + 1 < len(lanes) and lanes[i + 1] else lanes[i - 1]
-    vp("createActivityDiagram", diagramName=name)
-    for lane in dict.fromkeys(lanes):
-        vp("addActivityPartition", diagramName=name, partitionName=lane, x=0, y=0, width=0, height=0)
-    for lane, (_, nodes) in zip(lanes, frames):
-        for kind, node in nodes:
-            if kind in ("action", "dao"):
-                vp("addActivityAction", diagramName=name, actionName=node, partitionName=lane, x=0, y=0)
-            else:
-                vp("addActivityControlNode", diagramName=name, kind=kind, nodeName=node, partitionName=lane,
-                   x=0, y=0)
-    for a, b, guard in flows:
-        vp("addActivityFlow", diagramName=name, fromNode=a, toNode=b, guard=guard, twoWay=False)
-    prev = None
-    for _, nodes in frames:
-        for kind, node in nodes:
-            if kind == "dao":
-                vp("addActivityFlow", diagramName=name, fromNode=prev, toNode=node, guard="", twoWay=True)
-            else:
-                prev = node
-    vp("autoLayoutDiagram", diagramName=name)
-
-
 # ================================================================ nội dung
 
 # ---- Pha 2: biểu đồ tuần tự pha phân tích, theo kịch bản v2 (pha2-phan-tich.md mục 5)
@@ -609,7 +570,7 @@ STATE_M4_POS = {
     "Hiển thị ResultDialog": (420, 800),
 }
 
-# ---- Pha 3: biểu đồ tuần tự M4 đầy đủ (Hình 3.23-3.25): mọi lifeline của các phần, actor đứng trước
+# ---- Pha 3: biểu đồ tuần tự M4 đầy đủ (Hình 3.21-3.23): mọi lifeline của các phần, actor đứng trước
 
 M4_FULL_PARTS = sorted(gen_seq.M4A_PARTS + [p for p in gen_seq.M4BC_PARTS if p[1] not in {q[1] for q in gen_seq.M4A_PARTS}],
                        key=lambda p: ["actor", "boundary", "control", "entity"].index(p[0]))
@@ -628,154 +589,6 @@ SEQ_M4_X = {"Người chơi A": 72, "Người chơi B": 158, "MainActivity": 263
 # bản của Dev 2: thách đấu rồi kết thúc ván, bỏ các bước chơi ván (Dev 1) nhưng giữ số bước của kịch bản
 SEQA_M4_DEV2 = SEQA_M4_1 + [("skip", gen_seq.count(SEQA_M4_PLAY))] + SEQA_M4_2
 SEQ_M4_DEV2 = gen_seq.M4A + [("skip", gen_seq.count(gen_seq.M4B))] + gen_seq.M4C
-
-# ---- Pha 3: biểu đồ hoạt động
-
-ACT_M2 = [
-    ("", [("initial", "Bắt đầu")]),
-    ("Xử lí tại MainActivity", [("action", "Hiển thị giao diện chính")]),
-    ("Xử lí tại RankingActivity", [("action", "Gửi message GET_RANKING")]),
-    ("Xử lí tại server: RankingController.handleGetRanking()", [
-        ("action", "Lấy bảng xếp hạng"), ("dao", "PlayerRankingDAO: getRanking()"),
-        ("decision", "Yêu cầu trang của người chơi?"),
-        ("action", "Tìm dòng của người chơi, lấy trang chứa dòng đó"),
-        ("action", "Lấy các dòng của trang được yêu cầu"), ("merge", "#1"),
-        ("action", "Gửi message RANKING")]),
-    ("Xử lí tại RankingActivity (hiển thị)", [
-        ("decision", "Hỏi vị trí mà chưa có trong bảng?"), ("action", "Báo chưa có trong bảng xếp hạng"),
-        ("action", "Hiển thị trang, tô dòng của người chơi"), ("merge", "#3"), ("decision", "Người chơi chọn gì?")]),
-    ("Xử lí tại MainActivity (quay lại)", [("action", "Hiển thị giao diện chính #2")]),
-    ("", [("final", "Kết thúc")]),
-]
-ACT_M2_FLOWS = [
-    ("Bắt đầu", "Hiển thị giao diện chính", ""),
-    ("Hiển thị giao diện chính", "Gửi message GET_RANKING", "click xem bảng xếp hạng"),
-    ("Gửi message GET_RANKING", "Lấy bảng xếp hạng", ""),
-    ("Lấy bảng xếp hạng", "Yêu cầu trang của người chơi?", ""),
-    ("Yêu cầu trang của người chơi?", "Tìm dòng của người chơi, lấy trang chứa dòng đó", "mine"),
-    ("Yêu cầu trang của người chơi?", "Lấy các dòng của trang được yêu cầu", "số trang"),
-    ("Tìm dòng của người chơi, lấy trang chứa dòng đó", "#1", ""),
-    ("Lấy các dòng của trang được yêu cầu", "#1", ""),
-    ("#1", "Gửi message RANKING", ""),
-    ("Gửi message RANKING", "Hỏi vị trí mà chưa có trong bảng?", ""),
-    ("Hỏi vị trí mà chưa có trong bảng?", "Báo chưa có trong bảng xếp hạng", "mine, me rỗng"),
-    ("Hỏi vị trí mà chưa có trong bảng?", "Hiển thị trang, tô dòng của người chơi", "còn lại"),
-    ("Báo chưa có trong bảng xếp hạng", "#3", ""),
-    ("Hiển thị trang, tô dòng của người chơi", "#3", ""),
-    ("#3", "Người chơi chọn gì?", ""),
-    ("Người chơi chọn gì?", "Gửi message GET_RANKING", "click chuyển trang hoặc vị trí của tôi"),
-    ("Người chơi chọn gì?", "Hiển thị giao diện chính #2", "click quay lại"),
-    ("Hiển thị giao diện chính #2", "Kết thúc", ""),
-]
-
-ACT_M4 = [
-    ("", [("initial", "Bắt đầu")]),
-    ("Xử lí tại MainActivity (máy A)", [("action", "Hiển thị giao diện chính")]),
-    ("Xử lí tại LobbyActivity (máy A)", [("action", "Gửi GET_ONLINE_LIST"), ("merge", "#4")]),
-    ("Xử lí tại server: ChallengeController.handleGetOnlineList()", [
-        ("action", "Lấy danh sách online"), ("dao", "OnlinePlayerManager: getOnlinePlayers()"),
-        ("dao", "PlayerRankingDAO: getTotalPoints()"), ("action", "Gửi ONLINE_LIST cho A")]),
-    ("Xử lí tại LobbyActivity (hiển thị)", [("action", "Hiển thị danh sách người chơi online")]),
-    ("Xử lí tại ChallengeConfirmDialog (máy A)", [
-        ("action", "Hiển thị dialog xác nhận thách đấu B"), ("decision", "A chọn gì?"),
-        ("action", "Gửi INVITE, hiện popup chờ 30 giây"), ("action", "Đóng popup, báo lý do")]),
-    ("Xử lí tại server: ChallengeController.handleInvite()", [
-        ("action", "Ghi lời mời, hẹn giờ 30 giây"), ("dao", "OnlinePlayerManager: sendInvitation()"),
-        ("decision", "B online và không bận?"), ("action", "Gửi INVITE_RECEIVED cho B"),
-        ("action", "Gửi INVITE_RESULT cho A")]),
-    ("Xử lí tại InvitationDialog (máy B)", [("action", "Hiển thị popup lời mời"), ("decision", "B trả lời?")]),
-    ("Xử lí tại server: ChallengeController.handleInviteReply()", [
-        ("action", "Gỡ lời mời"), ("dao", "OnlinePlayerManager: removeInvitation()"),
-        ("action", "Sinh đề bài"), ("dao", "BoardGenerator: generateBoard()"),
-        ("action", "Tạo phòng chơi"), ("dao", "MatchManager: createMatch()"),
-        ("action", "Chuyển A, B sang bận, đóng các lời mời khác"), ("dao", "OnlinePlayerManager: updateStatus()"),
-        ("action", "Gửi MATCH_START, gửi lại danh sách online")]),
-    ("Xử lí tại MatchActivity (A, B)", [
-        ("action", "Hiển thị bàn chơi, đồng hồ"), ("action", "Nhận hai ô được click, gửi MOVE")]),
-    ("Xử lí tại server: MatchController.handleMove()", [
-        ("action", "Kiểm tra đường nối trên bàn của người gửi"), ("dao", "PathFinder: checkPath()"),
-        ("action", "Xóa hai ô, kiểm tra hết ô"), ("dao", "Board: removePair(), isCleared()"),
-        ("action", "Kiểm tra bế tắc, xáo riêng bàn đó nếu cần"),
-        ("dao", "PathFinder: findAvailablePair(), BoardGenerator: shuffle()"),
-        ("action", "Gửi MOVE_RESULT, OPPONENT_PROGRESS"),
-        ("decision", "Có người xóa hết ô hoặc hết giờ?")]),
-    ("Xử lí tại server: MatchController.endMatch()", [
-        ("action", "Tính kết quả và điểm"), ("action", "Lưu ván đấu và hai kết quả"),
-        ("dao", "MatchDAO: saveMatch()"), ("action", "Gửi MATCH_END cho A và B")]),
-    ("Xử lí tại ResultDialog (A, B)", [("action", "Hiển thị kết quả, hỏi tái đấu trong 30 giây")]),
-    ("Xử lí tại server: MatchController.handleRematchReply()", [
-        ("decision", "Hai người chọn gì?"),
-        ("action", "Bỏ phòng cũ, sinh đề mới, tạo phòng mới"), ("dao", "MatchManager: removeRoom(), createMatch()"),
-        ("action", "Chuyển A, B về rỗi, bỏ phòng"), ("dao", "OnlinePlayerManager: updateStatus() #2"),
-        ("action", "Gửi OPPONENT_LEFT cho B"), ("action", "Gửi danh sách online mới"),
-        ("dao", "OnlinePlayerManager: getOnlinePlayers() #2"), ("dao", "PlayerRankingDAO: getTotalPoints() #2")]),
-    ("Xử lí tại LobbyActivity (A, B)", [("action", "Hiển thị danh sách online đã cập nhật")]),
-    ("", [("final", "Kết thúc")]),
-]
-ACT_M4_FLOWS = [
-    ("Bắt đầu", "Hiển thị giao diện chính", ""),
-    ("Hiển thị giao diện chính", "Gửi GET_ONLINE_LIST", "A click đấu đối kháng"),
-    ("Gửi GET_ONLINE_LIST", "Lấy danh sách online", ""),
-    ("Lấy danh sách online", "Gửi ONLINE_LIST cho A", ""),
-    ("Gửi ONLINE_LIST cho A", "#4", ""),
-    ("#4", "Hiển thị danh sách người chơi online", ""),
-    ("Hiển thị danh sách người chơi online", "Hiển thị dialog xác nhận thách đấu B", "click tên B không bận"),
-    ("Hiển thị dialog xác nhận thách đấu B", "A chọn gì?", ""),
-    ("A chọn gì?", "#4", "click hủy"),
-    ("A chọn gì?", "Gửi INVITE, hiện popup chờ 30 giây", "click xác nhận"),
-    ("Gửi INVITE, hiện popup chờ 30 giây", "Ghi lời mời, hẹn giờ 30 giây", ""),
-    ("Ghi lời mời, hẹn giờ 30 giây", "B online và không bận?", ""),
-    ("B online và không bận?", "Gửi INVITE_RECEIVED cho B", "có"),
-    ("B online và không bận?", "Gửi INVITE_RESULT cho A", "không"),
-    ("Gửi INVITE_RECEIVED cho B", "Hiển thị popup lời mời", ""),
-    ("Hiển thị popup lời mời", "B trả lời?", ""),
-    ("B trả lời?", "Gửi INVITE_RESULT cho A", "reject, hết 30 giây hoặc A hủy"),
-    ("Gửi INVITE_RESULT cho A", "Đóng popup, báo lý do", ""),
-    ("Đóng popup, báo lý do", "#4", ""),
-    ("B trả lời?", "Gỡ lời mời", "accept"),
-    ("Gỡ lời mời", "Sinh đề bài", ""),
-    ("Sinh đề bài", "Tạo phòng chơi", ""),
-    ("Tạo phòng chơi", "Chuyển A, B sang bận, đóng các lời mời khác", ""),
-    ("Chuyển A, B sang bận, đóng các lời mời khác", "Gửi MATCH_START, gửi lại danh sách online", ""),
-    ("Gửi MATCH_START, gửi lại danh sách online", "Hiển thị bàn chơi, đồng hồ", ""),
-    ("Hiển thị bàn chơi, đồng hồ", "Nhận hai ô được click, gửi MOVE", ""),
-    ("Nhận hai ô được click, gửi MOVE", "Kiểm tra đường nối trên bàn của người gửi", ""),
-    ("Kiểm tra đường nối trên bàn của người gửi", "Xóa hai ô, kiểm tra hết ô", ""),
-    ("Xóa hai ô, kiểm tra hết ô", "Kiểm tra bế tắc, xáo riêng bàn đó nếu cần", ""),
-    ("Kiểm tra bế tắc, xáo riêng bàn đó nếu cần", "Gửi MOVE_RESULT, OPPONENT_PROGRESS", ""),
-    ("Gửi MOVE_RESULT, OPPONENT_PROGRESS", "Có người xóa hết ô hoặc hết giờ?", ""),
-    ("Có người xóa hết ô hoặc hết giờ?", "Hiển thị bàn chơi, đồng hồ", "chưa"),
-    ("Có người xóa hết ô hoặc hết giờ?", "Tính kết quả và điểm", "rồi"),
-    ("Tính kết quả và điểm", "Lưu ván đấu và hai kết quả", ""),
-    ("Lưu ván đấu và hai kết quả", "Gửi MATCH_END cho A và B", ""),
-    ("Gửi MATCH_END cho A và B", "Hiển thị kết quả, hỏi tái đấu trong 30 giây", ""),
-    ("Hiển thị kết quả, hỏi tái đấu trong 30 giây", "Hai người chọn gì?", ""),
-    ("Hai người chọn gì?", "Bỏ phòng cũ, sinh đề mới, tạo phòng mới", "cả hai tái đấu"),
-    ("Bỏ phòng cũ, sinh đề mới, tạo phòng mới", "Hiển thị bàn chơi, đồng hồ", ""),
-    ("Hai người chọn gì?", "Chuyển A, B về rỗi, bỏ phòng", "A dừng hoặc hết 30 giây"),
-    ("Chuyển A, B về rỗi, bỏ phòng", "Gửi OPPONENT_LEFT cho B", ""),
-    ("Gửi OPPONENT_LEFT cho B", "Gửi danh sách online mới", ""),
-    ("Gửi danh sách online mới", "Hiển thị danh sách online đã cập nhật", ""),
-    ("Hiển thị danh sách online đã cập nhật", "Kết thúc", ""),
-]
-
-# Bản cho tài liệu của Dev 2: vòng lặp chơi ván (MatchActivity, MatchController.handleMove(), phần của Dev 1)
-# thu lại thành một hành động
-ACT_M4_PLAY = "Chơi ván (phần của Dev 1)"
-ACT_M4_DEV2 = [f if not f[0].startswith(("Xử lí tại MatchActivity", "Xử lí tại server: MatchController.handleMove()"))
-               else None for f in ACT_M4]
-ACT_M4_DEV2[ACT_M4_DEV2.index(None)] = ("Xử lí tại MatchActivity (A, B)", [
-    ("action", "Hiển thị bàn chơi, đồng hồ"), ("action", ACT_M4_PLAY)])
-ACT_M4_DEV2 = [f for f in ACT_M4_DEV2 if f]
-_PLAY_NODES = {"Nhận hai ô được click, gửi MOVE", "Kiểm tra đường nối trên bàn của người gửi", "Xóa hai ô, kiểm tra hết ô",
-               "Kiểm tra bế tắc, xáo riêng bàn đó nếu cần", "Gửi MOVE_RESULT, OPPONENT_PROGRESS",
-               "Có người xóa hết ô hoặc hết giờ?"}
-_FIRST_PLAY = next(i for i, f in enumerate(ACT_M4_FLOWS) if f[0] in _PLAY_NODES or f[1] in _PLAY_NODES)
-_KEPT = [f for f in ACT_M4_FLOWS if f[0] not in _PLAY_NODES and f[1] not in _PLAY_NODES]
-ACT_M4_DEV2_FLOWS = (_KEPT[:_FIRST_PLAY]
-                     + [("Hiển thị bàn chơi, đồng hồ", ACT_M4_PLAY, ""),
-                        (ACT_M4_PLAY, "Tính kết quả và điểm", "một người xóa hết ô hoặc hết giờ")]
-                     + _KEPT[_FIRST_PLAY:])
 
 # ---- Pha 3: luồng message giữa hai client và server (protocol.puml)
 
@@ -876,39 +689,115 @@ def build_erd(name):
 
 # ---- Pha 3: biểu đồ gói (package.puml)
 
-PACKAGES = {
-    "app (Android client)": {
-        "view": ["LoginActivity", "RegisterActivity", "BaseActivity", "MainActivity", "LobbyActivity", "RankingActivity",
-                 "DifficultyActivity", "BotGameActivity", "MatchActivity", "ChallengeConfirmDialog",
-                 "InvitationDialog", "ResultDialog", "BotResultDialog", "BoardView"],
-        "network": ["ServerConnection", "MessageListener", "ClientSession"]},
-    "server (Java)": {
-        "controller": ["GameServer", "ClientHandler", "LoginController", "RankingController", "ChallengeController",
-                       "MatchController", "OnlinePlayerManager", "MatchManager", "MatchRoom"],
-        "dao": ["DAO", "PlayerDAO", "PlayerRankingDAO", "MatchDAO"]},
-    "core (Java thuần, dùng chung)": {
-        "model": ["Player", "PlayerRanking", "Match", "MatchResult", "Board", "Cell"],
-        "logic": ["PathFinder", "BoardGenerator", "Bot", "Difficulty"],
-        "protocol": ["Message", "MessageType"]},
-}
+# Bố cục đặt theo tầng, từ trên xuống: app, core, server (mũi tên <<use>> của app đi xuống, của server đi lên,
+# đều vào core); lớp trong mỗi gói xếp thành lưới để hình gần vuông, vừa một trang dọc mà chữ không quá nhỏ. Các gói
+# cấp 1 rộng bằng nhau, gói con dàn đều từ mép trái tới mép phải (protocol nằm dưới network, dao bên phải controller).
+# Chỉ ghim vị trí các khung và lớp; đường nối để VP tự vẽ (không route_lines) cho dễ chỉnh tay.
+# gói cấp 1: (tên, [(gói con, [hàng lớp...])...])
+PACKAGES = [
+    ("app (Android client)", [
+        ("view", [["BaseActivity", "MainActivity", "LoginActivity", "RegisterActivity", "RankingActivity"],
+                  ["DifficultyActivity", "BotGameActivity", "BotResultDialog", "BoardView", "LobbyActivity"],
+                  ["InvitationDialog", "MatchActivity", "ResultDialog", "ChallengeConfirmDialog"]]),
+        ("network", [["ServerConnection"], ["MessageListener"], ["ClientSession"]])]),
+    ("core (Java thuần, dùng chung)", [
+        ("logic", [["PathFinder", "BoardGenerator"], ["Bot", "Difficulty"]]),
+        ("model", [["Player", "PlayerRanking", "Match"], ["MatchResult", "Board", "Cell"]]),
+        ("protocol", [["Message"], ["MessageType"]])]),
+    ("server (Java)", [
+        ("controller", [["GameServer", "ClientHandler", "LoginController"],
+                        ["RankingController", "ChallengeController", "MatchController"],
+                        ["OnlinePlayerManager", "MatchManager", "MatchRoom"]]),
+        ("dao", [["DAO", "PlayerDAO"], ["PlayerRankingDAO", "MatchDAO"]])]),
+]
 PACKAGE_DEPS = [("view", "network"), ("view", "logic"), ("view", "model"), ("network", "protocol"),
                 ("controller", "dao"), ("controller", "logic"), ("controller", "protocol"), ("dao", "model"),
                 ("logic", "model"), ("network", "model"), ("controller", "model")]
+# lề trong khung, phần tên gói ở đầu khung, khoảng cách hai hàng lớp và khoảng trống giữa hai lớp cạnh nhau (plugin đẩy
+# hai ô lớp gần nhau hơn ~66 px ra), khoảng trống tối thiểu giữa hai gói con và giữa hai gói cấp 1 (chỗ cho mũi tên và
+# nhãn <<use>>), góc trên trái của gói đầu tiên
+PKG_PAD, PKG_HEAD, PKG_ROW, PKG_COLGAP, PKG_SUBGAP, PKG_GAP, PKG_X0, PKG_Y0 = 24, 46, 100, 72, 90, 110, 40, 40
+
+
+def _box_w(c):
+    return max(80, round(6.2 * len(c) + 6))  # độ rộng ô lớp VP vẽ vừa tên (ước lượng, chỉ để tính khung)
+
+
+def _package_frames():
+    """[(gói cấp 1, x, y, rộng, cao, [(gói con, x, y, rộng, cao, vị trí các cột, hàng lớp)...])...] theo PACKAGES."""
+    sized = []
+    for top, subs in PACKAGES:
+        boxes = []
+        for sub, rows in subs:
+            colw = [max(_box_w(r[j]) for r in rows if j < len(r)) for j in range(max(len(r) for r in rows))]
+            cw = [sum(colw[:j]) + PKG_COLGAP * j for j in range(len(colw))]  # vị trí từng cột trong khung
+            w = 2 * PKG_PAD + cw[-1] + colw[-1]
+            h = PKG_HEAD + (len(rows) - 1) * PKG_ROW + 40 + PKG_PAD
+            boxes.append((sub, w, h, cw, rows))
+        sized.append((top, boxes))
+    inner_w = max(sum(b[1] for b in boxes) + PKG_SUBGAP * (len(boxes) - 1) for _, boxes in sized)
+    frames, ty = [], PKG_Y0
+    for top, boxes in sized:
+        gap = (inner_w - sum(b[1] for b in boxes)) / max(1, len(boxes) - 1)
+        x, placed = PKG_X0 + PKG_PAD, []
+        for sub, w, h, cw, rows in boxes:
+            placed.append((sub, round(x), ty + PKG_HEAD, w, h, cw, rows))
+            x += w + gap
+        bottom = max(y + h for _, _, y, _, h, _, _ in placed)
+        frames.append((top, PKG_X0, ty, inner_w + 2 * PKG_PAD, bottom + PKG_PAD - ty, placed))
+        ty = bottom + PKG_PAD + PKG_GAP
+    return frames
+
+
+def place_package(name):
+    """Đặt các khung và lớp của biểu đồ gói theo PACKAGES. Mỗi lần thêm phần tử plugin lại xếp tầng cả biểu đồ, nên
+    đặt vị trí sau cùng: dời các gói cấp 1 ra chỗ trống (toạ độ <= 0 bị plugin hiểu là giữ nguyên), xếp lớp và
+    thu nhỏ khung từ trong ra ngoài, rồi mới dời gói cấp 1 về chỗ của nó. Khung kéo theo những gì nó chứa. Plugin đẩy
+    ô đè lên ô khác ra chỗ khác, nên các lớp của một gói được dời ra một hàng tạm bên dưới trước khi xếp lưới."""
+    def pos():
+        return {m[1]: (int(m[2]), int(m[3])) for m in re.finditer(
+            r"^\s*(?:Package|Class): (.+?) (-?\d+),(-?\d+) \d+x\d+", vp("getDiagramGeometry", diagramName=name), re.M)}
+
+    def put(elem, x, y, w=0, h=0):
+        vp("setElementBounds", diagramName=name, elementName=elem, x=x, y=y, width=w, height=h)
+
+    frames = _package_frames()
+    for i, (top, *_) in enumerate(frames):
+        put(top, 5000 + 3000 * i, 100)
+    for top, tx, ty, tw, th, boxes in frames:
+        for sub, x, y, w, h, cw, rows in boxes:
+            cur = pos()
+            sx, sy = cur[sub]
+            low = max(cur[c][1] for r in rows for c in r) + 200
+            for k, c in enumerate(c for r in rows for c in r):
+                put(c, sx + PKG_PAD + 200 * k, low)
+            for i, r in enumerate(rows):
+                for j, c in enumerate(r):
+                    put(c, sx + PKG_PAD + cw[j], sy + PKG_HEAD + i * PKG_ROW)
+            put(sub, sx, sy, w, h)
+        ox, oy = pos()[top]
+        for sub, x, y, w, h, _, _ in boxes:
+            put(sub, ox + x - tx, oy + y - ty)
+        put(top, ox, oy, tw, th)
+    for top, tx, ty, *_ in frames:
+        put(top, tx, ty)
+    vp("rerouteConnectors", diagramName=name)
 
 
 def build_package(name):
     vp("createPackageDiagram", diagramName=name)
-    for top, subs in PACKAGES.items():
+    for top, subs in PACKAGES:
         vp("addPackageElement", diagramName=name, packageName=top, parentPackage="", x=0, y=0, width=0, height=0,
            backgroundColor="")
-        for sub, classes in subs.items():
+        for sub, rows in subs:
             vp("addPackageElement", diagramName=name, packageName=sub, parentPackage=top, x=0, y=0, width=0,
                height=0, backgroundColor="")
-            for c in classes:
-                vp("addClassInPackage", diagramName=name, packageName=sub, className=c)
+            for r in rows:
+                for c in r:
+                    vp("addClassInPackage", diagramName=name, packageName=sub, className=c)
     for a, b in PACKAGE_DEPS:
         vp("addPackageDependency", diagramName=name, fromPackage=a, toPackage=b, kind="use")
-    vp("autoLayoutDiagram", diagramName=name)
+    place_package(name)
 
 
 # ---- Pha 3: biểu đồ triển khai (deployment.puml)
@@ -960,21 +849,18 @@ DIAGRAMS = [
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
     ("class-design-m2", "3.7 Lớp thiết kế M2 (27-10)", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2710", oblique_up=True)),
     ("class-design-m4", "3.16 Lớp thiết kế M4 (27-10)", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2710", oblique_up=True, rows=M4_ROWS)),
-    ("activity-m2", "3.18 Hoạt động M2 (27-10)", lambda n: build_activity(n, ACT_M2, ACT_M2_FLOWS)),
     ("seq-m2", "3.19 Tuần tự thiết kế M2",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
-    ("activity-m4", "3.22 Hoạt động M4 (27-10)", lambda n: build_activity(n, ACT_M4, ACT_M4_FLOWS)),
     ("seq-m4-4", "3.26 Tuần tự thiết kế M4 (tái đấu) (27-10)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),
     ("seq-m4-5", "3.27 Tuần tự thiết kế M4 (thoát ván)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4E_PARTS), seq_steps(gen_seq.M4E_PARTS, gen_seq.M4E))),
-    ("package", "3.27 Biểu đồ gói (27-10)", build_package),
+    ("package", "3.26 Biểu đồ gói (dọc)", build_package),
     ("deployment", "3.28 Biểu đồ triển khai (27-10)", build_deployment),
     ("protocol", "3.29 Luồng message (27-10)", build_protocol),
-    # bản hoạt động M4 cho tài liệu của Dev 2 (docs/dev2/build_gdoc.py, không có trong md); hai biểu đồ tuần tự M4
-    # vẽ đủ mọi bước trong một hình, ảnh được cắt thành nhiều phần theo SLICES (Hình 2.13-2.14, 3.23-3.25).
+    # hai biểu đồ tuần tự M4 vẽ đủ mọi bước trong một hình, ảnh được cắt thành nhiều phần theo SLICES
+    # (Hình 2.13-2.14, 3.21-3.23).
     # Tên biểu đồ trong VP còn chữ "Thử:" từ lần dựng đầu; giữ nguyên để --export tìm được trong pikachu.vpp đã chỉnh tay
-    ("activity-m4-dev2", "Hoạt động M4 (bản Dev 2) (27-10)", lambda n: build_activity(n, ACT_M4_DEV2, ACT_M4_DEV2_FLOWS)),
     ("seq-analysis-m4-full", "Thử: tuần tự phân tích M4 đầy đủ (27-10)",
      lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_1 + SEQA_M4_PLAY + SEQA_M4_2, xs=SEQA_M4_X)),
     ("seq-m4-full", "Thử: tuần tự thiết kế M4 đầy đủ (27-10)",
@@ -995,7 +881,7 @@ SLICES = {"seq-analysis-m4-full": 2, "seq-m4-full": 3, "seq-analysis-m4-dev2": 2
 
 # biểu đồ có đường nối vẽ lại bằng tidy.route_lines() sau khi dựng: mỗi đường tối đa 3 đoạn (yêu cầu của người dùng)
 TIDY = {"class-entity", "class-analysis-m2", "class-analysis-m4", "state-m2", "state-m4", "class-design-entity",
-        "class-design-m2", "class-design-m4", "activity-m2", "activity-m4", "activity-m4-dev2"}
+        "class-design-m2", "class-design-m4"}
 
 
 def export(name, key):

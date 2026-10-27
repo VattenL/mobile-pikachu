@@ -146,7 +146,7 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 
 #### 3.3.2. Thiết kế hoạt động (§4.3.2)
 
-- **Bước 1:** biểu đồ hoạt động cho mỗi modul, mỗi hành động ứng với một phương thức trong biểu đồ lớp thiết kế.
+- **Bước 1:** biểu đồ hoạt động, mỗi hành động ứng với một phương thức trong biểu đồ lớp thiết kế. Giảng viên chỉ yêu cầu một trong hai loại, biểu đồ hoạt động hoặc biểu đồ tuần tự (2026-10-27): M2 và M4 chỉ dùng biểu đồ tuần tự; M1, M3 do Dev 1 quyết định.
 - **Bước 2:** kịch bản v3 và biểu đồ tuần tự thiết kế; tên hành động là tên phương thức đã thiết kế, thể hiện phạm vi hoạt động của từng phương thức.
 
 #### 3.3.3. Thiết kế triển khai (§4.3.3)
