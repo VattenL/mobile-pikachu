@@ -334,12 +334,13 @@ def build_state(name, src, pos=None):
 
 # ---------------------------------------------------------------- sequence
 
-def build_sequence(name, parts, steps, start=1):
+def build_sequence(name, parts, steps, start=1, xs=None):
     """parts: (kiểu, tên lifeline). steps theo định dạng của gen_seq.py; ("msg2", nguồn, [đích...], nhãn) vẽ
-    một bước kịch bản thành nhiều mũi tên (23a, 23b) khi một lớp hiển thị cho cả hai người chơi."""
+    một bước kịch bản thành nhiều mũi tên (23a, 23b) khi một lớp hiển thị cho cả hai người chơi; ("skip", k) bỏ
+    qua k số bước (phần của dev khác không vẽ). xs: {lifeline: x} của bản mẫu (place_lifelines)."""
     vp("createSequenceDiagram", diagramName=name)
     parts = sorted(parts, key=lambda p: p[0] != "actor")  # mọi actor (người chơi A, B) đứng bên trái
-    used = {x for st in steps if st[0] not in ("loop", "end", "deact")
+    used = {x for st in steps if st[0] not in ("loop", "end", "deact", "skip")
             for x in [st[1], *(st[2] if isinstance(st[2], list) else [st[2]])] if x}
     for kind, lifeline in parts:
         if lifeline not in used:
@@ -348,6 +349,9 @@ def build_sequence(name, parts, steps, start=1):
            lifelineType=kind, alias="")
     n, loops = start, []
     for st in steps:
+        if st[0] == "skip":
+            n += st[1]
+            continue
         if st[0] == "loop":
             loops.append([st[1], n])
             continue
@@ -371,6 +375,8 @@ def build_sequence(name, parts, steps, start=1):
             vp("addMessage", diagramName=name, fromLifeline=src, toLifeline=src if kind == "self" else dst,
                messageName=text_, sequenceNumber=str(n), messageType="asynch" if kind == "msg" else "synch")
         n += 1
+    if xs:
+        place_lifelines(name, xs, {lifeline: kind for kind, lifeline in parts if lifeline in used})
 
 
 def seq_parts(parts):
@@ -390,12 +396,42 @@ def seq_steps(parts, steps):
     names = {alias: seq_name(alias, lab) for _, alias, lab in parts}
     out = []
     for st in steps:
-        if st[0] in ("loop", "end", "deact"):
+        if st[0] in ("loop", "end", "deact", "skip"):
             out.append(st)
         else:
             kind, src, dst, text_, _ = st
             out.append((kind, names[src], names.get(dst), text_))
     return out
+
+
+# khung hẹp: biểu tượng và tên vẫn vẽ đủ (tên tràn ra hai bên khung); biểu tượng boundary cần khung rộng hơn,
+# hẹp quá thì mất vạch đứng bên trái
+LIFELINE_W = {"boundary": 80}
+LIFELINE_W_DEFAULT = 60
+LIFELINE_EXTRA_GAP = 10  # thêm vào mỗi bước giữa hai lifeline so với bản mẫu
+
+
+def place_lifelines(name, ref, kinds):
+    """Đặt các lifeline theo khoảng cách của bản mẫu ref {lifeline: x tâm}, lấy từ bản đầy đủ người dùng chỉnh tay
+    (lifeline sát nhau hơn khe 60 px của layout tự động), nới thêm LIFELINE_EXTRA_GAP. Lifeline vắng mặt thì dồn
+    lại: mỗi lifeline cách lifeline đứng trước nó đúng bằng bước từ lifeline đó tới lifeline kế tiếp trong bản mẫu.
+    kinds: {lifeline có trên biểu đồ: kiểu}.
+    setElementBounds đẩy khung đè lên khung khác ra xa, mà khung tự dựng rộng hơn tên (khung chỉnh tay chồng lên
+    nhau), nên trước hết co mọi khung lại rồi mới đặt từ trái sang phải."""
+    height = {m[1]: int(m[2]) for m in re.finditer(
+        r"^\s*(?:Lifeline|InteractionActor): (.+?) -?\d+,-?\d+ \d+x(\d+)", vp("getDiagramGeometry", diagramName=name), re.M)}
+    order = [lifeline for lifeline in sorted(ref, key=ref.get) if lifeline in kinds]
+    width = {lifeline: LIFELINE_W.get(kinds[lifeline], LIFELINE_W_DEFAULT) for lifeline in order}
+    for lifeline in order:
+        vp("setElementBounds", diagramName=name, elementName=lifeline, x=0, y=0, width=width[lifeline],
+           height=height[lifeline])
+    full = sorted(ref, key=ref.get)
+    step = {a: ref[b] - ref[a] + LIFELINE_EXTRA_GAP for a, b in zip(full, full[1:])}
+    c = None
+    for prev, lifeline in zip([None] + order, order):
+        c = ref[lifeline] if prev is None else c + step[prev]
+        vp("setElementBounds", diagramName=name, elementName=lifeline, x=c - width[lifeline] // 2, y=0,
+           width=width[lifeline], height=height[lifeline])
 
 
 # ---------------------------------------------------------------- activity
@@ -563,6 +599,21 @@ STATE_M4_POS = {
 
 M4_FULL_PARTS = sorted(gen_seq.M4A_PARTS + [p for p in gen_seq.M4BC_PARTS if p[1] not in {q[1] for q in gen_seq.M4A_PARTS}],
                        key=lambda p: ["actor", "boundary", "control", "entity"].index(p[0]))
+
+# x tâm của lifeline trong hai bản đầy đủ sau khi người dùng chỉnh tay trong VP (2026-10-26); dùng cho chính chúng khi
+# dựng lại và cho bản của Dev 2 (bỏ vòng lặp chơi ván, dồn lifeline lại theo cùng khoảng cách)
+SEQA_M4_X = {"Người chơi A": 94, "Người chơi B": 196, "MainScreen": 293, "LobbyScreen": 396,
+             "ChallengeConfirmDialog": 512, "InvitationDialog": 641, "MatchScreen": 755, "ResultDialog": 872,
+             "Player": 995, "PlayerRanking": 1107, "Board": 1220, "Match": 1320}
+SEQ_M4_X = {"Người chơi A": 72, "Người chơi B": 158, "MainActivity": 263, "LobbyActivity": 371,
+            "ChallengeConfirmDialog": 489, "InvitationDialog": 613, "MatchActivity": 718, "ResultDialog": 831,
+            "ServerConnection": 955, "ClientHandler": 1063, "ChallengeController": 1188, "OnlinePlayerManager": 1351,
+            "BoardGenerator": 1471, "MatchManager": 1582, "PlayerRankingDAO": 1696, "MatchController": 1824,
+            "PathFinder": 1930, "MatchDAO": 2022, "Board": 2110, "Match": 2200, "PlayerRanking": 2300}
+
+# bản của Dev 2: thách đấu rồi kết thúc ván, bỏ các bước chơi ván (Dev 1) nhưng giữ số bước của kịch bản
+SEQA_M4_DEV2 = SEQA_M4_1 + [("skip", gen_seq.count(SEQA_M4_PLAY))] + SEQA_M4_2
+SEQ_M4_DEV2 = gen_seq.M4A + [("skip", gen_seq.count(gen_seq.M4B))] + gen_seq.M4C
 
 # ---- Pha 3: biểu đồ hoạt động
 
@@ -866,14 +917,21 @@ DIAGRAMS = [
     # Tên biểu đồ trong VP còn chữ "Thử:" từ lần dựng đầu; giữ nguyên để --export tìm được trong pikachu.vpp đã chỉnh tay
     ("activity-m4-dev2", "Hoạt động M4 (bản Dev 2)", lambda n: build_activity(n, ACT_M4_DEV2, ACT_M4_DEV2_FLOWS)),
     ("seq-analysis-m4-full", "Thử: tuần tự phân tích M4 đầy đủ",
-     lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_1 + SEQA_M4_PLAY + SEQA_M4_2)),
+     lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_1 + SEQA_M4_PLAY + SEQA_M4_2, xs=SEQA_M4_X)),
     ("seq-m4-full", "Thử: tuần tự thiết kế M4 đầy đủ",
-     lambda n: build_sequence(n, seq_parts(M4_FULL_PARTS), seq_steps(M4_FULL_PARTS, gen_seq.M4A + gen_seq.M4B + gen_seq.M4C))),
+     lambda n: build_sequence(n, seq_parts(M4_FULL_PARTS), seq_steps(M4_FULL_PARTS, gen_seq.M4A + gen_seq.M4B + gen_seq.M4C),
+                              xs=SEQ_M4_X)),
+    # bản của Dev 2 thay cho hai bản đầy đủ trong tài liệu Dev 2 (docs/dev2/build_gdoc.py): bỏ vòng lặp chơi ván
+    ("seq-analysis-m4-dev2", "Tuần tự phân tích M4 (bản Dev 2)",
+     lambda n: build_sequence(n, SEQA_M4_PARTS, SEQA_M4_DEV2, xs=SEQA_M4_X)),
+    ("seq-m4-dev2", "Tuần tự thiết kế M4 (bản Dev 2)",
+     lambda n: build_sequence(n, seq_parts(M4_FULL_PARTS), seq_steps(M4_FULL_PARTS, SEQ_M4_DEV2), xs=SEQ_M4_X)),
 ]
 
 
-# ảnh tuần tự dài: số phần cắt (docs/vp/slice_seq.py), mỗi phần lặp lại hàng đầu lifeline
-SLICES = {"seq-analysis-m4-full": 2, "seq-m4-full": 3}
+# ảnh tuần tự dài: số phần cắt (docs/vp/slice_seq.py), mỗi phần lặp lại hàng đầu lifeline; bản Dev 2 cắt cùng số
+# phần với bản đầy đủ để số hình trong tài liệu Dev 2 khớp tài liệu chung
+SLICES = {"seq-analysis-m4-full": 2, "seq-m4-full": 3, "seq-analysis-m4-dev2": 2, "seq-m4-dev2": 3}
 
 
 def export(name, key):
@@ -888,6 +946,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="danh sách khoá, phân cách bằng dấu phẩy; dựng thử vào project đang mở, không lưu")
     ap.add_argument("--export", help="danh sách khoá: chỉ xuất ảnh các biểu đồ có sẵn trong project đang mở")
+    ap.add_argument("--add", help="danh sách khoá: dựng các biểu đồ chưa có vào pikachu.vpp đang mở, đúng tên, rồi lưu")
     ap.add_argument("--force", action="store_true", help="dựng lại toàn bộ dù pikachu.vpp đã được chỉnh tay")
     a = ap.parse_args()
     names = {k: n for k, n, _ in DIAGRAMS}
@@ -895,6 +954,22 @@ def main():
         for key in a.export.split(","):
             export(names[key], key)
             print("exported", key)
+        return
+    if a.add:
+        # thêm biểu đồ mới mà không dựng lại toàn bộ (giữ các bố cục chỉnh tay); project đang mở phải là pikachu.vpp
+        info = json.loads(re.search(r"\{.*\}", vp("getProjectInfo"))[0])
+        if not info.get("file") or Path(info["file"]).resolve() != VPP:
+            raise SystemExit(f"project đang mở không phải {VPP}")
+        existing = vp("listDiagrams")
+        builds = {k: b for k, _, b in DIAGRAMS}
+        for key in a.add.split(","):
+            if f"- {names[key]} (" in existing:
+                raise SystemExit(f"đã có biểu đồ {names[key]}")
+            builds[key](names[key])
+            export(names[key], key)
+            print("added", key)
+        vp("saveProject")
+        print("saved", VPP)
         return
     only = set(a.only.split(",")) if a.only else None
     if only and only - {k for k, _, _ in DIAGRAMS}:

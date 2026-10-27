@@ -104,8 +104,21 @@ def fold_play_steps(md):
 
 
 DEV1_FIGURES = ["uml/pha3/ui-m4-2.png"]  # giao diện phần chơi ván (Dev 1)
-# hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): hoạt động M4 không có vòng lặp chơi ván
-DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png"}
+# hình dùng bản riêng cho tài liệu Dev 2 (docs/vp/build_vp.py): hoạt động và tuần tự M4 không có vòng lặp chơi ván
+DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png",
+                **{f"vp/png/seq-analysis-m4-full-{i}.png": f"vp/png/seq-analysis-m4-dev2-{i}.png" for i in (1, 2)},
+                **{f"vp/png/seq-m4-full-{i}.png": f"vp/png/seq-m4-dev2-{i}.png" for i in (1, 2, 3)}}
+# đoạn dẫn của các hình tuần tự M4 nói theo bản Dev 2
+DEV2_TEXT = {
+    "Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, "
+    "thuộc modul của Dev 1); vì dài":
+        "Biểu đồ vẽ các bước 1–32 (thách đấu) và 44–60 (kết thúc ván) của kịch bản phiên bản 2 trong một biểu đồ; "
+        "phần chơi ván (bước 33–43) thuộc phần của Dev 1 nên không vẽ, số bước giữ như kịch bản. Vì dài",
+    "Biểu đồ tuần tự vẽ đủ các bước 1–117 ở trên trong một biểu đồ, kể cả vòng lặp chơi ván (bước 60–82, thuộc "
+    "phần của Dev 1); vì dài":
+        "Biểu đồ tuần tự vẽ các bước 1–59 (thách đấu) và 83–117 (kết thúc ván) ở trên trong một biểu đồ; vòng lặp "
+        "chơi ván (bước 60–82) thuộc phần của Dev 1 nên không vẽ, số bước giữ như kịch bản. Vì dài",
+}
 
 
 def adjust(md):
@@ -114,6 +127,10 @@ def adjust(md):
         md = re.sub(rf"!\[[^\]]*\]\({re.escape(src)}\)\n\n\*Hình [^\n]*\*\n\n", "", md)
     for old, new in DEV2_FIGURES.items():
         md = md.replace(f"]({old})", f"]({new})")
+    for old, new in DEV2_TEXT.items():
+        if md.count(old) != 1:
+            raise SystemExit(f"không khớp: {old}")
+        md = md.replace(old, new)
     for old, new in [
         (r"giao diện chơi \(Hình 3\.\d+\)", "giao diện chơi (thuộc phần của Dev 1)"),
         (r"^- `MatchScreen` → `MatchActivity`: .*$", "- `MatchScreen` → `MatchActivity`: thuộc phần của Dev 1."),
