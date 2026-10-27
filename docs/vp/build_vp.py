@@ -56,6 +56,7 @@ def vp(tool, **args):
 
 
 RUN = ""  # hậu tố tên khi dựng thử (--only)
+EXPORT_ONLY = False  # --export: chỉ xuất ảnh, không động vào đường nối đã chỉnh tay
 STAMP = HERE / "build-stamp.txt"  # mtime của pikachu.vpp ngay sau lần dựng tự động toàn bộ gần nhất (không commit)
 # biểu đồ người dùng chỉnh bố cục bằng tay trong VP sau khi dựng; nội dung vẫn lấy từ nguồn ở đây
 HAND_EDITED = ["class-entity", "class-analysis-m2", "class-analysis-m4", "state-m4", "class-design-entity",
@@ -992,7 +993,15 @@ DIAGRAMS = [
 SLICES = {"seq-analysis-m4-full": 2, "seq-m4-full": 3, "seq-analysis-m4-dev2": 2, "seq-m4-dev2": 3}
 
 
+# biểu đồ có đường nối vẽ lại bằng tidy.route_lines() sau khi dựng: mỗi đường tối đa 3 đoạn (yêu cầu của người dùng)
+TIDY = {"class-entity", "class-analysis-m2", "class-analysis-m4", "state-m2", "state-m4", "class-design-entity",
+        "class-design-m2", "class-design-m4", "activity-m2", "activity-m4", "activity-m4-dev2"}
+
+
 def export(name, key):
+    if key in TIDY and not EXPORT_ONLY:
+        import tidy
+        tidy.route_lines(name, key)
     vp("exportDiagramImage", diagramName=name, filePath=str(PNG / f"{key}.png"))
     if key in SLICES:
         import slice_seq
@@ -1009,6 +1018,8 @@ def main():
     a = ap.parse_args()
     names = {k: n for k, n, _ in DIAGRAMS}
     if a.export:
+        global EXPORT_ONLY
+        EXPORT_ONLY = True
         for key in a.export.split(","):
             export(names[key], key)
             print("exported", key)
