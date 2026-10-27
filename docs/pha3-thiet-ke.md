@@ -1,7 +1,5 @@
 # Pha 3. Thiết kế
 
-> Bản nháp. Một số điểm chưa chốt được viết theo phương án đề xuất: ván thắng do đối thủ bỏ cuộc không tính vào trung bình thời gian thắng, bàn chơi có 25 loại hình, CSDL dùng MySQL. Khi chốt khác thì sửa lại các mục liên quan.
-
 ## 1. Thiết kế lớp thực thể
 
 Đầu vào là biểu đồ lớp thực thể pha phân tích (Hình 2.1). Ngôn ngữ cài đặt là Java cho cả client Android, server và thư viện dùng chung `core`; các lớp thực thể đặt trong `core` để client và server dùng chung một định nghĩa.
