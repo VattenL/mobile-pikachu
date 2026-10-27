@@ -61,17 +61,16 @@ A -> LobbyActivity : click tên B
 LobbyActivity -> ChallengeConfirmDialog : gọi
 ChallengeConfirmDialog -> A : hiển thị
 A -> ChallengeConfirmDialog : click xác nhận
-ChallengeConfirmDialog --> LobbyActivity : xác nhận
-LobbyActivity -> ServerConnection : send(INVITE)
-LobbyActivity -> A : hiển thị
+ChallengeConfirmDialog -> ServerConnection : send(INVITE)
+ChallengeConfirmDialog -> A : hiển thị
 ServerConnection -> ClientHandler : INVITE (TCP)
 ClientHandler -> ChallengeController : handleInvite()
 ChallengeController -> OnlinePlayerManager : gọi
 OnlinePlayerManager -> OnlinePlayerManager : sendInvitation()
 activate OnlinePlayerManager
-OnlinePlayerManager -> ClientHandler : send(INVITE_RECEIVED)
 OnlinePlayerManager --> ChallengeController : trả về
 deactivate OnlinePlayerManager
+ChallengeController -> ClientHandler : send(INVITE_RECEIVED)
 ClientHandler -> ServerConnection : INVITE_RECEIVED (TCP)
 ServerConnection -> LobbyActivity : onMessage()
 LobbyActivity -> InvitationDialog : gọi
@@ -80,6 +79,11 @@ B -> InvitationDialog : click accept
 InvitationDialog -> ServerConnection : send(INVITE_REPLY)
 ServerConnection -> ClientHandler : INVITE_REPLY (TCP)
 ClientHandler -> ChallengeController : handleInviteReply()
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : removeInvitation()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
 ChallengeController -> BoardGenerator : gọi
 BoardGenerator -> BoardGenerator : generateBoard()
 activate BoardGenerator
@@ -105,8 +109,30 @@ OnlinePlayerManager -> OnlinePlayerManager : updateStatus()
 activate OnlinePlayerManager
 OnlinePlayerManager --> ChallengeController : trả về
 deactivate OnlinePlayerManager
+ChallengeController -> ChallengeController : closeInvitations()
+activate ChallengeController
+deactivate ChallengeController
 ChallengeController -> ClientHandler : send(MATCH_START)
-ClientHandler -> ServerConnection : MATCH_START (TCP)
+ChallengeController -> ChallengeController : broadcastOnlineList()
+activate ChallengeController
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : getOnlinePlayers()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ChallengeController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getTotalPoints()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> ChallengeController : trả về
+deactivate PlayerRankingDAO
+ChallengeController -> ClientHandler : send(ONLINE_LIST)
+deactivate ChallengeController
+ClientHandler -> ServerConnection : MATCH_START,\nONLINE_LIST (TCP)
 ServerConnection -> LobbyActivity : onMessage()
 LobbyActivity -> MatchActivity : gọi
 MatchActivity -> A : hiển thị

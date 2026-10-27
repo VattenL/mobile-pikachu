@@ -24,6 +24,7 @@ class Player {
 }
 
 class PlayerRanking {
+  - rank : int
   - totalPoint : float
   - avgOpponentPoint : float
   - avgWinTime : Float

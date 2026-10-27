@@ -13,11 +13,26 @@ rectangle Result [
 {
   <b>Chiến thắng!
   .
-  Bạn thắng. Thời gian hoàn thành 06:42.
-  Bạn có muốn tái đấu không?
+  Bạn thắng (+1 điểm). Thời gian hoàn thành 06:42.
+  Bạn có muốn tái đấu không? (còn 25 giây)
   .
   [ Dừng ] | [ Tái đấu ]
 }
 }}
 ]
+
+rectangle Left [
+{{salt
+{
+  <b>Chiến thắng!
+  .
+  Bạn thắng (+1 điểm). Đối thủ đã thoát.
+  (còn 25 giây)
+  .
+  [ Về sảnh ]
+}
+}}
+]
+
+Result -[hidden]right- Left
 @enduml

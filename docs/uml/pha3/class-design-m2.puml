@@ -26,6 +26,10 @@ class MainActivity #E3F2FD {
   + onRankingClick(v : View) : void
 }
 
+abstract class BaseActivity #E3F2FD {
+  + onMessage(msg : Message) : void
+}
+
 class RankingActivity #E3F2FD {
   - rvRanking : RecyclerView
   - tvPage : TextView
@@ -36,6 +40,7 @@ class RankingActivity #E3F2FD {
   - page : int
   - pageCount : int
   - listRanking : ArrayList<PlayerRanking>
+  - myRank : Integer
   + onPrevPageClick(v : View) : void
   + onNextPageClick(v : View) : void
   + onMyRankClick(v : View) : void
@@ -49,6 +54,7 @@ class ServerConnection #EDE7F6 {
   - reader : BufferedReader
   - writer : PrintWriter
   - listeners : ArrayList<MessageListener>
+  - pingTimer : Timer
   + getInstance() : ServerConnection
   + connect(host : String, port : int) : boolean
   + send(msg : Message) : void
@@ -106,6 +112,7 @@ class Player #FFF3E0 {
 }
 
 class PlayerRanking #FFF3E0 {
+  - rank : int
   - totalPoint : float
   - avgOpponentPoint : float
   - avgWinTime : Float
@@ -113,7 +120,8 @@ class PlayerRanking #FFF3E0 {
 
 ' giao dien
 MainActivity -right- RankingActivity
-RankingActivity ..|> MessageListener
+RankingActivity -up-|> BaseActivity
+BaseActivity ..|> MessageListener
 
 ' giao dien - mang
 RankingActivity -down- ServerConnection

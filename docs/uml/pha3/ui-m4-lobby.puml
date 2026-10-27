@@ -21,7 +21,7 @@ rectangle Lobby [
     Người chơi D | 9 | Luyện tập
   }
   .
-  <color:blue>Đang chờ B trả lời...
+  <color:blue>B đã từ chối lời mời
   .
   [ Quay lại ]
 }

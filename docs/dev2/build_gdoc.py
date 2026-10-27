@@ -108,17 +108,19 @@ DEV1_FIGURES = ["uml/pha3/ui-m4-2.png"]  # giao diện phần chơi ván (Dev 1)
 DEV2_FIGURES = {"vp/png/activity-m4.png": "vp/png/activity-m4-dev2.png",
                 **{f"vp/png/seq-analysis-m4-full-{i}.png": f"vp/png/seq-analysis-m4-dev2-{i}.png" for i in (1, 2)},
                 **{f"vp/png/seq-m4-full-{i}.png": f"vp/png/seq-m4-dev2-{i}.png" for i in (1, 2, 3)}}
-# đoạn dẫn của các hình tuần tự M4 nói theo bản Dev 2
-DEV2_TEXT = {
-    "Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, "
-    "thuộc modul của Dev 1); vì dài":
-        "Biểu đồ vẽ các bước 1–32 (thách đấu) và 44–60 (kết thúc ván) của kịch bản phiên bản 2 trong một biểu đồ; "
-        "phần chơi ván (bước 33–43) thuộc phần của Dev 1 nên không vẽ, số bước giữ như kịch bản. Vì dài",
-    "Biểu đồ tuần tự vẽ đủ các bước 1–117 ở trên trong một biểu đồ, kể cả vòng lặp chơi ván (bước 60–82, thuộc "
-    "phần của Dev 1); vì dài":
-        "Biểu đồ tuần tự vẽ các bước 1–59 (thách đấu) và 83–117 (kết thúc ván) ở trên trong một biểu đồ; vòng lặp "
-        "chơi ván (bước 60–82) thuộc phần của Dev 1 nên không vẽ, số bước giữ như kịch bản. Vì dài",
-}
+# đoạn dẫn của các hình tuần tự M4 nói theo bản Dev 2: (mẫu, hàm thay); số bước lấy từ chính câu trong md
+DEV2_TEXT = [
+    (r"Biểu đồ vẽ đủ các bước 1–(\d+) của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván "
+     r"\(bước (\d+)–(\d+), thuộc modul của Dev 1\); vì dài",
+     lambda m: f"Biểu đồ vẽ các bước 1–{int(m[2]) - 1} (thách đấu) và {int(m[3]) + 1}–{m[1]} (kết thúc ván) của kịch "
+               f"bản phiên bản 2 trong một biểu đồ; phần chơi ván (bước {m[2]}–{m[3]}) thuộc phần của Dev 1 nên không "
+               f"vẽ, số bước giữ như kịch bản. Vì dài"),
+    (r"Biểu đồ tuần tự vẽ đủ các bước 1–(\d+) ở trên trong một biểu đồ, kể cả vòng lặp chơi ván "
+     r"\(bước (\d+)–(\d+), thuộc phần của Dev 1\); vì dài",
+     lambda m: f"Biểu đồ tuần tự vẽ các bước 1–{int(m[2]) - 1} (thách đấu) và {int(m[3]) + 1}–{m[1]} (kết thúc ván) ở "
+               f"trên trong một biểu đồ; vòng lặp chơi ván (bước {m[2]}–{m[3]}) thuộc phần của Dev 1 nên không vẽ, số "
+               f"bước giữ như kịch bản. Vì dài"),
+]
 
 
 def adjust(md):
@@ -127,10 +129,10 @@ def adjust(md):
         md = re.sub(rf"!\[[^\]]*\]\({re.escape(src)}\)\n\n\*Hình [^\n]*\*\n\n", "", md)
     for old, new in DEV2_FIGURES.items():
         md = md.replace(f"]({old})", f"]({new})")
-    for old, new in DEV2_TEXT.items():
-        if md.count(old) != 1:
-            raise SystemExit(f"không khớp: {old}")
-        md = md.replace(old, new)
+    for pattern, new in DEV2_TEXT:
+        md, n = re.subn(pattern, new, md)
+        if n != 1:
+            raise SystemExit(f"không khớp: {pattern}")
     # ngoại lệ 10a, 10b của kịch bản v1 M4 xảy ra trong lúc chơi ván (phần của Dev 1)
     md, n = re.subn(r"<br>10[ab]\. [^<|]*", "", md)
     if n != 2:

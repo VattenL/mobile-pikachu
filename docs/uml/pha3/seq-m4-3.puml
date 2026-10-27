@@ -14,7 +14,7 @@ skinparam sequence {
   ActorBackgroundColor #F7F7F7
 }
 autonumber "<b>0:"
-autonumber 83 "<b>0:"
+autonumber 97 "<b>0:"
 
 actor "Người chơi A" as A
 boundary LobbyActivity
@@ -24,6 +24,7 @@ control "Server\nConnection" as ServerConnection
 control "Client\nHandler" as ClientHandler
 control "Match\nController" as MatchController
 control "Challenge\nController" as ChallengeController
+control "Match\nManager" as MatchManager
 control "OnlinePlayer\nManager" as OnlinePlayerManager
 control MatchDAO
 control "PlayerRanking\nDAO" as PlayerRankingDAO
@@ -47,12 +48,24 @@ ResultDialog -> ServerConnection : send(REMATCH_REPLY)
 ResultDialog -> LobbyActivity : gọi
 ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
 ClientHandler -> MatchController : handleRematchReply()
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : getRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> MatchController : stopRematch()
+activate MatchController
 MatchController -> OnlinePlayerManager : gọi
 OnlinePlayerManager -> OnlinePlayerManager : updateStatus()
 activate OnlinePlayerManager
 OnlinePlayerManager --> MatchController : trả về
 deactivate OnlinePlayerManager
 MatchController -> ClientHandler : send(OPPONENT_LEFT)
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : removeRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
 MatchController -> ChallengeController : gọi
 ChallengeController -> ChallengeController : broadcastOnlineList()
 activate ChallengeController
@@ -73,6 +86,7 @@ PlayerRankingDAO --> ChallengeController : trả về
 deactivate PlayerRankingDAO
 ChallengeController -> ClientHandler : send(ONLINE_LIST)
 deactivate ChallengeController
+deactivate MatchController
 ClientHandler -> ServerConnection : OPPONENT_LEFT,\nONLINE_LIST (TCP)
 ServerConnection -> ResultDialog : onMessage()
 ResultDialog -> LobbyActivity : gọi

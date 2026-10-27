@@ -24,7 +24,7 @@ Kịch bản của modul xem bảng xếp hạng và modul thách đấu dùng n
 | **Tiền điều kiện** | Người chơi A đã đăng nhập và đang ở giao diện chính; hệ thống có 12 người chơi đã đấu ít nhất một ván đối kháng |
 | **Hậu điều kiện** | A xem được bảng xếp hạng, thấy vị trí của mình và quay về giao diện chính |
 | **Kịch bản chuẩn** | 1. Tại giao diện chính, A click nút **Xem bảng xếp hạng**.<br>2. Giao diện bảng xếp hạng hiện trang 1, sắp xếp theo tổng điểm giảm dần, rồi trung bình điểm đối thủ giảm dần, rồi trung bình thời gian thắng tăng dần; mỗi trang 10 người, dòng "Trang 1/2" và các nút **Trang trước**, **Trang sau**, **Vị trí của tôi**, **Quay lại**:<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>1</td><td>Người chơi B</td><td>12.5</td><td>9.2</td><td>05:48</td></tr><tr><td>2</td><td>Người chơi C</td><td>10.5</td><td>9.5</td><td>06:31</td></tr><tr><td>3</td><td>Người chơi D</td><td>9</td><td>10.4</td><td>06:05</td></tr><tr><td>4</td><td>Người chơi E</td><td>8.5</td><td>8.9</td><td>07:12</td></tr><tr><td>5</td><td>Người chơi G</td><td>8</td><td>9.1</td><td>06:44</td></tr><tr><td>6</td><td>Người chơi H</td><td>7.5</td><td>11.0</td><td>07:02</td></tr><tr><td>7</td><td>Người chơi I</td><td>7.5</td><td>8.4</td><td>06:55</td></tr><tr><td>8</td><td>Người chơi K</td><td>6</td><td>7.8</td><td>07:30</td></tr><tr><td>9</td><td>Người chơi L</td><td>5.5</td><td>9.0</td><td>08:01</td></tr><tr><td>10</td><td>Người chơi M</td><td>5</td><td>8.2</td><td>06:20</td></tr></table><br>3. A click nút **Vị trí của tôi**.<br>4. Hệ thống chuyển sang trang có dòng của A, tô màu dòng đó và hiện "Trang 2/2":<table><tr><th>Hạng</th><th>Tên</th><th>Tổng điểm</th><th>TB điểm đối thủ</th><th>TB thời gian thắng</th></tr><tr><td>11</td><td>Người chơi N</td><td>4.5</td><td>7.5</td><td>07:45</td></tr><tr><td>12</td><td><b>Người chơi A</b></td><td><b>3.5</b></td><td><b>8.6</b></td><td><b>06:58</b></td></tr></table><br>5. A click nút **Quay lại**.<br>6. Hệ thống đưa A về giao diện chính. |
-| **Ngoại lệ** | 2a. Hệ thống chưa có ván đối kháng nào nên bảng xếp hạng rỗng.<br>2b. Người xem là khách (chưa đăng nhập): giao diện bảng xếp hạng không có nút **Vị trí của tôi**.<br>3a. A click **Trang sau** hoặc **Trang trước**: hệ thống hiện trang kế tiếp hoặc trang trước đó.<br>4a. A chưa đấu ván đối kháng nào nên chưa có trong bảng xếp hạng: hệ thống báo "Bạn chưa có trong bảng xếp hạng" và giữ nguyên trang đang xem. |
+| **Ngoại lệ** | 2a. Hệ thống chưa có ván đối kháng nào nên bảng xếp hạng rỗng: giao diện bảng xếp hạng hiện "Chưa có dữ liệu xếp hạng", "Trang 1/1", các nút chuyển trang bị vô hiệu.<br>2b. Người xem là khách (chưa đăng nhập): giao diện bảng xếp hạng không có nút **Vị trí của tôi**.<br>2c. Không kết nối được tới server: hệ thống báo "Không kết nối được máy chủ" và giữ người xem ở giao diện chính.<br>3a. A click **Trang sau** hoặc **Trang trước**: hệ thống hiện trang kế tiếp hoặc trang trước đó.<br>4a. A chưa đấu ván đối kháng nào nên chưa có trong bảng xếp hạng: hệ thống báo "Bạn chưa có trong bảng xếp hạng" và giữ nguyên trang đang xem. |
 
 ### c. Kịch bản cho modul chơi với máy
 
@@ -43,10 +43,10 @@ Kịch bản của modul xem bảng xếp hạng và modul thách đấu dùng n
 |---|---|
 | **Use case** | `Challenge Player`, `Respond To Challenge`, `Play Online Match`: Thách đấu và đấu đối kháng |
 | **Actor** | Player: người chơi A là người thách đấu, người chơi B là người được mời |
-| **Tiền điều kiện** | A và B đã đăng nhập trên hai máy client; A đang rỗi ở giao diện chính, B không bận (rỗi hoặc luyện tập) và đang ở màn hình đấu đối kháng |
-| **Hậu điều kiện** | Kết quả ván và điểm của hai người chơi được lưu trên server; hai người chơi về màn hình đấu đối kháng ở trạng thái rỗi |
-| **Kịch bản chuẩn** | 1. Tại giao diện chính, A click nút **Đấu đối kháng**.<br>2. Hệ thống hiện màn hình đấu đối kháng gồm danh sách người chơi online và nút **Quay lại**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Người chơi B</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Người chơi C</td><td>10.5</td><td>Bận</td></tr><tr><td>3</td><td>Người chơi D</td><td>9</td><td>Luyện tập</td></tr></table><br>3. A click vào tên B (không bận) trong danh sách.<br>4. Hệ thống hiện dialog xác nhận "Bạn muốn thách đấu B?" với hai nút **Xác nhận** và **Hủy** trên máy của A.<br>5. A click **Xác nhận**.<br>6. Hệ thống gửi lời mời tới B và hiện thông báo "Đang chờ B trả lời..." trên máy của A; trên máy của B hiện dialog "A muốn thách đấu bạn" với hai nút **Accept** và **Reject**.<br>7. B click **Accept**.<br>8. Hệ thống tạo ván đấu, sinh một đề bài 10x10, chuyển trạng thái hai người sang bận và hiện giao diện chơi trên cả hai máy: bàn chơi với cùng đề bài, đồng hồ đếm ngược 10:00, số ô còn lại của đối thủ "Đối thủ: 100", nút **Thoát**.<br>9. A click lần lượt hai ô cùng hình.<br>10. Hệ thống kiểm tra hai ô nối được bằng tối đa 3 đoạn thẳng, vẽ đường nối, xóa hai ô trên máy của A và cập nhật "Đối thủ: 98" trên máy của B.<br>(Lặp lại bước 9-10; B chơi song song trên máy của mình theo cùng cách.)<br>11. A click cặp ô cuối cùng.<br>12. Hệ thống xóa cặp ô, ghi nhận A hoàn thành lúc 06:42, kết thúc ván, lưu kết quả, cập nhật điểm và hiện dialog kết quả trên hai máy, kèm câu hỏi "Bạn có muốn tái đấu không?" với hai nút **Tái đấu** và **Dừng**:<table><tr><th>Máy</th><th>Nội dung dialog kết quả</th></tr><tr><td>A</td><td>Bạn thắng. Thời gian hoàn thành 06:42.</td></tr><tr><td>B</td><td>Bạn thua. Bạn còn 18 ô.</td></tr></table><br>13. A click **Dừng**.<br>14. Hệ thống chuyển hai người chơi về trạng thái rỗi, đưa cả hai về màn hình đấu đối kháng với danh sách người chơi online đã cập nhật điểm, và báo B "A đã dừng chơi". |
-| **Ngoại lệ** | 2a. A chưa đăng nhập (đang là khách): hệ thống hiện giao diện đăng nhập trước, đăng nhập xong mới hiện màn hình đấu đối kháng.<br>6a. A click **Hủy**: hệ thống đóng dialog, không gửi lời mời, A ở lại màn hình đấu đối kháng.<br>6b. B vừa chuyển sang trạng thái bận trước khi lời mời tới.<br>8a. B click **Reject**.<br>8b. Một người chơi click **Thoát** khi ván đang diễn ra, kể cả trước khi nối cặp nào, hoặc mất kết nối giữa ván.<br>10a. Hai ô không cùng hình hoặc không nối được bằng tối đa 3 đoạn thẳng: hai ô được bỏ chọn.<br>10b. Bàn chơi bị bế tắc, không còn cặp nào nối được.<br>12a. B xóa hết ô trước A.<br>12b. Hết 10 phút mà cả hai người chơi chưa xóa hết ô.<br><br>**14a. Cả hai người chơi click Tái đấu.**<br>14a1. Hệ thống tạo ván mới với đề bài mới và hiện giao diện chơi trên cả hai máy như bước 8. |
+| **Tiền điều kiện** | A và B đã đăng nhập trên hai máy client; A đang rỗi ở giao diện chính; B đang rỗi ở màn hình đấu đối kháng |
+| **Hậu điều kiện** | Kết quả ván được lưu trên server, tổng điểm của hai người chơi thay đổi theo kết quả; hai người chơi về màn hình đấu đối kháng ở trạng thái rỗi |
+| **Kịch bản chuẩn** | 1. Tại giao diện chính, A click nút **Đấu đối kháng**.<br>2. Hệ thống hiện màn hình đấu đối kháng gồm danh sách người chơi online và nút **Quay lại**:<table><tr><th>TT</th><th>Tên</th><th>Tổng điểm</th><th>Trạng thái</th></tr><tr><td>1</td><td>Người chơi B</td><td>12.5</td><td>Rỗi</td></tr><tr><td>2</td><td>Người chơi C</td><td>10.5</td><td>Bận</td></tr><tr><td>3</td><td>Người chơi D</td><td>9</td><td>Luyện tập</td></tr></table><br>3. A click vào tên B (không bận) trong danh sách.<br>4. Hệ thống hiện dialog xác nhận "Bạn muốn thách đấu B?" với hai nút **Xác nhận** và **Hủy** trên máy của A.<br>5. A click **Xác nhận**.<br>6. Hệ thống gửi lời mời tới B và hiện trên máy của A popup "Đang chờ B trả lời..." đếm ngược 30 giây, kèm nút **Hủy lời mời**; trên máy của B hiện popup "A muốn thách đấu bạn" đếm ngược 30 giây với hai nút **Accept** và **Reject**. Popup trên máy B không chặn màn hình bên dưới.<br>7. B click **Accept**.<br>8. Hệ thống tạo ván đấu, sinh một đề bài 10x10, chuyển trạng thái hai người sang bận và hiện giao diện chơi trên cả hai máy: bàn chơi với cùng đề bài, đồng hồ đếm ngược 10:00, số ô còn lại của đối thủ "Đối thủ: 100", nút **Thoát**.<br>9. A click lần lượt hai ô cùng hình.<br>10. Hệ thống kiểm tra hai ô nối được bằng tối đa 3 đoạn thẳng, vẽ đường nối, xóa hai ô trên máy của A và cập nhật "Đối thủ: 98" trên máy của B.<br>(Lặp lại bước 9-10; B chơi song song trên máy của mình theo cùng cách.)<br>11. A click cặp ô cuối cùng.<br>12. Hệ thống xóa cặp ô, ghi nhận A hoàn thành lúc 06:42, kết thúc ván, lưu kết quả, cập nhật điểm và hiện dialog kết quả trên hai máy, kèm câu hỏi "Bạn có muốn tái đấu không?" đếm ngược 30 giây với hai nút **Tái đấu** và **Dừng**:<table><tr><th>Máy</th><th>Nội dung dialog kết quả</th></tr><tr><td>A</td><td>Bạn thắng (+1 điểm). Thời gian hoàn thành 06:42.</td></tr><tr><td>B</td><td>Bạn thua (+0 điểm). Bạn còn 18 ô.</td></tr></table><br>13. A click **Dừng**.<br>14. Hệ thống chuyển hai người chơi về trạng thái rỗi, đưa cả hai về màn hình đấu đối kháng với danh sách người chơi online đã cập nhật điểm, và báo B "A đã dừng chơi". |
+| **Ngoại lệ** | 2a. A chưa đăng nhập (đang là khách): hệ thống hiện giao diện đăng nhập trước, đăng nhập xong mới hiện màn hình đấu đối kháng.<br>3a. A click tên một người chơi đang bận (C): hệ thống không phản hồi, không hiện dialog xác nhận.<br>5a. A click **Hủy**: hệ thống đóng dialog, không gửi lời mời, A ở lại màn hình đấu đối kháng.<br>6a. B vừa chuyển sang bận hoặc vừa rời mạng trước khi lời mời tới: hệ thống không gửi lời mời, đóng popup chờ trên máy A và báo "B đang bận" hoặc "B không còn online".<br>6b. B đang chơi với máy (trạng thái luyện tập): popup lời mời hiện ngay trên giao diện chơi với máy và ván với máy vẫn tiếp tục; B click **Accept** thì ván với máy dừng (không lưu) và hệ thống làm tiếp như bước 8.<br>6c. Nhiều người chơi cùng mời B: các lời mời được xếp hàng trên máy của B và hiện lần lượt từng popup; mỗi lời mời vẫn đếm 30 giây từ lúc được gửi, lời mời hết hạn khi còn trong hàng thì bị bỏ khỏi hàng.<br>7a. A click **Hủy lời mời** khi B chưa trả lời: hệ thống đóng popup chờ trên máy A và gỡ popup lời mời trên máy B (hoặc bỏ lời mời khỏi hàng đợi của B).<br>7b. B click **Reject**: hệ thống đóng popup lời mời trên máy B, đóng popup chờ trên máy A và báo "B đã từ chối lời mời"; hai người vẫn rỗi.<br>7c. Hết 30 giây mà B chưa trả lời: hệ thống hủy lời mời, đóng popup trên hai máy và báo A "B không trả lời".<br>7d. A đăng xuất hoặc mất kết nối khi B chưa trả lời: hệ thống gỡ popup lời mời trên máy B. B mất kết nối khi chưa trả lời: hệ thống đóng popup chờ trên máy A và báo "B không còn online".<br>7e. Trong lúc lời mời của A đang chờ, B chấp nhận lời mời của người khác: hệ thống hủy lời mời của A, đóng popup chờ trên máy A và báo "B đang bận".<br>9a. A click **Thoát** khi ván đang diễn ra, kể cả trước khi nối cặp nào, hoặc A mất kết nối giữa ván: hệ thống kết thúc ván, xử A thua (0 điểm), B thắng (+1 điểm) và lưu kết quả; máy A về màn hình đấu đối kháng với thông báo "Bạn đã thoát nên bị xử thua (0 điểm)"; máy B hiện dialog kết quả "Bạn thắng (+1 điểm). Đối thủ đã thoát." chỉ có nút **Về sảnh**, không hỏi tái đấu; B click **Về sảnh** (hoặc hết 30 giây) thì về màn hình đấu đối kháng; hai người về rỗi.<br>10a. Hai ô không cùng hình hoặc không nối được bằng tối đa 3 đoạn thẳng: hai ô được bỏ chọn.<br>10b. Bàn chơi bị bế tắc, không còn cặp nào nối được.<br>12a. B xóa hết ô trước A: hệ thống kết thúc ván với B thắng, A thua; dialog kết quả như bước 12 với nội dung đổi chỗ cho nhau.<br>12b. Hết 10 phút mà cả hai người chơi chưa xóa hết ô: hệ thống kết thúc ván hòa và lưu kết quả; dialog trên hai máy "Hòa (+0.5 điểm). Bạn còn ... ô." kèm câu hỏi tái đấu như bước 12.<br>12c. A và B xóa hết ô gần như cùng lúc: người có nước đi cuối được server xử lý trước thì thắng; ván chỉ kết thúc và được lưu một lần.<br><br>**13a. Cả hai người chơi click Tái đấu.**<br>13a1. Hệ thống tạo ván mới với đề bài mới và hiện giao diện chơi trên cả hai máy như bước 8.<br><br>13b. A click **Tái đấu** còn B click **Dừng**: hệ thống chuyển hai người về rỗi, đưa cả hai về màn hình đấu đối kháng và báo A "B đã dừng chơi".<br>13c. Hết 30 giây mà một người chưa chọn: hệ thống coi người đó chọn Dừng và làm như bước 14.<br>13d. Một người mất kết nối khi đang ở dialog kết quả: hệ thống coi người đó chọn Dừng và làm như bước 14. |
 
 ## 2. Biểu đồ lớp thực thể của hệ thống
 
@@ -176,15 +176,18 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.4.
 ### d. Phân tích tĩnh modul thách đấu và đấu đối kháng
 
 - Bước 1 của kịch bản, giao diện chính đề xuất lớp `MainScreen`, trong modul này cần nút đấu đối kháng, kiểu submit.
-- Bước 2, màn hình đấu đối kháng đề xuất lớp `LobbyScreen`, cần có: danh sách người chơi online, kiểu output; thông báo (đang chờ, bị từ chối, đối thủ đã dừng), kiểu output; tên đối thủ để click và nút quay lại, kiểu submit.
+- Bước 2, màn hình đấu đối kháng đề xuất lớp `LobbyScreen`, cần có: danh sách người chơi online, kiểu output; thông báo (bị từ chối, đối thủ bận, không trả lời, đã dừng chơi), kiểu output; tên đối thủ để click và nút quay lại, kiểu submit.
 - Để hiện danh sách online, cần: lấy các người chơi đang online, output là danh sách `Player` → `getOnlinePlayers()`, gán cho `Player`; lấy tổng điểm của các người chơi đó, output là các `PlayerRanking` → `getTotalPoints()`, gán cho `PlayerRanking`.
-- Bước 4, dialog xác nhận thách đấu trên máy người thách đấu đề xuất lớp `ChallengeConfirmDialog`, cần có: tên đối thủ, kiểu output; nút Xác nhận và nút Hủy, kiểu submit.
-- Bước 5, khi click Xác nhận, cần: gửi lời mời, input là người mời và người được mời, đều là `Player` → `sendInvitation()`, gán cho `Player`.
-- Bước 6, dialog lời mời trên máy người được mời đề xuất lớp `InvitationDialog`, cần có: tên người mời, kiểu output; nút Accept và nút Reject, kiểu submit.
+- Bước 4, dialog xác nhận thách đấu trên máy người thách đấu đề xuất lớp `ChallengeConfirmDialog`. Sau khi xác nhận, chính dialog này đổi thành popup chờ (bước 6) để người mời hủy được lời mời. Cần có: tên đối thủ, thông báo đang chờ và thời gian còn lại, kiểu output; nút Xác nhận và nút Hủy (sau khi xác nhận là nút Hủy lời mời), kiểu submit.
+- Bước 5, khi click Xác nhận, cần: ghi nhận và gửi lời mời, input là người mời và người được mời, đều là `Player`, output là gửi được hay lý do không gửi được (người được mời bận hoặc không online) → `sendInvitation()`, gán cho `Player`.
+- Ngoại lệ 7a, khi người mời click Hủy lời mời, cần: hủy lời mời đang chờ, input là người mời và người được mời → `cancelInvitation()`, gán cho `Player`.
+- Bước 6, popup lời mời trên máy người được mời đề xuất lớp `InvitationDialog`, cần có: tên người mời và thời gian còn lại, kiểu output; nút Accept và nút Reject, kiểu submit.
+- Bước 7, khi người được mời click Accept (hoặc Reject ở ngoại lệ 7b), cần: ghi nhận câu trả lời, kiểm tra lời mời còn hiệu lực (chưa bị hủy, chưa hết 30 giây) và báo cho người mời; input là người mời, người được mời và câu trả lời; output là lời mời còn hiệu lực hay không → `replyInvitation()`, gán cho `Player`.
 - Bước 8, khi người được mời chấp nhận, cần: sinh đề bài → `Board.generateBoard()`; tạo ván đấu cho hai người với đề bài vừa sinh, output là `Match` → `createMatch()`, gán cho `Match`; chuyển trạng thái hai người sang bận, input là các `Player` → `updateStatus()`, gán cho `Player`.
 - Bước 8, giao diện chơi đề xuất lớp `MatchScreen`, cần có: bàn chơi, đồng hồ, số ô còn lại của đối thủ, kiểu output; ô người chơi click, kiểu input; nút thoát, kiểu submit. Các xử lý khi chọn hai ô dùng lại `checkPath()`, `removePair()`, `isCleared()`, `findAvailablePair()`, `shuffle()` của `Board`.
-- Bước 12, khi ván kết thúc, cần: lưu ván cùng hai kết quả và điểm, input là ván và kết quả của hai người → `saveMatch()`, gán cho `Match` vì `Match` gắn chặt với hai `MatchResult`.
-- Bước 12, dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, kiểu output; nút tái đấu và nút dừng, kiểu submit. Khi dừng, chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()` rồi về `LobbyScreen`. Khi cả hai chọn tái đấu (ngoại lệ 14a), dùng lại `Board.generateBoard()` và `Match.createMatch()` để tạo ván mới, nên `ResultDialog` liên kết với `Board` và `Match`.
+- Bước 12, khi ván kết thúc, cần: xác định kết quả và điểm của hai người theo cách kết thúc (xóa hết ô, hết giờ, thoát, mất kết nối), input là ván và cách kết thúc, output là hai kết quả → `endMatch()`; lưu ván cùng hai kết quả, input là ván và kết quả của hai người → `saveMatch()`. Cả hai gán cho `Match` vì `Match` gắn chặt với hai `MatchResult`.
+- Bước 12, dialog kết quả đề xuất lớp `ResultDialog`, cần có: kết quả, điểm nhận được và thời gian còn lại để trả lời, kiểu output; nút tái đấu và nút dừng, kiểu submit.
+- Bước 13, khi người chơi chọn tái đấu hoặc dừng, cần: ghi nhận lựa chọn của người đó trong ván, input là ván, người chơi và lựa chọn, output là cả hai đã đồng ý, có người dừng, hoặc còn chờ người kia → `replyRematch()`, gán cho `Match`. Có người dừng thì chuyển trạng thái hai người về rỗi bằng `Player.updateStatus()` rồi về `LobbyScreen`. Khi cả hai chọn tái đấu (ngoại lệ 13a), dùng lại `Board.generateBoard()` và `Match.createMatch()` để tạo ván mới, nên `ResultDialog` liên kết với `Board` và `Match`.
 
 Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 
@@ -195,11 +198,15 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 | Phương thức | Input | Output | Gán cho lớp |
 |---|---|---|---|
 | `getOnlinePlayers()` | không có | danh sách `Player` đang online | `Player` |
-| `sendInvitation()` | người mời, người được mời | gửi được hay không | `Player` |
+| `sendInvitation()` | người mời, người được mời | gửi được, hoặc lý do không gửi được | `Player` |
+| `cancelInvitation()` | người mời, người được mời | hủy được hay không | `Player` |
+| `replyInvitation()` | người mời, người được mời, câu trả lời | lời mời còn hiệu lực hay không | `Player` |
 | `updateStatus()` | danh sách người chơi, trạng thái mới | thành công hay không | `Player` |
 | `getTotalPoints()` | danh sách người chơi | các `PlayerRanking` tương ứng | `PlayerRanking` |
 | `createMatch()` | hai người chơi, đề bài | `Match` | `Match` |
+| `endMatch()` | ván đấu, cách kết thúc | kết quả và điểm của hai người | `Match` |
 | `saveMatch()` | ván đấu, kết quả của hai người | thành công hay không | `Match` |
+| `replyRematch()` | ván đấu, người chơi, lựa chọn tái đấu hay dừng | cả hai đồng ý, có người dừng hoặc còn chờ | `Match` |
 | `generateBoard()`, `checkPath()`, `removePair()`, `isCleared()`, `findAvailablePair()`, `shuffle()` | như modul chơi với máy | như modul chơi với máy | `Board` |
 
 ## 4. Biểu đồ trạng thái cho bốn modul
@@ -237,10 +244,12 @@ Biểu đồ lớp pha phân tích của modul như Hình 2.5.
 ### d. Biểu đồ trạng thái modul thách đấu và đấu đối kháng
 
 - Tại giao diện chính, khi click đấu đối kháng thì hệ thống chuyển sang màn hình đấu đối kháng; nếu chưa đăng nhập thì qua giao diện đăng nhập trước, đăng nhập thành công mới chuyển sang màn hình đấu đối kháng.
-- Tại màn hình đấu đối kháng, khi click quay lại thì trở về giao diện chính; khi click tên một đối thủ không bận thì hệ thống hiện dialog xác nhận thách đấu. Từ dialog xác nhận, click hủy thì trở về màn hình đấu đối kháng; click xác nhận thì trở về màn hình đấu đối kháng kèm thông báo đang chờ; nếu đối thủ từ chối thì hiện lại kèm thông báo bị từ chối; nếu đối thủ chấp nhận thì chuyển sang giao diện chơi.
-- Tại màn hình đấu đối kháng, khi nhận lời mời thì hệ thống hiện dialog lời mời. Từ dialog lời mời, click reject thì trở về màn hình đấu đối kháng, click accept thì chuyển sang giao diện chơi.
-- Tại giao diện chơi, mỗi lần click hai ô thì hệ thống hiện lại chính giao diện đó; khi click thoát thì trở về màn hình đấu đối kháng; khi một bên xóa hết ô, hết giờ hoặc đối thủ thoát thì chuyển sang dialog kết quả.
-- Từ dialog kết quả, nếu cả hai click tái đấu thì chuyển sang giao diện chơi của ván mới; nếu mình click dừng hoặc đối thủ dừng thì trở về màn hình đấu đối kháng.
+- Tại màn hình đấu đối kháng, khi click quay lại thì trở về giao diện chính; khi click tên một đối thủ không bận thì hệ thống hiện dialog xác nhận thách đấu.
+- Từ dialog xác nhận, click hủy thì trở về màn hình đấu đối kháng; click xác nhận thì dialog chuyển sang popup chờ đối thủ trả lời.
+- Từ popup chờ, nếu đối thủ chấp nhận thì chuyển sang giao diện chơi; nếu click hủy lời mời, đối thủ từ chối, đối thủ bận hoặc hết 30 giây thì trở về màn hình đấu đối kháng kèm thông báo tương ứng.
+- Khi nhận lời mời thì hệ thống hiện popup lời mời. Lời mời đến được ở mọi màn hình sau khi đăng nhập trừ giao diện chơi đối kháng; biểu đồ vẽ trường hợp đang ở màn hình đấu đối kháng. Từ popup lời mời, click reject, hết 30 giây hoặc người mời hủy thì trở về màn hình trước đó; click accept thì chuyển sang giao diện chơi.
+- Tại giao diện chơi, mỗi lần click hai ô thì hệ thống hiện lại chính giao diện đó; khi click thoát thì trở về màn hình đấu đối kháng kèm thông báo bị xử thua; khi một bên xóa hết ô, hết giờ, đối thủ thoát hoặc đối thủ mất kết nối thì chuyển sang dialog kết quả.
+- Tại dialog kết quả, khi click tái đấu mà đối thủ chưa chọn thì hệ thống hiện lại chính dialog đó với thông báo đang chờ; nếu cả hai click tái đấu thì chuyển sang giao diện chơi của ván mới; nếu click dừng, click về sảnh (khi đối thủ đã thoát), đối thủ dừng hoặc hết 30 giây thì trở về màn hình đấu đối kháng.
 
 ![Hình 2.9: Biểu đồ trạng thái của modul thách đấu và đấu đối kháng](vp/png/state-m4.png)
 
@@ -357,56 +366,62 @@ Sau kịch bản phiên bản 2 của mỗi modul là biểu đồ tương tác 
 11. Lớp `LobbyScreen` gọi lớp `ChallengeConfirmDialog`.
 12. Lớp `ChallengeConfirmDialog` hiển thị dialog xác nhận thách đấu B cho A.
 13. A click nút Xác nhận.
-14. Lớp `ChallengeConfirmDialog` trả kết quả xác nhận cho lớp `LobbyScreen`.
-15. Lớp `LobbyScreen` gọi lớp `Player` yêu cầu gửi lời mời từ A tới B.
-16. Lớp `Player` gửi lời mời.
-17. Lớp `Player` trả kết quả cho lớp `LobbyScreen`.
-18. Lớp `LobbyScreen` hiển thị thông báo đang chờ B trả lời cho A.
-19. Lớp `LobbyScreen` trên máy của B nhận lời mời và gọi lớp `InvitationDialog`.
-20. Lớp `InvitationDialog` hiển thị lời mời cho B.
-21. B click nút Accept.
-22. Lớp `InvitationDialog` gọi lớp `Board` yêu cầu sinh đề bài 10x10.
-23. Lớp `Board` sinh đề bài.
-24. Lớp `Board` trả đề bài cho lớp `InvitationDialog`.
-25. Lớp `InvitationDialog` gọi lớp `Match` yêu cầu tạo ván đấu cho A và B với đề bài vừa sinh.
-26. Lớp `Match` tạo ván đấu.
-27. Lớp `Match` trả ván đấu cho lớp `InvitationDialog`.
-28. Lớp `InvitationDialog` gọi lớp `Player` yêu cầu chuyển trạng thái A và B sang bận.
-29. Lớp `Player` cập nhật trạng thái.
-30. Lớp `Player` trả kết quả cho lớp `InvitationDialog`.
-31. Lớp `InvitationDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
-32. Lớp `MatchScreen` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B.
-33. A click lần lượt hai ô cùng hình.
-34. Lớp `MatchScreen` gọi lớp `Board` yêu cầu kiểm tra đường nối giữa hai ô.
-35. Lớp `Board` tìm đường nối gồm tối đa 3 đoạn thẳng.
-36. Lớp `Board` trả đường nối cho lớp `MatchScreen`.
-37. Lớp `MatchScreen` gọi lớp `Board` yêu cầu xóa hai ô.
-38. Lớp `Board` xóa hai ô.
-39. Lớp `Board` trả bàn chơi mới cho lớp `MatchScreen`.
-40. Lớp `MatchScreen` gọi lớp `Board` yêu cầu kiểm tra bàn đã hết ô chưa.
-41. Lớp `Board` kiểm tra số ô còn lại.
-42. Lớp `Board` trả kết quả cho lớp `MatchScreen`.
-43. Lớp `MatchScreen` vẽ đường nối, hiển thị bàn chơi mới cho A và số ô còn lại của A cho B.
-(Lặp lại các bước 33-43 cho đến khi bước 42 trả về A đã xóa hết ô; B chơi song song theo cùng các bước trên máy của mình.)
-44. Lớp `MatchScreen` gọi lớp `Match` yêu cầu kết thúc ván và lưu kết quả: A thắng kèm thời gian hoàn thành, B thua.
-45. Lớp `Match` tính điểm, lưu ván đấu và hai kết quả.
-46. Lớp `Match` trả kết quả cho lớp `MatchScreen`.
-47. Lớp `MatchScreen` gọi lớp `ResultDialog` trên máy của cả hai người chơi.
-48. Lớp `ResultDialog` hiển thị kết quả và câu hỏi có muốn tái đấu không cho A và B.
-49. A click nút Dừng.
-50. Lớp `ResultDialog` gọi lớp `Player` yêu cầu chuyển trạng thái A và B về rỗi.
-51. Lớp `Player` cập nhật trạng thái.
-52. Lớp `Player` trả kết quả cho lớp `ResultDialog`.
-53. Lớp `ResultDialog` gọi lớp `LobbyScreen` trên máy của cả hai người chơi.
-54. Lớp `LobbyScreen` gọi lớp `Player` yêu cầu lấy danh sách người chơi online.
-55. Lớp `Player` lấy danh sách người chơi đang online.
-56. Lớp `Player` trả danh sách cho lớp `LobbyScreen`.
-57. Lớp `LobbyScreen` gọi lớp `PlayerRanking` yêu cầu lấy tổng điểm của các người chơi trong danh sách.
-58. Lớp `PlayerRanking` tính tổng điểm.
-59. Lớp `PlayerRanking` trả kết quả cho lớp `LobbyScreen`.
-60. Lớp `LobbyScreen` hiển thị danh sách người chơi online đã cập nhật cho A và B, kèm thông báo đối thủ đã dừng chơi cho B.
+14. Lớp `ChallengeConfirmDialog` gọi lớp `Player` yêu cầu gửi lời mời từ A tới B.
+15. Lớp `Player` kiểm tra B không bận, ghi nhận và gửi lời mời.
+16. Lớp `Player` trả kết quả cho lớp `ChallengeConfirmDialog`.
+17. Lớp `ChallengeConfirmDialog` hiển thị popup đang chờ B trả lời, đếm ngược 30 giây, kèm nút Hủy lời mời cho A.
+18. Lớp `LobbyScreen` trên máy của B nhận lời mời và gọi lớp `InvitationDialog`.
+19. Lớp `InvitationDialog` hiển thị popup lời mời, đếm ngược 30 giây, cho B.
+20. B click nút Accept.
+21. Lớp `InvitationDialog` gọi lớp `Player` yêu cầu ghi nhận B chấp nhận lời mời của A.
+22. Lớp `Player` kiểm tra lời mời còn hiệu lực và gỡ lời mời.
+23. Lớp `Player` trả kết quả cho lớp `InvitationDialog`.
+24. Lớp `InvitationDialog` gọi lớp `Board` yêu cầu sinh đề bài 10x10.
+25. Lớp `Board` sinh đề bài.
+26. Lớp `Board` trả đề bài cho lớp `InvitationDialog`.
+27. Lớp `InvitationDialog` gọi lớp `Match` yêu cầu tạo ván đấu cho A và B với đề bài vừa sinh.
+28. Lớp `Match` tạo ván đấu.
+29. Lớp `Match` trả ván đấu cho lớp `InvitationDialog`.
+30. Lớp `InvitationDialog` gọi lớp `Player` yêu cầu chuyển trạng thái A và B sang bận.
+31. Lớp `Player` cập nhật trạng thái.
+32. Lớp `Player` trả kết quả cho lớp `InvitationDialog`.
+33. Lớp `InvitationDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
+34. Lớp `MatchScreen` hiển thị bàn chơi, đồng hồ và số ô còn lại của đối thủ cho A và B.
+35. A click lần lượt hai ô cùng hình.
+36. Lớp `MatchScreen` gọi lớp `Board` yêu cầu kiểm tra đường nối giữa hai ô.
+37. Lớp `Board` tìm đường nối gồm tối đa 3 đoạn thẳng.
+38. Lớp `Board` trả đường nối cho lớp `MatchScreen`.
+39. Lớp `MatchScreen` gọi lớp `Board` yêu cầu xóa hai ô.
+40. Lớp `Board` xóa hai ô.
+41. Lớp `Board` trả bàn chơi mới cho lớp `MatchScreen`.
+42. Lớp `MatchScreen` gọi lớp `Board` yêu cầu kiểm tra bàn đã hết ô chưa.
+43. Lớp `Board` kiểm tra số ô còn lại.
+44. Lớp `Board` trả kết quả cho lớp `MatchScreen`.
+45. Lớp `MatchScreen` vẽ đường nối, hiển thị bàn chơi mới cho A và số ô còn lại của A cho B.
+(Lặp lại các bước 35-45 cho đến khi bước 44 trả về A đã xóa hết ô; B chơi song song theo cùng các bước trên máy của mình.)
+46. Lớp `MatchScreen` gọi lớp `Match` yêu cầu kết thúc ván vì bàn của A đã hết ô.
+47. Lớp `Match` xác định kết quả: A thắng kèm thời gian hoàn thành, B thua; tính điểm của hai người.
+48. Lớp `Match` lưu ván đấu và hai kết quả.
+49. Lớp `Match` trả kết quả cho lớp `MatchScreen`.
+50. Lớp `MatchScreen` gọi lớp `ResultDialog` trên máy của cả hai người chơi.
+51. Lớp `ResultDialog` hiển thị kết quả, điểm nhận được và câu hỏi có muốn tái đấu không, đếm ngược 30 giây, cho A và B.
+52. A click nút Dừng.
+53. Lớp `ResultDialog` gọi lớp `Match` yêu cầu ghi nhận A chọn dừng.
+54. Lớp `Match` ghi nhận A dừng: ván không được tái đấu.
+55. Lớp `Match` trả kết quả cho lớp `ResultDialog`.
+56. Lớp `ResultDialog` gọi lớp `Player` yêu cầu chuyển trạng thái A và B về rỗi.
+57. Lớp `Player` cập nhật trạng thái.
+58. Lớp `Player` trả kết quả cho lớp `ResultDialog`.
+59. Lớp `ResultDialog` gọi lớp `LobbyScreen` trên máy của cả hai người chơi.
+60. Lớp `LobbyScreen` gọi lớp `Player` yêu cầu lấy danh sách người chơi online.
+61. Lớp `Player` lấy danh sách người chơi đang online.
+62. Lớp `Player` trả danh sách cho lớp `LobbyScreen`.
+63. Lớp `LobbyScreen` gọi lớp `PlayerRanking` yêu cầu lấy tổng điểm của các người chơi trong danh sách.
+64. Lớp `PlayerRanking` tính tổng điểm.
+65. Lớp `PlayerRanking` trả kết quả cho lớp `LobbyScreen`.
+66. Lớp `LobbyScreen` hiển thị danh sách người chơi online đã cập nhật cho A và B, kèm thông báo đối thủ đã dừng chơi cho B.
 
-Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ vẽ đủ các bước 1–60 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 33–43, thuộc modul của Dev 1); vì dài nên ảnh được cắt thành hai phần, mỗi phần lặp lại hàng đầu lifeline (Hình 2.13, 2.14). Nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15.
+Người chơi A và người chơi B là hai actor cùng loại `Player` trên hai máy client. Một bước hiển thị trên cả hai máy được vẽ thành hai thông điệp cùng số, thêm hậu tố `a` (cho A) và `b` (cho B). Biểu đồ vẽ đủ các bước 1–66 của kịch bản phiên bản 2 trong một biểu đồ, kể cả phần chơi ván (bước 35–45, thuộc modul của Dev 1); vì dài nên ảnh được cắt thành hai phần, mỗi phần lặp lại hàng đầu lifeline (Hình 2.13, 2.14). Nhánh tái đấu khi cả hai chọn tái đấu ở Hình 2.15.
 
 ![Hình 2.13: Biểu đồ tuần tự pha phân tích của modul thách đấu, phần 1/2](vp/png/seq-analysis-m4-full-1.png)
 
@@ -416,19 +431,25 @@ Người chơi A và người chơi B là hai actor cùng loại `Player` trên 
 
 *Hình 2.14: Biểu đồ tuần tự pha phân tích của modul thách đấu và đấu đối kháng (phần 2/2)*
 
-Nhánh 14a của kịch bản v1 (cả hai người chơi chọn tái đấu) thay cho các bước 49–60:
+Nhánh 13a của kịch bản v1 (cả hai người chơi chọn tái đấu) thay cho các bước 52–66:
 
 1. Tại dialog kết quả, A click nút Tái đấu.
-2. Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A.
-3. B click nút Tái đấu.
-4. Lớp `ResultDialog` gọi lớp `Board` yêu cầu sinh đề bài 10x10 mới.
-5. Lớp `Board` sinh đề bài.
-6. Lớp `Board` trả đề bài cho lớp `ResultDialog`.
-7. Lớp `ResultDialog` gọi lớp `Match` yêu cầu tạo ván mới cho A và B với đề bài vừa sinh.
-8. Lớp `Match` tạo ván đấu.
-9. Lớp `Match` trả ván đấu cho lớp `ResultDialog`.
-10. Lớp `ResultDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
-11. Lớp `MatchScreen` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B; trạng thái hai người vẫn là bận.
+2. Lớp `ResultDialog` gọi lớp `Match` yêu cầu ghi nhận A chọn tái đấu.
+3. Lớp `Match` ghi nhận A đồng ý, B chưa trả lời.
+4. Lớp `Match` trả kết quả cho lớp `ResultDialog`.
+5. Lớp `ResultDialog` hiển thị thông báo đang chờ đối thủ trả lời cho A.
+6. B click nút Tái đấu.
+7. Lớp `ResultDialog` gọi lớp `Match` yêu cầu ghi nhận B chọn tái đấu.
+8. Lớp `Match` ghi nhận B đồng ý: cả hai đã đồng ý.
+9. Lớp `Match` trả kết quả cho lớp `ResultDialog`.
+10. Lớp `ResultDialog` gọi lớp `Board` yêu cầu sinh đề bài 10x10 mới.
+11. Lớp `Board` sinh đề bài.
+12. Lớp `Board` trả đề bài cho lớp `ResultDialog`.
+13. Lớp `ResultDialog` gọi lớp `Match` yêu cầu tạo ván mới cho A và B với đề bài vừa sinh.
+14. Lớp `Match` tạo ván đấu.
+15. Lớp `Match` trả ván đấu cho lớp `ResultDialog`.
+16. Lớp `ResultDialog` gọi lớp `MatchScreen` trên máy của cả hai người chơi.
+17. Lớp `MatchScreen` hiển thị bàn chơi mới, đồng hồ và số ô còn lại của đối thủ cho A và B; trạng thái hai người vẫn là bận.
 
 ![Hình 2.15: Biểu đồ tuần tự pha phân tích của modul thách đấu, nhánh tái đấu](vp/png/seq-analysis-m4-3.png)
 

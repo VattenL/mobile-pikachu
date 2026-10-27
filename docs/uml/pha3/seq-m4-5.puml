@@ -1,0 +1,133 @@
+@startuml seq-m4-5
+title Biểu đồ tuần tự - Modul Play Online Match (nhánh thoát ván)
+
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam ArrowColor #4A4A4A
+skinparam sequence {
+  LifeLineBorderColor #4A4A4A
+  ParticipantBorderColor #4A4A4A
+  ParticipantBackgroundColor #F7F7F7
+  ActorBorderColor #4A4A4A
+  ActorBackgroundColor #F7F7F7
+}
+autonumber "<b>0:"
+
+actor "Người chơi A" as A
+boundary LobbyActivity
+boundary MatchActivity
+boundary ResultDialog
+control "Server\nConnection" as ServerConnection
+control "Client\nHandler" as ClientHandler
+control "Match\nController" as MatchController
+control "Challenge\nController" as ChallengeController
+control "Match\nManager" as MatchManager
+control "OnlinePlayer\nManager" as OnlinePlayerManager
+control MatchDAO
+control "PlayerRanking\nDAO" as PlayerRankingDAO
+entity "Player\nRanking" as PlayerRanking
+actor "Người chơi B" as B
+
+A -> MatchActivity : click thoát
+MatchActivity -> ServerConnection : send(LEAVE_MATCH)
+MatchActivity -> LobbyActivity : gọi
+LobbyActivity -> A : hiển thị
+ServerConnection -> ClientHandler : LEAVE_MATCH (TCP)
+ClientHandler -> MatchController : handleLeaveMatch()
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : getRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> MatchController : endMatch()
+activate MatchController
+MatchController -> MatchDAO : gọi
+MatchDAO -> MatchDAO : saveMatch()
+activate MatchDAO
+MatchDAO --> MatchController : trả về
+deactivate MatchDAO
+MatchController -> ClientHandler : send(MATCH_END)
+MatchController -> MatchController : stopRematch()
+activate MatchController
+MatchController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : updateStatus()
+activate OnlinePlayerManager
+OnlinePlayerManager --> MatchController : trả về
+deactivate OnlinePlayerManager
+MatchController -> ChallengeController : gọi
+ChallengeController -> ChallengeController : broadcastOnlineList()
+activate ChallengeController
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : getOnlinePlayers()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ChallengeController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getTotalPoints()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> ChallengeController : trả về
+deactivate PlayerRankingDAO
+ChallengeController -> ClientHandler : send(ONLINE_LIST)
+deactivate ChallengeController
+deactivate MatchController
+deactivate MatchController
+ClientHandler -> ServerConnection : MATCH_END,\nONLINE_LIST (TCP)
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> A : hiển thị
+ServerConnection -> MatchActivity : onMessage()
+MatchActivity -> ResultDialog : gọi
+ResultDialog -> B : hiển thị
+B -> ResultDialog : click về sảnh
+ResultDialog -> ServerConnection : send(REMATCH_REPLY)
+ResultDialog -> LobbyActivity : gọi
+ServerConnection -> ClientHandler : REMATCH_REPLY (TCP)
+ClientHandler -> MatchController : handleRematchReply()
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : getRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> MatchController : stopRematch()
+activate MatchController
+MatchController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : updateStatus()
+activate OnlinePlayerManager
+OnlinePlayerManager --> MatchController : trả về
+deactivate OnlinePlayerManager
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : removeRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
+MatchController -> ChallengeController : gọi
+ChallengeController -> ChallengeController : broadcastOnlineList()
+activate ChallengeController
+ChallengeController -> OnlinePlayerManager : gọi
+OnlinePlayerManager -> OnlinePlayerManager : getOnlinePlayers()
+activate OnlinePlayerManager
+OnlinePlayerManager --> ChallengeController : trả về
+deactivate OnlinePlayerManager
+ChallengeController -> PlayerRankingDAO : gọi
+PlayerRankingDAO -> PlayerRankingDAO : getTotalPoints()
+activate PlayerRankingDAO
+PlayerRankingDAO -> PlayerRanking : gọi
+PlayerRanking -> PlayerRanking : PlayerRanking()
+activate PlayerRanking
+PlayerRanking --> PlayerRankingDAO : trả về
+deactivate PlayerRanking
+PlayerRankingDAO --> ChallengeController : trả về
+deactivate PlayerRankingDAO
+ChallengeController -> ClientHandler : send(ONLINE_LIST)
+deactivate ChallengeController
+deactivate MatchController
+ClientHandler -> ServerConnection : ONLINE_LIST (TCP)
+ServerConnection -> LobbyActivity : onMessage()
+LobbyActivity -> A : hiển thị
+@enduml

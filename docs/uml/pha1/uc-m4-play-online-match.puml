@@ -34,8 +34,7 @@ Player --> UC07
 Player --> UC08
 
 UC06 ..> UC02 : <<include>>
-UC07 ..> UC02 : <<include>>
 UC08 ..> UC08_1 : <<include>>
-UC08 ..> UC08_2 : <<include>>
+UC08 <.. UC08_2 : <<extend>>
 UC08 <.. UC08_3 : <<extend>>
 @enduml

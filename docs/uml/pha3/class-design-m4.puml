@@ -17,16 +17,21 @@ skinparam class {
 
 ' ===== Client Android: tang giao dien =====
 class ChallengeConfirmDialog #E3F2FD {
-  - tvOpponent : TextView
+  - tvMessage : TextView
   - btnConfirm : Button
   - btnCancel : Button
   - opponent : Player
+  - countDown : CountDownTimer
   + onConfirmClick(v : View) : void
   + onCancelClick(v : View) : void
+  + onMessage(msg : Message) : void
 }
 
 abstract class BaseActivity #E3F2FD {
+  - invitationQueue : ArrayDeque<Message>
+  - invitationDialog : InvitationDialog
   + onMessage(msg : Message) : void
+  + showNextInvitation() : void
 }
 
 class MainActivity #E3F2FD {
@@ -47,9 +52,11 @@ class LobbyActivity #E3F2FD {
 
 class InvitationDialog #E3F2FD {
   - tvChallenger : TextView
+  - tvCountdown : TextView
   - btnAccept : Button
   - btnReject : Button
   - challenger : String
+  - countDown : CountDownTimer
   + onAcceptClick(v : View) : void
   + onRejectClick(v : View) : void
 }
@@ -63,7 +70,7 @@ class MatchActivity #E3F2FD {
   - btnQuit : Button
   - board : Board
   - opponentBoard : Board
-  - matchId : int
+  - roomId : int
   - opponent : Player
   - firstCell : Cell
   + onCellClick(cell : Cell) : void
@@ -73,9 +80,11 @@ class MatchActivity #E3F2FD {
 
 class ResultDialog #E3F2FD {
   - tvResult : TextView
+  - tvCountdown : TextView
   - btnRematch : Button
   - btnStop : Button
-  - matchId : int
+  - roomId : int
+  - countDown : CountDownTimer
   + onRematchClick(v : View) : void
   + onStopClick(v : View) : void
   + onMessage(msg : Message) : void
@@ -85,6 +94,7 @@ class ResultDialog #E3F2FD {
 class ServerConnection #EDE7F6 {
   - socket : Socket
   - listeners : ArrayList<MessageListener>
+  - pingTimer : Timer
   + getInstance() : ServerConnection
   + send(msg : Message) : void
   + addListener(l : MessageListener) : void
@@ -98,15 +108,20 @@ interface MessageListener #EDE7F6 {
 class ClientHandler #E8F5E9 {
   - socket : Socket
   - player : Player
+  - roomId : Integer
   + run() : void
   + send(msg : Message) : void
 }
 
 class ChallengeController #E8F5E9 {
+  - inviteTimer : Timer
   + handleGetOnlineList(handler : ClientHandler, msg : Message) : void
   + handleInvite(handler : ClientHandler, msg : Message) : void
+  + handleInviteCancel(handler : ClientHandler, msg : Message) : void
   + handleInviteReply(handler : ClientHandler, msg : Message) : void
   + handleUpdateStatus(handler : ClientHandler, msg : Message) : void
+  + onInviteTimeout(from : String, to : String) : void
+  + closeInvitations(username : String, reason : String) : void
   + broadcastOnlineList() : void
 }
 
@@ -115,33 +130,43 @@ class MatchController #E8F5E9 {
   + handleLeaveMatch(handler : ClientHandler, msg : Message) : void
   + handleRematchReply(handler : ClientHandler, msg : Message) : void
   + onTimeout(room : MatchRoom) : void
+  + onRematchTimeout(room : MatchRoom) : void
   + handleDisconnect(handler : ClientHandler) : void
   - endMatch(room : MatchRoom, reason : String) : void
+  - stopRematch(room : MatchRoom, stopper : ClientHandler) : void
 }
 
 class OnlinePlayerManager #E8F5E9 {
   - onlineHandlers : HashMap<String, ClientHandler>
+  - pendingInvites : HashMap<String, String>
   + getInstance() : OnlinePlayerManager
   + getOnlinePlayers() : ArrayList<Player>
-  + sendInvitation(from : Player, to : Player) : boolean
+  + getHandler(username : String) : ClientHandler
+  + sendInvitation(from : String, to : String) : String
+  + removeInvitation(from : String, to : String) : boolean
+  + removeInvitationsOf(username : String) : HashMap<String, String>
   + updateStatus(listPlayer : ArrayList<Player>, status : String) : boolean
   + removeOnlinePlayer(handler : ClientHandler) : boolean
 }
 
 class MatchManager #E8F5E9 {
   - rooms : HashMap<Integer, MatchRoom>
+  - nextRoomId : int
   + getInstance() : MatchManager
   + createMatch(a : ClientHandler, b : ClientHandler, board : Board) : MatchRoom
-  + getRoom(matchId : int) : MatchRoom
+  + getRoom(roomId : int) : MatchRoom
+  + removeRoom(roomId : int) : void
 }
 
 class MatchRoom #E8F5E9 {
+  - roomId : int
   - match : Match
   - handlers : ClientHandler[]
   - boards : Board[]
   - startMillis : long
   - timer : Timer
   - rematchReplies : Boolean[]
+  - ended : boolean
   + getBoard(handler : ClientHandler) : Board
   + getOpponent(handler : ClientHandler) : ClientHandler
 }
@@ -223,10 +248,12 @@ LobbyActivity -up-|> BaseActivity
 BaseActivity ..|> MessageListener
 MatchActivity ..|> MessageListener
 ResultDialog ..|> MessageListener
+ChallengeConfirmDialog ..|> MessageListener
 BaseActivity -[norank]- MatchActivity
 
 ' giao dien - mang
 LobbyActivity -down- ServerConnection
+ChallengeConfirmDialog -down- ServerConnection
 InvitationDialog -down- ServerConnection
 MatchActivity -down- ServerConnection
 ResultDialog -down- ServerConnection

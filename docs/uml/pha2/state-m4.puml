@@ -17,6 +17,7 @@ state "Hiển thị MainScreen" as Main
 state "Hiển thị LoginScreen" as Login
 state "Hiển thị LobbyScreen" as Lobby
 state "Hiển thị ChallengeConfirmDialog" as Confirm
+state "Hiển thị ChallengeConfirmDialog (chờ trả lời)" as Waiting
 state "Hiển thị InvitationDialog" as Invitation
 state "Hiển thị MatchScreen" as Match
 state "Hiển thị ResultDialog" as Result
@@ -27,15 +28,17 @@ Login --> Lobby : [đăng nhập thành công]
 Main --> Lobby : [click đấu đối kháng,\nđã đăng nhập]
 Lobby --> Main : [click quay lại]
 Lobby --> Confirm : [click tên đối thủ không bận]
-Confirm --> Lobby : [click hủy]\n[click xác nhận]
-Lobby --> Lobby : [đối thủ từ chối]
+Confirm --> Lobby : [click hủy]
+Confirm --> Waiting : [click xác nhận]
+Waiting --> Lobby : [click hủy lời mời, đối thủ từ chối,\nđối thủ bận hoặc hết 30 giây]
+Waiting --> Match : [đối thủ chấp nhận]
 Lobby --> Invitation : [nhận lời mời]
-Invitation --> Lobby : [click reject]
+Invitation --> Lobby : [click reject, hết 30 giây\nhoặc người mời hủy]
 Invitation --> Match : [click accept]
-Lobby --> Match : [đối thủ chấp nhận]
 Match --> Match : [click hai ô]
-Match --> Lobby : [click thoát]
-Match --> Result : [một bên xóa hết ô,\nhết giờ hoặc\nđối thủ thoát]
+Match --> Lobby : [click thoát (bị xử thua)]
+Match --> Result : [một bên xóa hết ô, hết giờ,\nđối thủ thoát hoặc mất kết nối]
+Result --> Result : [click tái đấu, đối thủ chưa chọn]
 Result --> Match : [cả hai click\ntái đấu]
-Result --> Lobby : [click dừng hoặc\nđối thủ dừng]
+Result --> Lobby : [click dừng, click về sảnh,\nđối thủ dừng hoặc hết 30 giây]
 @enduml

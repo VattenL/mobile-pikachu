@@ -22,7 +22,7 @@ Lấy theo các chức năng của đề. Dòng Dễ của đề (quản lí th�
 | Mã | Modul | Mức | Nội dung |
 | --- | --- | --- | --- |
 | M1 | Quản lý tài khoản | Dễ | Đăng ký, đăng nhập, đăng xuất |
-| M2 | Xem bảng xếp hạng | Dễ | Đăng nhập, xem bảng xếp hạng theo ba tiêu chí |
+| M2 | Xem bảng xếp hạng | Dễ | Xem bảng xếp hạng theo ba tiêu chí (khách cũng xem được), xem vị trí của mình |
 | M3 | Thi đấu với máy | Trung bình | Chọn độ khó, đua với bot trên cùng một đề, xem kết quả |
 | M4 | Thách đấu và đấu đối kháng | Khó | Xem danh sách online, thách đấu, trả lời lời mời, chơi ván đối kháng, chọn tái đấu / dừng |
 
@@ -60,7 +60,7 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
   - Bước 1, actor: `Người chơi`; người bị thách đấu là actor gián tiếp của use case thách đấu.
   - Bước 2, mỗi chức năng ở §1.2 thành một use case.
   - Bước 3, mịn hóa: gộp các use case trùng nhau, dùng use case trừu tượng nếu cần.
-- **Use case chi tiết cho từng modul M2 đến M1:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
+- **Use case chi tiết cho từng modul M1 đến M4:** trích phần use case tương ứng từ biểu đồ tổng quan; mỗi giao diện tương tác thành một use case con; xác định quan hệ include / extend / generalization; kèm bảng mô tả từng use case.
 - Ví dụ use case con: `Nối cặp ô` được cả M3 và M4 include; `Trả lời lời mời` (M4).
 - Quy tắc: tên use case là động từ chỉ hành động của actor; mỗi use case có đường đi tới ít nhất một actor; mã use case (UC01, UC02...) giữ nguyên từ biểu đồ tổng quan sang biểu đồ chi tiết.
 
@@ -91,7 +91,8 @@ Phần dùng chung toàn hệ thống (từ khóa, mô tả hệ thống, use ca
 ### 2.3. Trích lớp biên và lớp điều khiển, biểu đồ lớp phân tích (§3.2.3)
 
 - **Bước 1:** mỗi giao diện thành một lớp biên. Giao diện dự kiến:
-  - M2: đăng nhập, đăng ký, trang chính, bảng xếp hạng.
+  - M1: đăng nhập, đăng ký, trang chính.
+  - M2: trang chính, bảng xếp hạng.
   - M3: chọn độ khó, bàn chơi, kết quả.
   - M4: màn hình đấu đối kháng (danh sách online, mở từ giao diện chính), dialog lời mời, bàn chơi, dialog kết quả và hỏi tái đấu.
 - **Bước 2:** mỗi thành phần giao diện thành một thuộc tính, tiền tố `in` (nhận dữ liệu vào), `out` (hiện dữ liệu ra), `sub` (submit).
@@ -181,7 +182,7 @@ Mỗi thuật toán có mã giả và hình minh họa.
 
 ### 4.2. Cài đặt các modul (§5.2)
 
-- Mỗi modul M2 đến M1: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
+- Mỗi modul M1 đến M4: trình bày code các lớp trong biểu đồ lớp thiết kế (lớp giao diện, lớp điều khiển phía server, DAO) và giải thích cách các phương thức hoạt động. Lớp thực thể không cần trình bày code.
 
 ### 4.3. Kiểm thử đơn vị (§5.3)
 
@@ -249,8 +250,8 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 - **Hạ tầng chung do Dev 2 dựng trước:** `GameServer`, `ClientHandler`, `ServerConnection`, `MessageListener`, `Message`, lớp `DAO`, script tạo CSDL và dữ liệu mẫu. Dev 1 đã nhận phần thuật toán nặng nhất (`core`, bot, trọng tài) nên không nhận thêm hạ tầng.
 - **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
   - Dev 1: `handleMove()`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
-  - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `MatchDAO`, `ResultDialog`.
-  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Khi code có thể tách phần của Dev 2 ra một lớp riêng để không sửa chung một file; nếu tách thì sửa Hình 3.12, kịch bản v3 và biểu đồ tuần tự M4 cho khớp.
+  - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `stopRematch()`, `onRematchTimeout()`, `MatchDAO`, `ResultDialog`.
+  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Quyết định 2026-10-27: không tách, giữ `MatchController` chung; phần của Dev 2 gồm thêm `stopRematch()`, `onRematchTimeout()`. `MatchRoom` (Dev 1) có thêm `roomId`, cờ `ended` và dùng lại `timer` để hẹn 30 giây chờ tái đấu; các thuộc tính này do phần của Dev 2 dùng.
 - `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
 - Mỗi người chỉ sửa code thuộc phần mình; thay đổi interface dùng chung (mục 5) phải báo người kia.
 - Đề yêu cầu "server lưu toàn bộ thông tin", nên CSDL và tài khoản nằm trên server ngay từ Phase 1, không làm bản offline rồi bỏ.
@@ -283,7 +284,7 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
   - `ServerSocket` đa luồng, mỗi client một `ClientHandler`; `Message` và danh sách loại message.
   - Tầng network client: kết nối, gửi/nhận message JSON trên luồng nền, đẩy sự kiện về UI thread.
   - CSDL: các bảng `tblPlayer`, `tblMatch`, `tblMatchResult` (như Phần I §3.2), lớp `DAO`, dữ liệu mẫu.
-- Sảnh: `OnlinePlayerManager` (danh sách online, trạng thái rỗi / luyện tập / bận), màn chính với danh sách online, tự đẩy `ONLINE_LIST`.
+- Sảnh: `OnlinePlayerManager` (danh sách online, trạng thái rỗi / luyện tập / bận, lời mời đang chờ), màn hình đấu đối kháng (`LobbyActivity`) với danh sách online, tự đẩy `ONLINE_LIST`.
 - Bảng xếp hạng: `PlayerRankingDAO` (truy vấn 3 tiêu chí, đồng hạng; tổng điểm cho danh sách online), `RankingController`, màn Bảng xếp hạng. Có thể nhập sẵn dữ liệu trận giả để test.
 
 ### Việc chung ngày đầu
@@ -301,9 +302,9 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 
 ### Dev 2: thách đấu, kết thúc ván và tái đấu
 
-- Thách đấu và trả lời lời mời: `ChallengeConfirmDialog`, `InvitationDialog`, `BaseActivity` (nhận lời mời ở mọi màn hình), `ChallengeController` (`INVITE`, `INVITE_REPLY`, `UPDATE_STATUS`, người được mời đang bận, hai người mời nhau cùng lúc); khi đồng ý thì sinh đề bằng `generateBoard()` của `core`, tạo ván bằng `MatchManager.createMatch()` (Dev 2 cài `MatchManager`: tạo, tra cứu và bỏ phòng chơi), chuyển hai người sang bận bằng `updateStatus()`, gửi `MATCH_START`.
-- Kết thúc ván: `endMatch()` xác định kết quả theo lý do (xóa hết ô, hết giờ, thoát, mất kết nối) và chỉ kết thúc một lần dù hai người về đích gần như cùng lúc; bộ hẹn giờ 10 phút và `onTimeout()`; `handleLeaveMatch()`; mất kết nối giữa ván bị xử thua; `MatchDAO.saveMatch()` lưu ván và hai kết quả trong một giao dịch; gửi `MATCH_END`.
-- Tái đấu: `ResultDialog`, `handleRematchReply()`: cả hai tái đấu thì bắt đầu ván mới; một người dừng (hoặc mất kết nối ở dialog kết quả) thì gửi `OPPONENT_LEFT`, trả hai người về rỗi, gửi lại danh sách online.
+- Thách đấu và trả lời lời mời: `ChallengeConfirmDialog` (kèm popup chờ có nút Hủy lời mời), `InvitationDialog` (popup không chặn), `BaseActivity` (nhận lời mời ở mọi màn hình, hàng đợi lời mời), `ChallengeController` (`INVITE`, `INVITE_CANCEL`, `INVITE_REPLY`, `UPDATE_STATUS`, lời mời hết hạn sau 30 giây, người được mời đang bận, hai người mời nhau cùng lúc, đóng các lời mời khác khi một người vào ván); khi đồng ý thì sinh đề bằng `generateBoard()` của `core`, tạo ván bằng `MatchManager.createMatch()` (Dev 2 cài `MatchManager`: tạo, tra cứu và bỏ phòng chơi), chuyển hai người sang bận bằng `updateStatus()`, gửi `MATCH_START`.
+- Kết thúc ván: `endMatch()` xác định kết quả theo lý do (xóa hết ô, hết giờ, thoát, mất kết nối) và chỉ kết thúc một lần dù hai người về đích gần như cùng lúc; bộ hẹn giờ 10 phút và `onTimeout()`; `handleLeaveMatch()` (người thoát bị xử thua và được coi như đã dừng); mất kết nối giữa ván (lỗi đọc hoặc quá 15 giây không có `PING`) bị xử thua; `MatchDAO.saveMatch()` lưu ván và hai kết quả trong một giao dịch; gửi `MATCH_END`.
+- Tái đấu: `ResultDialog` (đếm ngược 30 giây), `handleRematchReply()`, `stopRematch()`, `onRematchTimeout()`: cả hai tái đấu thì bắt đầu ván mới; một người dừng, hết 30 giây hoặc mất kết nối ở dialog kết quả thì gửi `OPPONENT_LEFT`, trả hai người về rỗi, bỏ phòng, gửi lại danh sách online.
 
 ## 5. Hợp đồng giao tiếp
 
@@ -352,30 +353,33 @@ public final class Bot {
 JSON, mỗi message một dòng, trường `type` xác định loại:
 
 | Chiều | `type` | Nội dung chính |
-| --- | --- | --- |
+|---|---|---|
 | C → S | `REGISTER` | `username`, `password` |
 | S → C | `REGISTER_RESULT` | `ok`, `error` |
 | C → S | `LOGIN` | `username`, `password` |
-| S → C | `LOGIN_RESULT` | `ok`, `error`, `player` `{username, totalPoint}` |
-| C → S | `LOGOUT` | |
-| C → S | `UPDATE_STATUS` | `status`: `TRAINING` khi bắt đầu chơi với máy, `IDLE` khi thôi; server bỏ qua nếu người chơi đang `BUSY` |
-| C → S | `GET_ONLINE_LIST` | khi mở màn hình đấu đối kháng; server trả `ONLINE_LIST` cho riêng người hỏi |
-| S → C | `ONLINE_LIST` | danh sách `{username, totalPoint, status}`. Server **tự đẩy** cho mọi client rỗi mỗi khi có người đăng nhập, đăng xuất, đổi trạng thái hoặc đổi điểm; client không cần hỏi |
-| C → S | `GET_RANKING` | `page` hoặc `mine` (trang chứa người chơi đang đăng nhập); khách cũng gửi được |
-| S → C | `RANKING` | `page`, `pageCount`, `me`, danh sách `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}` của trang (10 dòng một trang) |
+| S → C | `LOGIN_RESULT` | `ok`, `error`, `player` |
+| C → S | `LOGOUT` | không có dữ liệu; server gỡ người chơi khỏi danh sách online, không trả lời |
+| C → S | `PING` | không có dữ liệu, gửi mỗi 5 giây; server không trả lời |
+| C → S | `UPDATE_STATUS` | `status`: `TRAINING` khi bắt đầu ván với máy, `IDLE` khi ván kết thúc hoặc thoát; server bỏ qua nếu đang `BUSY` |
+| C → S | `GET_ONLINE_LIST` | không có dữ liệu; server trả `ONLINE_LIST` cho riêng người hỏi |
+| S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`), không gồm người nhận |
+| C → S | `GET_RANKING` | `page` (số trang, bắt đầu từ 1) hoặc `mine` (`true`: trang chứa người chơi đang đăng nhập) |
+| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi khi `mine`, rỗng nếu chưa có trong bảng), danh sách `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}` của trang |
 | C → S | `INVITE` | `to` |
-| S → C | `INVITE_RECEIVED` | `from` (gửi cho người được mời) |
+| S → C | `INVITE_RECEIVED` | `from`, `timeoutSec` (30): gửi cho người được mời |
+| C → S | `INVITE_CANCEL` | `to`: người mời hủy lời mời đang chờ |
 | C → S | `INVITE_REPLY` | `from`, `accept` |
-| S → C | `INVITE_RESULT` | `to`, `accepted`, `reason` (`REJECTED` / `BUSY` / `OFFLINE`), gửi cho người mời |
-| S → C | `MATCH_START` | `matchId`, `tiles` (đề ban đầu), `timeLimitSec`, `opponent` `{username}` |
-| C → S | `MOVE` | `matchId`, `a`, `b` |
-| S → C | `MOVE_RESULT` | `ok`, `path` (khi hợp lệ), `remaining` |
-| S → C | `BOARD_SHUFFLED` | `tiles` (bàn mới), chỉ gửi cho người có bàn bị bế tắc |
-| S → C | `OPPONENT_PROGRESS` | `remaining`, `a`, `b`, `path`, `tiles` (bàn hiện tại của đối thủ), `shuffled`: để mỗi người nhìn thấy bàn của đối thủ |
-| C → S | `LEAVE_MATCH` | `matchId` (bấm Thoát, bị xử thua) |
-| S → C | `MATCH_END` | `result` (WIN / DRAW / LOSE), `point`, `finishTime` hai bên, `remaining` hai bên, `reason` (`CLEARED` / `TIMEOUT` / `QUIT` / `DISCONNECT`) |
-| C → S | `REMATCH_REPLY` | `matchId`, `accept` |
-| S → C | `OPPONENT_LEFT` | gửi cho người còn lại khi đối thủ chọn Dừng, thoát ván hoặc mất kết nối |
+| S → C | `INVITE_RESULT` | gửi cho người mời: `to`, `accepted`, `reason` (`REJECTED`: bị từ chối; `BUSY`: người được mời đang bận hoặc vừa vào ván khác; `OFFLINE`: người được mời không online hoặc vừa rời mạng; `EXPIRED`: hết 30 giây chưa được trả lời) |
+| S → C | `INVITE_CLOSED` | gửi cho người được mời khi lời mời không còn hiệu lực: `from`, `reason` (`CANCELLED`: người mời hủy; `EXPIRED`: hết 30 giây, hoặc trả lời một lời mời đã hết hiệu lực; `BUSY`: người mời đã vào ván khác; `OFFLINE`: người mời đăng xuất hoặc mất kết nối) |
+| S → C | `MATCH_START` | `roomId`, `tiles`, `timeLimitSec`, `opponent` |
+| C → S | `MOVE` | `roomId`, `a`, `b` |
+| S → C | `MOVE_RESULT` | `ok`, `path`, `remaining` |
+| S → C | `BOARD_SHUFFLED` | `tiles` (chỉ gửi cho người có bàn bị bế tắc) |
+| S → C | `OPPONENT_PROGRESS` | `remaining`, `a`, `b`, `path` (nước đối thủ vừa đi), `tiles` (bàn hiện tại của đối thủ), `shuffled` (bàn đối thủ vừa được xáo) |
+| C → S | `LEAVE_MATCH` | `roomId` |
+| S → C | `MATCH_END` | `result`, `point`, `finishTime` và `remaining` của hai bên, `reason` (`CLEARED`, `TIMEOUT`, `QUIT`, `DISCONNECT`), `rematch` (`true` thì hỏi tái đấu; `false` khi đối thủ thoát hoặc mất kết nối), `replySec` (30); với `QUIT`, `DISCONNECT` chỉ gửi cho người còn lại |
+| C → S | `REMATCH_REPLY` | `roomId`, `accept`; gửi lại được để đổi từ đồng ý sang từ chối |
+| S → C | `OPPONENT_LEFT` | không có dữ liệu; gửi cho người còn ở dialog kết quả khi đối thủ chọn Dừng, hết thời gian trả lời hoặc mất kết nối |
 
 Ván mới sau khi cả hai chọn Tái đấu bắt đầu bằng một `MATCH_START` mới.
 
@@ -400,9 +404,9 @@ Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong m�
 | M1 (quản lý tài khoản), từ use case chi tiết đến kiểm thử | Dev 1 |
 | M2 (xem bảng xếp hạng), từ use case chi tiết đến kiểm thử | Dev 2 |
 | M3 (thi đấu với máy), từ use case chi tiết đến kiểm thử; thuật toán §3.5 | Dev 1 |
-| M4, phần thách đấu và trả lời lời mời (kịch bản bước 1–8 và các ngoại lệ 2a–8a) | Dev 2 |
+| M4, phần thách đấu và trả lời lời mời (kịch bản bước 1–8 và các ngoại lệ 2a–7e) | Dev 2 |
 | M4, phần chơi ván (kịch bản bước 9–11, ngoại lệ 10a, 10b) | Dev 1 |
-| M4, phần kết thúc ván và tái đấu (kịch bản bước 12–14, ngoại lệ 8b, 12a, 12b, 14a) | Dev 2 |
+| M4, phần kết thúc ván và tái đấu (kịch bản bước 12–14, ngoại lệ 9a, 12a–12c, 13a–13d) | Dev 2 |
 | Giao thức §3.4 | Dev 2 |
 | Thiết kế triển khai §3.3.3, tổ chức dự án §4.1, rà soát §5.1 | Cả hai |
 
@@ -420,11 +424,15 @@ Tài liệu vẫn viết theo modul (Pha 2–5 mỗi modul một bộ); trong m�
 - [x] **Cách tính điểm:** theo đề, thắng 1, hòa 0.5, thua 0 (`de_bai.md` là nguồn quyết định). Điểm suy ra từ `result` nên CSDL không lưu cột điểm.
 - [x] **Lưu bàn chơi:** CSDL lưu đề bài ban đầu (`tblMatch.tiles`) và bàn của từng người lúc ván kết thúc (`tblMatchResult.tiles`), theo quan hệ `Match` ◇ `Board` và `MatchResult` ◇ `Board` ở biểu đồ lớp thực thể.
 - [ ] **AWT với ván thắng do đối thủ bỏ cuộc:** đề xuất không tính vào AWT (người thắng chưa xóa hết ô nên không có `finishTime`).
-- [ ] **Một tài khoản đăng nhập ở 2 máy:** đề xuất từ chối lần đăng nhập sau (`LOGIN_RESULT` báo "tài khoản đang đăng nhập ở máy khác"), khớp ngoại lệ 2b của kịch bản M2.
-- [ ] **Mất kết nối ngoài ván:** đề xuất: đang có lời mời chờ thì server coi như từ chối (`INVITE_RESULT` với `OFFLINE`); đang ở dialog kết quả thì coi như chọn Dừng (`OPPONENT_LEFT`).
-- [ ] **Trạng thái trong lúc ở dialog kết quả (hỏi tái đấu):** đề xuất vẫn là bận cho đến khi cả hai trả lời, để không ai mời chen vào.
+- [ ] **Một tài khoản đăng nhập ở 2 máy:** đề xuất từ chối lần đăng nhập sau (`LOGIN_RESULT` báo "tài khoản đang đăng nhập ở máy khác"), khớp ngoại lệ 6b của kịch bản M1.
+- [x] **Mất kết nối ngoài ván:** đang có lời mời chờ thì mọi lời mời đi và đến người đó bị đóng với lý do `OFFLINE`; đang ở dialog kết quả thì coi như chọn Dừng (`OPPONENT_LEFT`).
+- [x] **Trạng thái trong lúc ở dialog kết quả (hỏi tái đấu):** vẫn là bận cho đến khi người đó rời dialog; dialog có hạn 30 giây, hết hạn coi như chọn Dừng; đã chọn Tái đấu vẫn đổi sang Dừng được.
 - [ ] **Số loại icon** trên bàn 10x10: đề xuất 25 loại, mỗi loại 4 ô.
 - [ ] **CSDL server:** MySQL hay SQLite. Đề xuất MySQL (server đa luồng ghi đồng thời, giáo trình cũng dùng MySQL).
 - [ ] **Phản hồi nước đi trong ván online:** hiện `MatchActivity` gửi `MOVE` rồi chờ `MOVE_RESULT` mới xóa ô, mạng chậm sẽ thấy giật. Đề xuất client kiểm tra ngay bằng `PathFinder` của `core` và xóa ô trên máy, server vẫn kiểm tra lại; server từ chối thì trả bàn về như cũ. Nếu chốt thì sửa pha 3 mục 4d, mục 7 và kịch bản v3 M4.
-- [ ] **Phát hiện mất kết nối (heartbeat):** hiện chỉ biết mất kết nối khi đọc socket báo lỗi; trên điện thoại kết nối có thể "chết im" nhiều phút, ván treo. Đề xuất client gửi `PING` định kỳ (ví dụ 5 giây), server đặt thời gian chờ đọc (ví dụ 15 giây) rồi xử lý như mất kết nối. Nếu chốt thì thêm message vào pha 3 mục 7 và §5.2.
+- [x] **Phát hiện mất kết nối (heartbeat):** client gửi `PING` mỗi 5 giây, server đặt thời gian chờ đọc 15 giây rồi xử lý như mất kết nối. Client mất kết nối thì xóa phiên, về giao diện chính chế độ khách và phải đăng nhập lại.
+- [x] **Thoát hoặc mất kết nối giữa ván (2026-10-27):** người thoát bị xử thua (0 điểm, không trừ điểm) và được coi như đã chọn Dừng: về sảnh ngay với thông báo, không hỏi tái đấu; người còn lại thấy dialog kết quả chỉ có nút Về sảnh.
+- [x] **Lời mời (2026-10-27):** lời mời hết hạn sau 30 giây tính từ lúc gửi; người mời thấy popup chờ chặn màn hình có nút Hủy lời mời, nên mỗi lúc chỉ có một lời mời đi; người được mời thấy popup không chặn (ván với máy vẫn chạy), nhiều lời mời thì xếp hàng trên máy và hiện lần lượt. Khi một người vào ván, mọi lời mời khác đi và đến người đó bị đóng.
+- [x] **Mã ván trong lúc chơi (2026-10-27):** ván đang diễn ra dùng mã phòng `roomId` do `MatchManager` cấp trong bộ nhớ; `Match.id` của CSDL chỉ có khi lưu lúc kết thúc.
+- [x] **Người chưa có ván trong bảng xếp hạng (2026-10-27):** không có trong bảng xếp hạng, vì không có trung bình điểm đối thủ để xếp theo tiêu chí 2; danh sách online vẫn hiện họ với 0 điểm.
 - [ ] **Vòng đời Android:** app xuống nền có thể bị thu hồi làm mất kết nối, người chơi bị xử thua. Tối thiểu: giữ `ServerConnection` ở mức ứng dụng (đã là singleton) và gỡ `MessageListener` khi màn hình đóng; làm kỹ hơn thì giữ kết nối trong một Service. Với phạm vi đồ án đề xuất làm mức tối thiểu.

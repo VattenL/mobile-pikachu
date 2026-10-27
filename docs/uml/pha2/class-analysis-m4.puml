@@ -29,12 +29,14 @@ class LobbyScreen {
 
 class ChallengeConfirmDialog {
   - outOpponent
+  - outWaiting
   - subConfirm
   - subCancel
 }
 
 class InvitationDialog {
   - outChallenger
+  - outRemainingTime
   - subAccept
   - subReject
 }
@@ -49,6 +51,7 @@ class MatchScreen {
 
 class ResultDialog {
   - outResult
+  - outRemainingTime
   - subRematch
   - subStop
 }
@@ -60,6 +63,8 @@ class Player {
   - status
   + getOnlinePlayers()
   + sendInvitation()
+  + cancelInvitation()
+  + replyInvitation()
   + updateStatus()
 }
 
@@ -87,7 +92,9 @@ class Match {
   - endTime
   - timeLimit
   + createMatch()
+  + endMatch()
   + saveMatch()
+  + replyRematch()
 }
 
 class MatchResult {
@@ -105,6 +112,7 @@ ResultDialog -[norank]- LobbyScreen
 
 LobbyScreen -down- Player
 LobbyScreen -down- PlayerRanking
+ChallengeConfirmDialog -down- Player
 InvitationDialog -down- Board
 InvitationDialog -down- Match
 InvitationDialog -down- Player

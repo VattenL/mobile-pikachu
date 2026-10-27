@@ -34,7 +34,7 @@ Vấn đề cần trao đổi:
 |---|---|---|---|
 | 1 | Tài liệu phân tích tuân theo phương pháp của giáo trình? | Y | Kịch bản v1, lớp thực thể, lớp phân tích, trạng thái, v2, giao tiếp |
 | 2 | Các màn hình đã được xác định? | Y | Mỗi lớp biên một màn hình |
-| 3 | Thông báo lỗi, cảnh báo, thông báo thông tin đầy đủ? | N | Thiếu thông báo khi đối thủ mất kết nối lúc đang mời và lúc ở dialog tiếp tục |
+| 3 | Thông báo lỗi, cảnh báo, thông báo thông tin đầy đủ? | Y | Kịch bản v1 M4 có thông báo cho từng ngoại lệ của lời mời (6a–7e), thoát ván (9a) và dialog kết quả (13b–13d); M2 có 2a, 2c |
 | 4 | Các giao tiếp giữa các thành phần đã được xác định? | Y | Biểu đồ giao tiếp khớp kịch bản v2 và biểu đồ lớp phân tích |
 | 5 | Thứ tự sắp xếp của báo cáo (bảng xếp hạng) đã được chỉ định? | Y | Ba tiêu chí theo đề |
 | 6 | Các trường của báo cáo tồn tại trong CSDL hoặc tính được? | Y | Ba chỉ số tính từ `MatchResult` |
@@ -44,10 +44,10 @@ Vấn đề cần trao đổi:
 
 Vấn đề cần trao đổi:
 
-1. Kịch bản modul thách đấu chưa có ngoại lệ: người được mời mất kết nối khi lời mời đang chờ; một người mất kết nối khi đang ở dialog hỏi tiếp tục. Thiết kế (pha 3, mục 7) đang xử lý theo phương án đề xuất ở `plan.md` §8.
-2. Ngoại lệ 2b của kịch bản xem bảng xếp hạng (tài khoản đang đăng nhập ở máy khác) chưa nói hệ thống xử lý thế nào. Thiết kế đang từ chối lần đăng nhập sau.
+1. Đã xử lý (2026-10-27): kịch bản modul thách đấu có ngoại lệ cho lời mời hủy, hết hạn, người mời hoặc người được mời mất kết nối (7a–7e) và mất kết nối ở dialog kết quả (13d), theo các quyết định ở `plan.md` §8.
+2. Ngoại lệ 6b của kịch bản quản lý tài khoản (tài khoản đang đăng nhập ở máy khác) chưa nói hệ thống xử lý thế nào. Thiết kế đang từ chối lần đăng nhập sau.
 3. Ở pha phân tích, `MatchScreen` gọi trực tiếp `Board` để kiểm tra đường nối. Đây là mức trừu tượng của pha phân tích; ở thiết kế việc kiểm tra chuyển lên server (trọng tài). Không cần sửa pha 2 nhưng cần ghi nhận để người đọc không hiểu nhầm là client tự kiểm tra trong ván đối kháng.
-4. Ngoại lệ 4a của kịch bản xem bảng xếp hạng (bảng rỗng khi chưa có ván nào) ngầm định bảng xếp hạng chỉ gồm người đã có ván. Thiết kế theo cách hiểu này; cần xác nhận người chưa chơi ván nào có cần hiện với 0 điểm không.
+4. Ngoại lệ 2a và 4a của kịch bản xem bảng xếp hạng ngầm định bảng xếp hạng chỉ gồm người đã có ván. Đã chốt (2026-10-27, `plan.md` §8): người chưa có ván nào không có trong bảng xếp hạng.
 
 ### c. Rà soát thiết kế (pha 3)
 
@@ -62,7 +62,7 @@ Vấn đề cần trao đổi:
 | 7 | Truy cập đồng thời đã được xử lý? | Y | Đồng bộ trên `MatchRoom`, `ClientHandler.send()` và mọi hàm của DAO (cả đọc, vì các luồng dùng chung một kết nối) |
 | 8 | Mỗi phương thức trong kịch bản v3 có trong biểu đồ lớp thiết kế? | Y | Kịch bản v3 và biểu đồ tuần tự sinh từ cùng một danh sách bước (`docs/uml/pha3/gen_seq.py`) |
 | 9 | Mỗi lời gọi trong biểu đồ tuần tự đi trên một liên kết của biểu đồ lớp thiết kế? | Y | |
-| 10 | Phân quyền, kiểm soát truy cập dữ liệu đã được thực hiện? | Y | Lần rà soát đầu phát hiện server chưa kiểm tra người gửi `MOVE`, `LEAVE_MATCH`, `REMATCH_REPLY` có thuộc ván `matchId` không; đã bổ sung vào các hàm xử lý của `MatchController` (pha 4, mục 2e) |
+| 10 | Phân quyền, kiểm soát truy cập dữ liệu đã được thực hiện? | Y | Lần rà soát đầu phát hiện server chưa kiểm tra người gửi `MOVE`, `LEAVE_MATCH`, `REMATCH_REPLY` có thuộc phòng không, và chưa kiểm tra `INVITE_REPLY` ứng với một lời mời đang chờ; đã bổ sung vào thiết kế (pha 3, mục 4d) và các hàm xử lý (pha 4, mục 2e). Mật khẩu không đi theo đối tượng `Player` gửi qua mạng (`transient`) |
 
 Vấn đề cần trao đổi:
 
@@ -123,6 +123,8 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | VR_7 | Bằng điểm ở tiêu chí 1 và 2 | Nạp `seed-tiebreak.sql` thay cho dữ liệu mẫu chung: có hai người cùng tổng điểm và cùng TB điểm đối thủ | Người có TB thời gian thắng nhỏ hơn đứng trên | |
 | VR_8 | Bảng xếp hạng rỗng | Dùng CSDL chưa có ván nào | Hiện thông báo chưa có dữ liệu xếp hạng | |
 | VR_9 | Quay lại | Bấm Quay lại ở bảng xếp hạng | Về giao diện chính | |
+| VR_10 | Đồng hạng | Nạp `seed-tiebreak.sql`, thêm một người trùng cả ba tiêu chí với người đang đăng nhập; bấm Vị trí của tôi | Hai dòng cùng số hạng, hạng tiếp theo nhảy số (1, 2, 2, 4); chỉ dòng của người đang đăng nhập được tô màu | |
+| VR_11 | Không kết nối được server | Tắt server, bấm Xem bảng xếp hạng | Báo "Không kết nối được máy chủ", ở lại giao diện chính | |
 
 **Modul chơi với máy.** Tiền điều kiện: đã đăng nhập, đang ở giao diện chính.
 
@@ -149,7 +151,7 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 |---|---|---|---|---|
 | CP_0 | Khách vào đấu đối kháng | Chưa đăng nhập, bấm Đấu đối kháng ở giao diện chính | Hiện màn đăng nhập; đăng nhập xong thì vào màn hình đấu đối kháng | |
 | CP_1 | Danh sách online | Quan sát màn hình đấu đối kháng hai máy | Mỗi máy thấy người kia với tổng điểm và trạng thái Rỗi | |
-| CP_2 | Gửi lời mời | A click tên B, bấm Xác nhận | Sau khi click tên, máy A hiện dialog xác nhận thách đấu `minhanh`; sau khi xác nhận, máy A hiện "Đang chờ minhanh trả lời..."; máy B hiện dialog lời mời | |
+| CP_2 | Gửi lời mời | A click tên B, bấm Xác nhận | Sau khi click tên, máy A hiện dialog xác nhận thách đấu `minhanh`; sau khi xác nhận, máy A hiện popup "Đang chờ minhanh trả lời..." đếm ngược 30 giây với nút Hủy lời mời, không thao tác được màn hình phía sau; máy B hiện popup lời mời đếm ngược 30 giây | |
 | CP_3 | Hủy thách đấu | A click tên B, bấm Hủy | Dialog xác nhận đóng; máy A vẫn ở màn hình đấu đối kháng, không hiện "Đang chờ"; máy B không nhận lời mời | |
 | CP_4 | Từ chối | B bấm Reject | Máy A báo bị từ chối; hai người vẫn rỗi | |
 | CP_5 | Mời người đang bận | C đang trong ván với D; A click tên C, bấm Xác nhận | A được báo C đang bận; C không nhận lời mời | |
@@ -160,12 +162,20 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 | CP_10 | Thắng | A xóa hết ô trước | A: "Bạn thắng" kèm thời gian; B: "Bạn thua" kèm số ô còn lại; kết quả được lưu, tổng điểm cập nhật | |
 | CP_11 | Hoàn thành gần như cùng lúc | A và B cùng còn một cặp, bấm gần như cùng lúc | Chỉ một người thắng (người được server xử lý trước), ván chỉ kết thúc và lưu một lần | |
 | CP_12 | Hết giờ | Để hết 10 phút | Hai bên "Hòa"; lưu hai kết quả DRAW | |
-| CP_13 | Thoát giữa ván | A bấm Thoát | A thua, B thắng; B nhận dialog kết quả | |
-| CP_14 | Mất kết nối giữa ván | Tắt mạng máy A giữa ván | Server xử A thua, B thắng; A không còn trong danh sách online | |
+| CP_13 | Thoát giữa ván | A bấm Thoát | Máy A về màn hình đấu đối kháng với thông báo "Bạn đã thoát nên bị xử thua (0 điểm)", A rỗi ngay; máy B hiện "Bạn thắng (+1 điểm). Đối thủ đã thoát." chỉ có nút Về sảnh; B bấm Về sảnh thì về màn hình đấu đối kháng, B rỗi; kết quả được lưu | |
+| CP_14 | Mất kết nối giữa ván | Tắt mạng máy A giữa ván | Chậm nhất khoảng 15 giây sau, server xử A thua, B thắng; B thấy dialog như CP_13; A không còn trong danh sách online; máy A về giao diện chính chế độ khách, báo mất kết nối | |
 | CP_15 | Cả hai tái đấu | Hai người bấm Tái đấu | Bắt đầu ván mới với đề mới | |
 | CP_16 | Một bên dừng | A bấm Dừng | Hai máy về màn hình đấu đối kháng; B được báo "hoangnam đã dừng chơi"; hai người Rỗi, điểm cập nhật | |
 | CP_17 | Hai người mời nhau cùng lúc | A và B mời nhau gần như cùng lúc | Chỉ tạo tối đa một ván; không ai rơi vào hai ván | |
-| CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm Accept | C nhận dialog lời mời ngay trên màn chơi với máy; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
+| CP_18 | Mời người đang luyện tập | C đang chơi với máy; A click tên C, bấm Xác nhận; C bấm Accept | C nhận popup lời mời ngay trên màn chơi với máy, ván với máy vẫn chạy trong lúc popup hiện; sau khi đồng ý, ván với máy dừng (không lưu) và hai máy vào ván đối kháng | |
+| CP_19 | Hủy lời mời | A mời B, bấm Hủy lời mời trước khi B trả lời | Popup chờ trên máy A đóng; popup lời mời trên máy B biến mất; hai người vẫn rỗi | |
+| CP_20 | Lời mời hết hạn | A mời B, B không bấm gì trong 30 giây | Máy A báo "B không trả lời"; popup trên máy B biến mất; B bấm Accept đúng lúc hết hạn thì không vào ván | |
+| CP_21 | Nhiều người cùng mời | A và C lần lượt mời B | Máy B hiện lời mời của A trước; B bấm Reject thì hiện lời mời của C với thời gian còn lại tính từ lúc C gửi; lời mời đã quá hạn không hiện | |
+| CP_22 | Người được mời vào ván khác | A mời B, trong lúc đó B chấp nhận lời mời của C | B và C vào ván; máy A báo "B đang bận" | |
+| CP_23 | Người mời rời mạng | A mời B rồi tắt mạng máy A | Popup lời mời trên máy B biến mất trong khoảng 15 giây | |
+| CP_24 | Tái đấu rồi đối thủ dừng | A bấm Tái đấu, sau đó B bấm Dừng | Máy A về màn hình đấu đối kháng, báo B đã dừng chơi; hai người rỗi | |
+| CP_25 | Hết thời gian ở dialog kết quả | Hai người không bấm gì trong 30 giây | Hai máy tự về màn hình đấu đối kháng, hai người rỗi | |
+| CP_26 | Mất kết nối ở dialog kết quả | A tắt mạng khi dialog kết quả đang hiện | Máy B về màn hình đấu đối kháng với thông báo A đã dừng chơi; B rỗi | |
 
 ### c. Dữ liệu kiểm thử
 
@@ -183,4 +193,4 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 
 ### d. Thực hiện và ghi nhận
 
-Thực hiện khi hệ thống chạy được: chạy lần lượt các test case, ghi Đạt / Không đạt; trường hợp không đạt mô tả bước, dữ liệu, kết quả thực tế và chuyển cho người phụ trách phần đó (Dev A: `core` và màn chơi; Dev B: server, mạng, màn đăng nhập, sảnh, xếp hạng).
+Thực hiện khi hệ thống chạy được: chạy lần lượt các test case, ghi Đạt / Không đạt; trường hợp không đạt mô tả bước, dữ liệu, kết quả thực tế và chuyển cho người phụ trách phần đó (Dev 1: `core`, chơi với máy, tài khoản, phần chơi ván đối kháng; Dev 2: server, mạng, CSDL, xếp hạng, sảnh, thách đấu, kết thúc ván và tái đấu).

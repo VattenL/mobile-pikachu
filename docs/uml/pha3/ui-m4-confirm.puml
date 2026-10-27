@@ -19,4 +19,18 @@ rectangle Confirm [
 }
 }}
 ]
+
+rectangle Waiting [
+{{salt
+{
+  <b>Đang chờ trả lời
+  .
+  Đang chờ B trả lời... (còn 25 giây)
+  .
+  [ Hủy lời mời ]
+}
+}}
+]
+
+Confirm -right-> Waiting : Xác nhận
 @enduml

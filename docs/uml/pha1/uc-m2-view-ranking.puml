@@ -23,11 +23,9 @@ actor "Player" as Player
 rectangle "Modul: View Ranking" {
   usecase "View Ranking" as UC04
   usecase "Locate My Rank" as UC04_1
-  usecase "Login" as UC02
 }
 
 Player -|> Guest
 Guest --> UC04
 UC04 <.. UC04_1 : <<extend>>
-UC04_1 ..> UC02 : <<include>>
 @enduml

@@ -13,10 +13,16 @@ rectangle Invite [
 {
   <b>Thách đấu!
   .
-  A muốn thách đấu bạn
+  A muốn thách đấu bạn (còn 28 giây)
   .
   [ Reject ] | [ Accept ]
 }
 }}
 ]
+
+note bottom of Invite
+  Popup không chặn ở mép trên màn hình,
+  màn hình bên dưới vẫn thao tác được.
+  Nhiều lời mời thì hiện lần lượt.
+end note
 @enduml

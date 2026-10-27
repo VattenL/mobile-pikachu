@@ -38,3 +38,9 @@ Prompt bổ sung trong cùng lượt:
 
 > Mà actor phải dùng icon của actor nhé
 
+
+## 2026-10-27: sửa thiết kế Dev 2 theo bản đánh giá (kéo theo sửa khung code)
+
+> ok bắt đầu
+
+Bối cảnh: trả lời cho kế hoạch sửa sau bản đánh giá thiết kế Dev 2 cùng ngày (thoát hoặc mất kết nối coi như dừng, mã phòng `roomId` trong bộ nhớ, lời mời có hàng đợi, hết hạn 30 giây và nút hủy, `PING`, bỏ include Login ở `Locate My Rank` và `Respond To Challenge`, bảng xếp hạng chỉ gồm người đã có ván, giữ `MatchController` chung và chỉ thêm thuộc tính).

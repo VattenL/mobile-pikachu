@@ -46,6 +46,11 @@ MatchManager -> MatchManager : getRoom()
 activate MatchManager
 MatchManager --> MatchController : trả về
 deactivate MatchManager
+MatchController -> MatchManager : gọi
+MatchManager -> MatchManager : removeRoom()
+activate MatchManager
+MatchManager --> MatchController : trả về
+deactivate MatchManager
 MatchController -> BoardGenerator : gọi
 BoardGenerator -> BoardGenerator : generateBoard()
 activate BoardGenerator
