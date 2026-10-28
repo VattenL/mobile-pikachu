@@ -829,7 +829,8 @@ def build_deployment(name):
 # (khoá = tên file ảnh, tên biểu đồ trong VP, hàm dựng)
 # Hậu tố "(27-10)": bản dựng lại sau đợt sửa thiết kế ngày 27-10 bằng --add (không dựng lại toàn bộ để giữ bố cục
 # chỉnh tay của các hình không đổi); bản cũ cùng khoá còn trong pikachu.vpp cho tới khi xóa tay. Gói mô hình của các
-# biểu đồ lớp dựng lại mang hậu tố _2710 để không trùng lớp với bản cũ.
+# biểu đồ lớp dựng lại mang hậu tố _2710 để không trùng lớp với bản cũ. Hậu tố "(28-10)", gói _2810: đợt thêm
+# GameServer và khúc kết nối vào M2, thêm Message vào M4 ngày 28-10, cũng dựng bằng --add.
 
 DIAGRAMS = [
     ("uc-overview", "1.1 Use case tổng quan", lambda n: build_usecase(n, "pha1/uc-overview.puml", "fan")),
@@ -847,9 +848,9 @@ DIAGRAMS = [
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế (27-10)",
      lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity_2710", ENTITY_POS)),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
-    ("class-design-m2", "3.7 Lớp thiết kế M2 (27-10)", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2710", oblique_up=True)),
-    ("class-design-m4", "3.16 Lớp thiết kế M4 (27-10)", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2710", oblique_up=True, rows=M4_ROWS)),
-    ("seq-m2", "3.19 Tuần tự thiết kế M2",
+    ("class-design-m2", "3.7 Lớp thiết kế M2 (28-10)", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2810", oblique_up=True)),
+    ("class-design-m4", "3.16 Lớp thiết kế M4 (28-10)", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2810", oblique_up=True, rows=M4_ROWS)),
+    ("seq-m2", "3.19 Tuần tự thiết kế M2 (28-10)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
     ("seq-m4-4", "3.26 Tuần tự thiết kế M4 (tái đấu) (27-10)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),

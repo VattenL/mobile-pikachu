@@ -197,7 +197,14 @@ class PlayerRankingDAO #FFF8E1 {
   + getTotalPoints(listPlayer : ArrayList<Player>) : ArrayList<PlayerRanking>
 }
 
-' ===== core: lop thuc the =====
+' ===== core: lop thuc the va message =====
+class Message #FFF3E0 {
+  - type : String
+  - data : JsonObject
+  + toJson() : String
+  + fromJson(line : String) : Message
+}
+
 class Player #FFF3E0 {
   - id : int
   - username : String
@@ -294,4 +301,5 @@ PlayerRanking -down-|> Player
 Match o-down- Board
 MatchResult o-[norank]- Board
 PathFinder -[norank]- Board
+ClientHandler -[norank]- Message
 @enduml

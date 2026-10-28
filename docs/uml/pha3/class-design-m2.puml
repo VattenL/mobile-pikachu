@@ -71,6 +71,11 @@ class ClientSession #EDE7F6 {
 }
 
 ' ===== Server: tang dieu khien =====
+class GameServer #E8F5E9 {
+  - serverSocket : ServerSocket
+  + main(args : String[]) : void
+}
+
 class ClientHandler #E8F5E9 {
   - socket : Socket
   - reader : BufferedReader
@@ -125,11 +130,14 @@ BaseActivity ..|> MessageListener
 
 ' giao dien - mang
 RankingActivity -down- ServerConnection
+MainActivity -down- ServerConnection
 MainActivity -down- ClientSession
 RankingActivity -down- ClientSession
 ServerConnection -right- MessageListener
 
 ' mang client - server (TCP)
+ServerConnection -down- GameServer : TCP
+GameServer -right- ClientHandler
 ServerConnection -down- ClientHandler : TCP
 ClientHandler -right- RankingController
 

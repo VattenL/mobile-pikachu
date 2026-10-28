@@ -35,10 +35,12 @@ autonumber "<b>0:"
 
 # ---------------------------------------------------------------- M2
 M2_PARTS = [
+    ("actor", "Admin", "Quản trị server"),
     ("actor", "Player", "Người chơi"),
     ("boundary", "MainActivity", None),
     ("boundary", "RankingActivity", None),
     ("control", "ServerConnection", None),
+    ("control", "GameServer", None),
     ("control", "ClientHandler", None),
     ("control", "RankingController", None),
     ("control", "PlayerRankingDAO", None),
@@ -52,7 +54,24 @@ M2_FETCH = [  # lấy bảng xếp hạng trên server, dùng cho cả trang 1 v
     ("ret", "PlayerRanking", "PlayerRankingDAO", "trả về", "Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`."),
     ("ret", "PlayerRankingDAO", "RankingController", "trả về", "Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`."),
 ]
+M2_CONNECT = [  # khởi động server và kết nối khi mở ứng dụng: hạ tầng chung, vẽ một lần ở modul này
+    ("msg", "Admin", "GameServer", "chạy server", "Quản trị server chạy chương trình server (lớp `GameServer`)."),
+    ("self", "GameServer", None, "main()", "Lớp `GameServer` gọi hàm `main()`: đọc cổng từ tệp cấu hình `server.properties` và mở `ServerSocket` trên cổng đó."),
+    ("msg", "GameServer", "Admin", "hiển thị", "Lớp `GameServer` hiển thị thông báo server đang chạy cho quản trị server và chờ client kết nối."),
+    ("msg", "Player", "MainActivity", "mở ứng dụng", "Người chơi mở ứng dụng trên thiết bị Android."),
+    ("call", "MainActivity", "ServerConnection", "gọi", "Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu kết nối tới server."),
+    ("self", "ServerConnection", None, "connect()", "Lớp `ServerConnection` gọi hàm `connect()`."),
+    ("msg", "ServerConnection", "GameServer", "kết nối (TCP)", "Hàm `connect()` mở socket, kết nối qua TCP tới lớp `GameServer` trên server."),
+    ("call", "GameServer", "ClientHandler", "gọi", "Lớp `GameServer` chấp nhận kết nối và gọi lớp `ClientHandler`, giao socket của client."),
+    ("self", "ClientHandler", None, "ClientHandler()", "Lớp `ClientHandler` khởi tạo với socket của client."),
+    ("ret", "ClientHandler", "GameServer", "trả về", "Lớp `ClientHandler` trả đối tượng vừa tạo cho lớp `GameServer`."),
+    ("call", "GameServer", "ClientHandler", "run() (luồng mới)", "Lớp `GameServer` chạy hàm `run()` của lớp `ClientHandler` trên một luồng mới; từ đây `ClientHandler` đọc các message của client này."),
+    ("ret", "GameServer", "ServerConnection", "chấp nhận (TCP)", "Lớp `GameServer` quay lại chờ client khác; hàm `connect()` nhận được kết nối."),
+    ("ret", "ServerConnection", "MainActivity", "trả về", "Hàm `connect()` chạy luồng nền đọc message và bộ hẹn giờ `pingTimer` gửi `PING` mỗi 5 giây, rồi trả kết quả kết nối thành công cho lớp `MainActivity`."),
+    ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi (chưa đăng nhập thì hiện tên \"Khách\")."),
+]
 M2 = [
+    *M2_CONNECT,
     ("msg", "Player", "MainActivity", "click xem bảng xếp hạng", "Tại giao diện `MainActivity`, người chơi click nút Xem bảng xếp hạng."),
     ("call", "MainActivity", "RankingActivity", "gọi", "Lớp `MainActivity` gọi lớp `RankingActivity`."),
     ("call", "RankingActivity", "ServerConnection", "send(GET_RANKING)", "Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với trang 1."),

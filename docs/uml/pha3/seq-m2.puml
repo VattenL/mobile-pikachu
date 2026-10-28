@@ -15,15 +15,37 @@ skinparam sequence {
 }
 autonumber "<b>0:"
 
+actor "Quản trị server" as Admin
 actor "Người chơi" as Player
 boundary MainActivity
 boundary RankingActivity
 control ServerConnection
+control GameServer
 control ClientHandler
 control RankingController
 control PlayerRankingDAO
 entity "Player\nRanking" as PlayerRanking
 
+Admin -> GameServer : chạy server
+GameServer -> GameServer : main()
+activate GameServer
+GameServer -> Admin : hiển thị
+Player -> MainActivity : mở ứng dụng
+MainActivity -> ServerConnection : gọi
+ServerConnection -> ServerConnection : connect()
+activate ServerConnection
+ServerConnection -> GameServer : kết nối (TCP)
+GameServer -> ClientHandler : gọi
+ClientHandler -> ClientHandler : ClientHandler()
+activate ClientHandler
+ClientHandler --> GameServer : trả về
+deactivate ClientHandler
+GameServer -> ClientHandler : run() (luồng mới)
+GameServer --> ServerConnection : chấp nhận (TCP)
+deactivate GameServer
+ServerConnection --> MainActivity : trả về
+deactivate ServerConnection
+MainActivity -> Player : hiển thị
 Player -> MainActivity : click xem bảng xếp hạng
 MainActivity -> RankingActivity : gọi
 RankingActivity -> ServerConnection : send(GET_RANKING)
