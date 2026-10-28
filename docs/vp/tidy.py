@@ -4,7 +4,10 @@
 
 Với mỗi đường (trừ đường tự nối một shape), thử các dạng: thẳng (1 đoạn), chữ L (2 đoạn), chữ Z và chữ U (3 đoạn),
 với đầu mút ở giữa cạnh hoặc lệch một phần tư cạnh; bỏ dạng nào cắt qua shape khác, chọn dạng ngắn nhất, ít gấp
-nhất và ít chồng lên các đường đã vẽ. Nhãn đặt cạnh đoạn dài nhất. Đường không tìm được dạng nào thì để nguyên và báo.
+nhất và ít chồng lên các đường đã vẽ. Đường association (kể cả aggregation, composition) thử thẳng hoặc chữ L trước
+(tối đa 2 đoạn, yêu cầu của người dùng 28-10, đầu mút thử dày hơn: mỗi 1/8 cạnh); không dạng nào né hết shape thì
+mới cho 3 đoạn và báo tên đường. Nhãn đặt cạnh đoạn dài
+nhất. Đường không tìm được dạng nào né hết shape thì lấy dạng cắt qua ít shape nhất và báo để dời shape bằng tay.
 Với biểu đồ có bản cũ đã chỉnh tay (TIDY_REF), vị trí các shape trùng tên được chép từ bản cũ trước.
 Cần Visual Paradigm đang mở pikachu.vpp và lệnh setConnectorRoutes của plugin (bản vá cục bộ 2026-10-27).
 """
@@ -17,17 +20,17 @@ import build_vp as b
 TIDY_REF = {
     "class-analysis-m4": "2.5 Lớp phân tích M4",
     "state-m4": "2.9 Trạng thái M4",
-    "class-design-entity": "3.1 Lớp thực thể pha thiết kế",
-    "class-design-m2": "3.7 Lớp thiết kế M2",
-    "class-design-m4": "3.16 Lớp thiết kế M4",
+    "class-design-entity": "3.1 Lớp thực thể pha thiết kế (27-10)",
+    "class-design-m2": "3.7 Lớp thiết kế M2 (28-10)",
+    "class-design-m4": "3.16 Lớp thiết kế M4 (28-10)",
 }
-# shape mới (không có trong bản cũ): (shape tham chiếu, dx, dy) so với vị trí shape tham chiếu ở bản cũ
+# shape mới (không có trong bản cũ) hoặc cần dời: (shape tham chiếu, dx, dy) so với vị trí shape tham chiếu ở bản cũ
 NEW_POS = {
     "state-m4": {"Hiển thị ChallengeConfirmDialog (chờ trả lời)": ("Hiển thị InvitationDialog", 0, -200)},
-    "class-design-m2": {"BaseActivity": ("RankingActivity", 420, 0)},
 }
 
 GAP = 14      # khoảng cách tối thiểu giữa đường và shape khác
+MIN_XY = 40   # toạ độ nhỏ nhất của điểm gấp: VP bỏ không vẽ đoạn sát gốc toạ độ hơn
 STUB = 24     # đoạn ra khỏi shape tối thiểu trước khi rẽ (dạng U)
 SHAPE = re.compile(r"^(\s*)[^:]+: (.+?) (-?\d+),(-?\d+) (\d+)x(\d+)(?: caption .*)?$")
 POINT = re.compile(r"\((-?\d+),(-?\d+)\)")
@@ -49,7 +52,7 @@ def geometry(name):
                 box = tuple(int(v) for v in m.groups())
                 if n := NEEDS.search(line):
                     cap = (max(cap[0], int(n[1])), max(cap[1], int(n[2])))
-            conns.append((pts, cap, box))
+            conns.append((pts, cap, box, line.strip().split(":")[0].split(" ")[0]))
         elif m := SHAPE.match(line):
             shapes.append((m[2], tuple(int(v) for v in m.groups()[2:])))
             depth.append(len(m[1]))
@@ -58,6 +61,10 @@ def geometry(name):
         has_child = i + 1 < len(shapes) and depth[i + 1] > depth[i]
         (containers if has_child else leaves)[s] = box
     return leaves, containers, conns
+
+
+# số đoạn tối đa theo loại đường (getDiagramGeometry ghi aggregation, composition là Association); loại khác: 3
+MAX_SEGMENTS = {"Association": 2}
 
 
 def owner(boxes, p):
@@ -79,22 +86,24 @@ def seg_hits(a, c, box, gap=GAP):
     return x0 < x + w + gap and x1 > x - gap and y0 < y + h + gap and y1 > y - gap
 
 
-def anchors(box, side):
-    """Các điểm có thể làm đầu mút trên một cạnh: giữa cạnh và lệch một phần tư."""
+def anchors(box, side, fine=False):
+    """Các điểm có thể làm đầu mút trên một cạnh: giữa cạnh và lệch một phần tư; fine: mọi điểm chia cạnh thành
+    8 phần, gần giữa trước."""
     x, y, w, h = box
+    fr = sorted((k / 8 for k in range(1, 8)), key=lambda f: abs(f - 0.5)) if fine else [0.5, 0.25, 0.75]
     if side in "NS":
         yy = y if side == "N" else y + h
-        return [(x + w // 2, yy), (x + w // 4, yy), (x + 3 * w // 4, yy)]
+        return [(x + int(w * f), yy) for f in fr]
     xx = x if side == "W" else x + w
-    return [(xx, y + h // 2), (xx, y + h // 4), (xx, y + 3 * h // 4)]
+    return [(xx, y + int(h * f)) for f in fr]
 
 
 def out(p, side, d):
     return {"N": (p[0], p[1] - d), "S": (p[0], p[1] + d), "W": (p[0] - d, p[1]), "E": (p[0] + d, p[1])}[side]
 
 
-def candidates(A, B):
-    """Các route ≤ 3 đoạn từ shape A tới shape B."""
+def candidates(A, B, max_seg=3):
+    """Các route ≤ max_seg đoạn (2 hoặc 3) từ shape A tới shape B."""
     ax, ay, aw, ah = A
     bx, by, bw, bh = B
     res = []
@@ -113,15 +122,16 @@ def candidates(A, B):
             res.append([(xx, ay + ah), (xx, by)])
         elif ay >= by + bh:
             res.append([(xx, ay), (xx, by + bh)])
+    fine = max_seg < 3  # chỉ được thẳng hoặc chữ L: thử nhiều đầu mút hơn cho dễ né
     for sa in "NSWE":
-        for pa in anchors(A, sa):
+        for pa in anchors(A, sa, fine):
             for sb in "NSWE":
-                for pb in anchors(B, sb):
+                for pb in anchors(B, sb, fine):
                     horiz_a, horiz_b = sa in "WE", sb in "WE"
                     if horiz_a != horiz_b:  # chữ L: rẽ một lần
                         corner = (pb[0], pa[1]) if horiz_a else (pa[0], pb[1])
                         res.append([pa, corner, pb])
-                    else:  # chữ Z (hai cạnh đối diện) hoặc chữ U (cùng phía)
+                    elif max_seg >= 3:  # chữ Z (hai cạnh đối diện) hoặc chữ U (cùng phía)
                         for mid in mids(A, B, pa, pb, sa, sb):
                             if horiz_a:
                                 res.append([pa, (mid, pa[1]), (mid, pb[1]), pb])
@@ -145,6 +155,8 @@ def mids(A, B, pa, pb, sa, sb):
         for k in range(10):
             d = STUB + GAP + 40 * k
             out_.append(max(hi_a, hi_b) + d if sa in "ES" else min(lo_a, lo_b) - d)
+        # VP không vẽ đoạn nào có toạ độ dưới khoảng 40 (đường cụt trong ảnh xuất, 28-10)
+        out_ = [m for m in out_ if m >= MIN_XY]
     return out_
 
 
@@ -272,16 +284,17 @@ def tidy(key, copy=True):
 def route_lines(name, key=None):
     """Vẽ lại các đường của biểu đồ name (đã dựng xong, shape đã ở chỗ) thành dạng ≤ 3 đoạn, đặt lại nhãn."""
     leaves, _, conns = geometry(name)
-    lines, used, failed, routes, ends = [], [], [], {}, []
+    lines, used, failed, routes, ends, longer = [], [], [], {}, [], []
     # đường dài trước: chúng khó tìm chỗ hơn
     order = sorted(range(len(conns)), key=lambda i: -abs(conns[i][0][0][0] - conns[i][0][-1][0])
                    - abs(conns[i][0][0][1] - conns[i][0][-1][1]))
     for i in order:
         pts, cap = conns[i][:2]
+        max_seg = MAX_SEGMENTS.get(conns[i][3], 3)
         a, c = owner(leaves, pts[0]), owner(leaves, pts[-1])
         if not a or not c or a == c:
             continue
-        if len(pts) <= 4 and all(p[0] == q[0] or p[1] == q[1] for p, q in zip(pts, pts[1:])):
+        if len(pts) <= max_seg + 1 and all(p[0] == q[0] or p[1] == q[1] for p, q in zip(pts, pts[1:])):
             if not any(seg_hits(p, q, box) for p, q in zip(pts, pts[1:]) for s, box in leaves.items()
                        if s not in (a, c)) and not any(abs(e[0] - f[0]) + abs(e[1] - f[1]) < 16
                                                        for e in (pts[0], pts[-1]) for f in ends):
@@ -291,13 +304,22 @@ def route_lines(name, key=None):
                 continue
         obstacles = [box for s, box in leaves.items() if s not in (a, c)]
         best = None
-        for r in candidates(leaves[a], leaves[c]):
+        for r in candidates(leaves[a], leaves[c], max_seg):
             k = cost(r, obstacles, used, ends)
             if k is not None and (best is None or k < best[0]):
                 best = (k, r)
+        if not best and max_seg < 3:
+            # association không có đường thẳng / chữ L nào né hết shape: cho 3 đoạn (người dùng chọn 28-10)
+            max_seg = 3
+            for r in candidates(leaves[a], leaves[c], max_seg):
+                k = cost(r, obstacles, used, ends)
+                if k is not None and (best is None or k < best[0]):
+                    best = (k, r)
+            if best:
+                longer.append(f"{a} -> {c}")
         if not best:
-            # không có dạng nào né hết shape: lấy dạng ≤ 3 đoạn cắt qua ít shape nhất
-            for r in candidates(leaves[a], leaves[c]):
+            # không có dạng nào né hết shape: lấy dạng ≤ max_seg đoạn cắt qua ít shape nhất
+            for r in candidates(leaves[a], leaves[c], max_seg):
                 hits = sum(1 for box in obstacles if any(seg_hits(p, q, box, 2) for p, q in zip(r, r[1:])))
                 k = hits * 5000 + cost(r, [], used, ends)
                 if best is None or k < best[0]:
@@ -321,7 +343,7 @@ def route_lines(name, key=None):
         lines.append(line)
     if lines:
         print(b.vp("setConnectorRoutes", diagramName=name, routes="\n".join(lines)))
-    print(key or name, "vẽ lại:", len(lines), "chưa né được hết:", failed)
+    print(key or name, "vẽ lại:", len(lines), "association phải 3 đoạn:", longer, "chưa né được hết:", failed)
 
 
 if __name__ == "__main__":
