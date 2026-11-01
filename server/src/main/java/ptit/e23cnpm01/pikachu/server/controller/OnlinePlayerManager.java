@@ -7,31 +7,68 @@ import ptit.e23cnpm01.pikachu.core.model.Player;
 /**
  * Danh sách người chơi online, trạng thái và lời mời đang chờ (chỉ trong bộ nhớ). Chỉ giữ dữ liệu, không gửi message.
  *
+ * <p>Trạng thái của mỗi người là thuộc tính status của Player trong ClientHandler: IDLE (rỗi), TRAINING (luyện tập),
+ * BUSY (bận). Mọi phương thức được đồng bộ vì nhiều luồng ClientHandler và các bộ hẹn giờ cùng truy cập.
+ *
  * <p>Phụ trách: Dev 2.
  */
 public class OnlinePlayerManager {
+    private static OnlinePlayerManager instance;
+
+    /** Tên đăng nhập -> ClientHandler của người đang online. */
     private HashMap<String, ClientHandler> onlineHandlers;
     /** Lời mời đang chờ: người mời -> người được mời (mỗi người mời chỉ có một lời mời đi). */
     private HashMap<String, String> pendingInvites;
 
-    public static OnlinePlayerManager getInstance() {
-        throw new UnsupportedOperationException("TODO");
+    private OnlinePlayerManager() {
+        onlineHandlers = new HashMap<>();
+        pendingInvites = new HashMap<>();
     }
 
-    public boolean addOnlinePlayer(ClientHandler handler) {
-        throw new UnsupportedOperationException("TODO");
+    public static synchronized OnlinePlayerManager getInstance() {
+        if (instance == null) {
+            instance = new OnlinePlayerManager();
+        }
+        return instance;
     }
 
-    public boolean removeOnlinePlayer(ClientHandler handler) {
-        throw new UnsupportedOperationException("TODO");
+    /**
+     * Thêm người chơi của handler (đã gán bằng setPlayer) vào danh sách online với trạng thái rỗi. Trả false nếu
+     * tài khoản đang online ở máy khác.
+     */
+    public synchronized boolean addOnlinePlayer(ClientHandler handler) {
+        Player player = handler.getPlayer();
+        if (onlineHandlers.containsKey(player.getUsername())) {
+            return false;
+        }
+        player.setStatus("IDLE");
+        onlineHandlers.put(player.getUsername(), handler);
+        return true;
     }
 
-    public ArrayList<Player> getOnlinePlayers() {
-        throw new UnsupportedOperationException("TODO");
+    /**
+     * Xóa ánh xạ tên đăng nhập -> handler. Trả false nếu handler không có trong danh sách (chưa đăng nhập, đã gỡ,
+     * hoặc tên đó đang online qua một kết nối khác).
+     */
+    public synchronized boolean removeOnlinePlayer(ClientHandler handler) {
+        Player player = handler.getPlayer();
+        if (player == null) {
+            return false;
+        }
+        return onlineHandlers.remove(player.getUsername(), handler);
     }
 
-    public ClientHandler getHandler(String username) {
-        throw new UnsupportedOperationException("TODO");
+    public synchronized ArrayList<Player> getOnlinePlayers() {
+        ArrayList<Player> list = new ArrayList<>();
+        for (ClientHandler handler : onlineHandlers.values()) {
+            list.add(handler.getPlayer());
+        }
+        return list;
+    }
+
+    /** ClientHandler của người đang online, null nếu người đó không online. */
+    public synchronized ClientHandler getHandler(String username) {
+        return onlineHandlers.get(username);
     }
 
     /** Ghi lời mời from -> to; trả null nếu ghi được, "OFFLINE" hoặc "BUSY" nếu không. */

@@ -9,8 +9,11 @@ import ptit.e23cnpm01.pikachu.core.protocol.Message;
  * <p>Phụ trách: Dev 2.
  */
 public class ChallengeController {
-    /** Hẹn giờ 30 giây cho các lời mời đang chờ. */
-    private Timer inviteTimer;
+    /**
+     * Hẹn giờ 30 giây cho các lời mời đang chờ. Tĩnh vì lớp điều khiển được tạo bằng new ở mỗi lần xử lý message,
+     * mọi lời mời dùng chung một bộ hẹn giờ.
+     */
+    private static Timer inviteTimer = new Timer("invite-timer", true);
 
     public void broadcastOnlineList() {
         // TODO

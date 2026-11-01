@@ -44,3 +44,14 @@ Prompt bổ sung trong cùng lượt:
 > ok bắt đầu
 
 Bối cảnh: trả lời cho kế hoạch sửa sau bản đánh giá thiết kế Dev 2 cùng ngày (thoát hoặc mất kết nối coi như dừng, mã phòng `roomId` trong bộ nhớ, lời mời có hàng đợi, hết hạn 30 giây và nút hủy, `PING`, bỏ include Login ở `Locate My Rank` và `Respond To Challenge`, bảng xếp hạng chỉ gồm người đã có ván, giữ `MatchController` chung và chỉ thêm thuộc tính).
+
+## 2026-11-01: Dev 2 bắt đầu code, hạ tầng server và CSDL
+
+> Bắt đầu code phần Dev 2. Đọc trước @plan.md đặc biệt là pha thiết kế. Bắt đầu bằng việc làm hạ tầng server và csdl trước. Chỉ làm các phần có liên quan đến dev 2 và code phải khớp thiết kế 100%. Trước khi implement, nếu có câu hỏi gì thì hỏi lại tôi để xác nhận.
+
+Trả lời các câu hỏi xác nhận trong cùng lượt:
+
+> - Nhánh: Nhánh mới từ main, để tên là dev2/code
+> - Phạm vi: Server+CSDL+OnlinePlayer (Message, ServerConfig, GameServer, ClientHandler, DAO, 4 script SQL + phần OnlinePlayerManager mà hạ tầng/Dev 1 cần)
+> - Controller: Xem lại các diagram xem có không, nếu không thì option 1 (tạo bằng new khi cần, inviteTimer static), sau đó giải thích lại cho tôi về việc nó có khớp thiết kế không.
+> - Seed: Option 1 (khớp cả TB điểm đối thủ và TB thời gian thắng của bảng mẫu pha 2), giải thích nó giống thiết kế chỗ nào. Với cả nhớ lưu các prompt làm code vào prompt.md
