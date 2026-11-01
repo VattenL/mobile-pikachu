@@ -6,6 +6,8 @@
     <!-- Android 17 (API 37): kết nối tới địa chỉ LAN (cả 10.0.2.2 của máy ảo) cần quyền mạng cục bộ, xin lúc chạy -->
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
+    <!-- Game chỉ chơi màn hình ngang: mọi Activity khóa sensorLandscape (ngang, xoay được hai chiều) -->
+    <!-- Game chỉ chơi màn hình ngang: mọi Activity khóa sensorLandscape (ngang, xoay được cả hai chiều ngang) -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,6 +19,7 @@
         android:theme="@style/Theme.Pikachu">
         <activity
             android:name=".view.MainActivity"
+            android:screenOrientation="sensorLandscape"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,13 +29,26 @@
         </activity>
         <activity
             android:name=".view.LoginActivity"
+            android:screenOrientation="sensorLandscape"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".view.RegisterActivity" />
-        <activity android:name=".view.LobbyActivity" />
-        <activity android:name=".view.RankingActivity" />
-        <activity android:name=".view.DifficultyActivity" />
-        <activity android:name=".view.BotGameActivity" />
-        <activity android:name=".view.MatchActivity" />
+        <activity
+            android:name=".view.RegisterActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".view.LobbyActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".view.RankingActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".view.DifficultyActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".view.BotGameActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".view.MatchActivity"
+            android:screenOrientation="sensorLandscape" />
     </application>
 
 </manifest>

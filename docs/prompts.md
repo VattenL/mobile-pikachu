@@ -77,3 +77,7 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 > - Theme: Material mặc định, theme sau
 > - Kết nối: Option 1 (ServerConnection giữ application Context, có isConnected(); lỗi socket thì hủy pingTimer, xóa phiên, mở MainActivity kèm thông báo; MainActivity.onStart() kết nối lại; connect() trên luồng nền, send() trên luồng ghi riêng), giải thích việc này sẽ ảnh hưởng đến thiết kế như thế nào.
 > - Định dạng số trên bảng xếp hạng: Như bảng mẫu
+
+## 2026-11-01: khóa màn hình ngang
+
+> Trước hết là force xoay ngang cho game đã. Về việc lệch m2 thì chính xác là nó thiếu thôi hay nó lệch hẳn luôn?
