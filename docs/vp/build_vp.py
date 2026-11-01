@@ -822,7 +822,18 @@ def build_deployment(name):
         vp("addCommunicationPath", diagramName=name, fromNode=dev[0], toNode=nodes[2][0],
            label="TCP, cổng 9999, JSON mỗi dòng một message")
     vp("addCommunicationPath", diagramName=name, fromNode=nodes[2][0], toNode=nodes[3][0], label="JDBC")
-    vp("rerouteConnectors", diagramName=name)
+    # VP nới node khi thêm khối con và để khối con đè lên tên node: đặt lại khung (cha trước để kéo con theo,
+    # rồi con, rồi thu cha về đúng cỡ), tên node ở trên, khối con bên dưới
+    boxes = [(nodes[0][0], 100, 40, 260, 110), (nodes[1][0], 500, 40, 260, 110),
+             (nodes[2][0], 275, 260, 310, 176), (nodes[3][0], 265, 520, 330, 110)]
+    inner = [(nodes[0][2], 128, 88, 204, 40), (nodes[1][2], 528, 88, 204, 40),
+             ("JVM (Java 11)", 299, 306, 262, 106), ("pikachu-server.jar (server + core)", 323, 354, 214, 40),
+             (nodes[3][2], 279, 568, 302, 40), ("JVM (Java 11)", 299, 306, 262, 106)]
+    for el, x, y, w, h in boxes + inner + boxes:
+        vp("setElementBounds", diagramName=name, elementName=el, x=x, y=y, width=w, height=h)
+    # đường thẳng đứng; nhãn TCP (rộng 253) ra hai bên ngoài, không chạm node máy A, B
+    vp("setConnectorRoutes", diagramName=name, routes="\n".join([
+        "0: 317,150 317,260 | 58,198", "1: 542,150 542,260 | 548,198", "2: 430,436 430,520 | 436,471"]))
 
 
 # ================================================================ danh sách biểu đồ
@@ -857,7 +868,7 @@ DIAGRAMS = [
     ("seq-m4-5", "3.27 Tuần tự thiết kế M4 (thoát ván)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4E_PARTS), seq_steps(gen_seq.M4E_PARTS, gen_seq.M4E))),
     ("package", "3.26 Biểu đồ gói (dọc)", build_package),
-    ("deployment", "3.28 Biểu đồ triển khai (27-10)", build_deployment),
+    ("deployment", "3.28 Biểu đồ triển khai (28-10)", build_deployment),
     ("protocol", "3.29 Luồng message (27-10)", build_protocol),
     # hai biểu đồ tuần tự M4 vẽ đủ mọi bước trong một hình, ảnh được cắt thành nhiều phần theo SLICES
     # (Hình 2.13-2.14, 3.21-3.23).
