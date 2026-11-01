@@ -23,6 +23,7 @@ class MainActivity #E3F2FD {
   - btnRanking : Button
   - btnSettings : Button
   - player : Player
+  + onResume() : void
   + onRankingClick(v : View) : void
 }
 
@@ -32,6 +33,7 @@ abstract class BaseActivity #E3F2FD {
 
 class RankingActivity #E3F2FD {
   - rvRanking : RecyclerView
+  - tvEmpty : TextView
   - tvPage : TextView
   - btnPrevPage : Button
   - btnNextPage : Button
@@ -55,8 +57,11 @@ class ServerConnection #EDE7F6 {
   - writer : PrintWriter
   - listeners : ArrayList<MessageListener>
   - pingTimer : Timer
+  - appContext : Context
   + getInstance() : ServerConnection
+  + setContext(context : Context) : void
   + connect(host : String, port : int) : boolean
+  + isConnected() : boolean
   + send(msg : Message) : void
   + addListener(l : MessageListener) : void
   + removeListener(l : MessageListener) : void

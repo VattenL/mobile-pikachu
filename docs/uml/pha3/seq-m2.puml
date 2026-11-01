@@ -31,6 +31,9 @@ GameServer -> GameServer : main()
 activate GameServer
 GameServer -> Admin : hiển thị
 Player -> MainActivity : mở ứng dụng
+MainActivity -> Player : hiển thị
+MainActivity -> MainActivity : onResume()
+activate MainActivity
 MainActivity -> ServerConnection : gọi
 ServerConnection -> ServerConnection : connect()
 activate ServerConnection
@@ -45,7 +48,7 @@ GameServer --> ServerConnection : chấp nhận (TCP)
 deactivate GameServer
 ServerConnection --> MainActivity : trả về
 deactivate ServerConnection
-MainActivity -> Player : hiển thị
+deactivate MainActivity
 Player -> MainActivity : click xem bảng xếp hạng
 MainActivity -> RankingActivity : gọi
 RankingActivity -> ServerConnection : send(GET_RANKING)

@@ -92,9 +92,9 @@ Kết quả thu được thiết kế cơ sở dữ liệu như Hình 3.2. Công
 
 Hệ thống gồm ba thành phần (module Gradle):
 
-- `app`: client Android. Tầng giao diện là các `Activity`, `Dialog` và lớp vẽ bàn chơi `BoardView`; tầng mạng gồm `ServerConnection` (giữ kết nối TCP, gửi message, nhận message trên một luồng nền rồi chuyển về luồng giao diện cho các `MessageListener`) và `ClientSession` (giữ người chơi đang đăng nhập, tương tự phiên làm việc).
+- `app`: client Android. Tầng giao diện là các `Activity`, `Dialog` và lớp vẽ bàn chơi `BoardView`; tầng mạng gồm `ServerConnection` (giữ kết nối TCP; gửi message trên một luồng ghi riêng vì Android không cho dùng mạng trên luồng giao diện; nhận message trên một luồng nền rồi chuyển về luồng giao diện cho các `MessageListener`; `isConnected()` cho biết đang có kết nối hay không; giữ `Context` của ứng dụng, do giao diện chính truyền vào bằng `setContext()`, để đưa ứng dụng về giao diện chính khi mất kết nối) và `ClientSession` (giữ người chơi đang đăng nhập, tương tự phiên làm việc).
 - `server`: Java thuần. `GameServer` mở `ServerSocket`; mỗi client có một `ClientHandler` chạy trên một luồng riêng, đọc từng dòng JSON và chuyển cho lớp điều khiển theo loại message. Lớp điều khiển gọi DAO để đọc ghi CSDL.
-- Phát hiện mất kết nối: client gửi `PING` mỗi 5 giây (bộ hẹn giờ `pingTimer` của `ServerConnection`); `ClientHandler` đặt thời gian chờ đọc 15 giây cho socket, quá thời gian đó mà không nhận được dòng nào thì xử lý như mất kết nối. Phía client, khi socket báo lỗi, `ServerConnection` xóa người chơi khỏi `ClientSession`, đưa ứng dụng về giao diện chính ở chế độ khách với thông báo "Mất kết nối tới máy chủ, vui lòng đăng nhập lại" rồi kết nối lại; server đã gỡ người chơi khỏi danh sách online nên phải đăng nhập lại.
+- Phát hiện mất kết nối: client gửi `PING` mỗi 5 giây (bộ hẹn giờ `pingTimer` của `ServerConnection`); `ClientHandler` đặt thời gian chờ đọc 15 giây cho socket, quá thời gian đó mà không nhận được dòng nào thì xử lý như mất kết nối. Phía client, khi socket báo lỗi, `ServerConnection` xóa người chơi khỏi `ClientSession`, đưa ứng dụng về giao diện chính ở chế độ khách với thông báo "Mất kết nối tới máy chủ, vui lòng đăng nhập lại"; giao diện chính kết nối lại mỗi khi hiện ra; server đã gỡ người chơi khỏi danh sách online nên phải đăng nhập lại.
 - `core`: Java thuần, dùng chung cho cả hai bên: lớp thực thể, các lớp xử lý bàn chơi (`PathFinder`, `BoardGenerator`, `Bot`) và lớp message `Message`.
 
 Client không bao giờ gọi DAO trực tiếp: giữa giao diện và DAO luôn có tầng mạng và lớp điều khiển trên server. Server là trọng tài: mọi nước đi trong ván đối kháng được server kiểm tra lại bằng `PathFinder` trên bản bàn chơi của chính người gửi.
@@ -157,8 +157,8 @@ Giao diện gồm hai màn hình: giao diện chính như Hình 3.5 và giao di�
 *Hình 3.6: Thiết kế giao diện bảng xếp hạng*
 
 - `MainScreen` → `MainActivity`: giao diện chính, hiện ngay khi mở ứng dụng, dùng chung cho khách và người chơi: `TextView` tên người chơi (hoặc "Khách"), bốn nút Chơi với máy, Đấu đối kháng, Xem bảng xếp hạng, Cài đặt; thuộc tính ẩn `player` lấy từ `ClientSession`, rỗng khi là khách. Màn hình cài đặt không thuộc modul nào nên không thiết kế ở đây.
-- `RankingScreen` → `RankingActivity`: `RecyclerView` các dòng của trang đang xem, `TextView` số trang ("Trang 1/2"), nút Trang trước, Trang sau, Vị trí của tôi, Quay lại; thuộc tính ẩn `page`, `pageCount`, `listRanking`, `myRank`. `RankingActivity` kế thừa `BaseActivity` (mục 4d) để người chơi đã đăng nhập vẫn nhận được lời mời khi đang xem bảng xếp hạng. Nút Vị trí của tôi chỉ hiện khi `ClientSession` có người chơi đã đăng nhập. Mỗi lần chuyển trang, `RankingActivity` gửi `GET_RANKING` với số trang; nút Vị trí của tôi gửi `GET_RANKING` với `mine = true`. Khi nhận `RANKING` thì hiện trang và tô màu dòng có tên đăng nhập trùng người chơi trong `ClientSession` (không tô theo thứ hạng, vì hai người cùng hạng có cùng số hạng); `me` (thứ hạng của người hỏi, giữ ở `myRank`) rỗng thì báo "Bạn chưa có trong bảng xếp hạng". Không kết nối được server thì báo "Không kết nối được máy chủ" và quay về giao diện chính.
-- Kết nối: `GameServer` (lớp chạy của server) đọc cổng từ `server.properties`, mở `ServerSocket` rồi lặp chờ kết nối; mỗi client kết nối tới thì nó tạo một `ClientHandler` và chạy trên một luồng riêng. Phía client, `MainActivity` gọi `ServerConnection.connect()` ngay khi mở ứng dụng, nên khách chưa đăng nhập vẫn xem được bảng xếp hạng: server trả lời `GET_RANKING` trên mọi kết nối. Khởi động server và kết nối là phần chung của mọi modul, chỉ vẽ một lần ở modul này (mục 5b, bước 1–14 của kịch bản phiên bản 3).
+- `RankingScreen` → `RankingActivity`: `RecyclerView` các dòng của trang đang xem, `TextView` báo bảng rỗng (`tvEmpty`, "Chưa có dữ liệu xếp hạng"), `TextView` số trang ("Trang 1/2"), nút Trang trước, Trang sau, Vị trí của tôi, Quay lại; thuộc tính ẩn `page`, `pageCount`, `listRanking`, `myRank`. `RankingActivity` kế thừa `BaseActivity` (mục 4d) để người chơi đã đăng nhập vẫn nhận được lời mời khi đang xem bảng xếp hạng. Nút Vị trí của tôi chỉ hiện khi `ClientSession` có người chơi đã đăng nhập. Mỗi lần chuyển trang, `RankingActivity` gửi `GET_RANKING` với số trang; nút Vị trí của tôi gửi `GET_RANKING` với `mine = true`. Khi nhận `RANKING` thì hiện trang và tô màu dòng có tên đăng nhập trùng người chơi trong `ClientSession` (không tô theo thứ hạng, vì hai người cùng hạng có cùng số hạng); `me` (thứ hạng của người hỏi, giữ ở `myRank`) rỗng thì báo "Bạn chưa có trong bảng xếp hạng" và giữ nguyên trang đang xem. Số hiển thị như bảng mẫu: tổng điểm bỏ phần ".0", trung bình điểm đối thủ một chữ số thập phân, trung bình thời gian thắng mm:ss làm tròn tới giây (rỗng thì "--"). Trước khi gửi, `RankingActivity` hỏi `ServerConnection.isConnected()`; không kết nối được server thì báo "Không kết nối được máy chủ" và quay về giao diện chính.
+- Kết nối: `GameServer` (lớp chạy của server) đọc cổng từ `server.properties`, mở `ServerSocket` rồi lặp chờ kết nối; mỗi client kết nối tới thì nó tạo một `ClientHandler` và chạy trên một luồng riêng. Phía client, mỗi khi giao diện chính hiện ra (`onResume()`, gồm cả lúc mở ứng dụng) mà chưa kết nối, `MainActivity` gọi `ServerConnection.connect()` trên một luồng nền nên giao diện không phải chờ; trên Android 17 (API 37) trở lên, kết nối tới địa chỉ trong mạng LAN cần quyền `ACCESS_LOCAL_NETWORK` cấp lúc chạy, nên `MainActivity` xin quyền này trước (hỏi một lần mỗi lần mở ứng dụng). Nhờ kết nối ngay từ đầu, khách chưa đăng nhập vẫn xem được bảng xếp hạng: server trả lời `GET_RANKING` trên mọi kết nối. Khởi động server và kết nối là phần chung của mọi modul, chỉ vẽ một lần ở modul này (mục 5b, bước 1–15 của kịch bản phiên bản 3).
 - Trên server, `RankingController.handleGetRanking()` gọi `PlayerRankingDAO.getRanking()` lấy cả bảng đã sắp xếp, đánh số hạng (mục 8d) rồi cắt ra trang được yêu cầu, mỗi trang `PAGE_SIZE` = 10 dòng, và gửi `RANKING`. Với `mine = true`, hàm tìm dòng của người chơi đang đăng nhập trên kết nối đó (`ClientHandler.player`) và trả trang chứa dòng đó, kèm `me` là thứ hạng của người chơi. Cả bảng được truy vấn lại mỗi lần vì số người chơi nhỏ; khi cần có thể chuyển sang `LIMIT`/`OFFSET` ngay trong truy vấn.
 - `PlayerRankingDAO` kế thừa lớp `DAO` để dùng chung một kết nối CSDL.
 
@@ -308,48 +308,49 @@ Kịch bản phiên bản 3:
 2. Lớp `GameServer` gọi hàm `main()`: đọc cổng từ tệp cấu hình `server.properties` và mở `ServerSocket` trên cổng đó.
 3. Lớp `GameServer` hiển thị thông báo server đang chạy cho quản trị server và chờ client kết nối.
 4. Người chơi mở ứng dụng trên thiết bị Android.
-5. Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu kết nối tới server.
-6. Lớp `ServerConnection` gọi hàm `connect()`.
-7. Hàm `connect()` mở socket, kết nối qua TCP tới lớp `GameServer` trên server.
-8. Lớp `GameServer` chấp nhận kết nối và gọi lớp `ClientHandler`, giao socket của client.
-9. Lớp `ClientHandler` khởi tạo với socket của client.
-10. Lớp `ClientHandler` trả đối tượng vừa tạo cho lớp `GameServer`.
-11. Lớp `GameServer` chạy hàm `run()` của lớp `ClientHandler` trên một luồng mới; từ đây `ClientHandler` đọc các message của client này.
-12. Lớp `GameServer` quay lại chờ client khác; hàm `connect()` nhận được kết nối.
-13. Hàm `connect()` chạy luồng nền đọc message và bộ hẹn giờ `pingTimer` gửi `PING` mỗi 5 giây, rồi trả kết quả kết nối thành công cho lớp `MainActivity`.
-14. Lớp `MainActivity` hiển thị giao diện chính cho người chơi (chưa đăng nhập thì hiện tên "Khách").
-15. Tại giao diện `MainActivity`, người chơi click nút Xem bảng xếp hạng.
-16. Lớp `MainActivity` gọi lớp `RankingActivity`.
-17. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với trang 1.
-18. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler` trên server.
-19. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
-20. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
-21. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
-22. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
-23. Lớp `PlayerRanking` đóng gói thông tin thực thể.
-24. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
-25. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
-26. Lớp `RankingController` đánh số hạng, lấy các dòng của trang 1 và gọi lớp `ClientHandler` gửi message `RANKING`.
-27. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
-28. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
-29. Lớp `RankingActivity` hiển thị trang 1 của bảng xếp hạng và số trang cho người chơi.
-30. Người chơi click nút Vị trí của tôi.
-31. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với `mine = true`.
-32. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler`.
-33. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
-34. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
-35. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
-36. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
-37. Lớp `PlayerRanking` đóng gói thông tin thực thể.
-38. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
-39. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
-40. Lớp `RankingController` tìm dòng của người chơi đang đăng nhập trên `ClientHandler`, lấy các dòng của trang chứa dòng đó và gọi lớp `ClientHandler` gửi message `RANKING` kèm thứ hạng `me`.
-41. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
-42. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
-43. Lớp `RankingActivity` hiển thị trang chứa người chơi, tô màu dòng có tên đăng nhập của người chơi.
-44. Người chơi click nút Quay lại.
-45. Lớp `RankingActivity` gọi lại lớp `MainActivity`.
-46. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
+5. Lớp `MainActivity` hiển thị giao diện chính cho người chơi (chưa đăng nhập thì hiện tên "Khách").
+6. Lớp `MainActivity` gọi hàm `onResume()`: chưa kết nối tới server thì xin quyền mạng cục bộ nếu chưa có (Android 17 trở lên) rồi yêu cầu kết nối trên một luồng nền, nên giao diện không phải chờ.
+7. Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu kết nối tới server.
+8. Lớp `ServerConnection` gọi hàm `connect()`.
+9. Hàm `connect()` mở socket, kết nối qua TCP tới lớp `GameServer` trên server.
+10. Lớp `GameServer` chấp nhận kết nối và gọi lớp `ClientHandler`, giao socket của client.
+11. Lớp `ClientHandler` khởi tạo với socket của client.
+12. Lớp `ClientHandler` trả đối tượng vừa tạo cho lớp `GameServer`.
+13. Lớp `GameServer` chạy hàm `run()` của lớp `ClientHandler` trên một luồng mới; từ đây `ClientHandler` đọc các message của client này.
+14. Lớp `GameServer` quay lại chờ client khác; hàm `connect()` nhận được kết nối.
+15. Hàm `connect()` chạy luồng nền đọc message và bộ hẹn giờ `pingTimer` gửi `PING` mỗi 5 giây, rồi trả kết quả kết nối thành công cho lớp `MainActivity`.
+16. Tại giao diện `MainActivity`, người chơi click nút Xem bảng xếp hạng.
+17. Lớp `MainActivity` gọi lớp `RankingActivity`.
+18. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với trang 1.
+19. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler` trên server.
+20. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
+21. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
+22. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
+23. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+24. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+25. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
+26. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
+27. Lớp `RankingController` đánh số hạng, lấy các dòng của trang 1 và gọi lớp `ClientHandler` gửi message `RANKING`.
+28. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
+29. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
+30. Lớp `RankingActivity` hiển thị trang 1 của bảng xếp hạng và số trang cho người chơi.
+31. Người chơi click nút Vị trí của tôi.
+32. Lớp `RankingActivity` gọi lớp `ServerConnection` yêu cầu gửi message `GET_RANKING` với `mine = true`.
+33. Lớp `ServerConnection` gửi message `GET_RANKING` qua TCP tới lớp `ClientHandler`.
+34. Lớp `ClientHandler` gọi hàm `handleGetRanking()` của lớp `RankingController`.
+35. Lớp `RankingController` gọi lớp `PlayerRankingDAO` yêu cầu lấy bảng xếp hạng.
+36. Lớp `PlayerRankingDAO` gọi hàm `getRanking()`.
+37. Hàm `getRanking()` gọi lớp `PlayerRanking` để đóng gói thông tin.
+38. Lớp `PlayerRanking` đóng gói thông tin thực thể.
+39. Lớp `PlayerRanking` trả kết quả cho hàm `getRanking()`.
+40. Hàm `getRanking()` trả danh sách đã sắp xếp cho lớp `RankingController`.
+41. Lớp `RankingController` tìm dòng của người chơi đang đăng nhập trên `ClientHandler`, lấy các dòng của trang chứa dòng đó và gọi lớp `ClientHandler` gửi message `RANKING` kèm thứ hạng `me`.
+42. Lớp `ClientHandler` gửi message `RANKING` qua TCP tới lớp `ServerConnection`.
+43. Lớp `ServerConnection` chuyển message cho lớp `RankingActivity`.
+44. Lớp `RankingActivity` hiển thị trang chứa người chơi, tô màu dòng có tên đăng nhập của người chơi.
+45. Người chơi click nút Quay lại.
+46. Lớp `RankingActivity` gọi lại lớp `MainActivity`.
+47. Lớp `MainActivity` hiển thị giao diện chính cho người chơi.
 <!-- END v3-m2 -->
 
 ![Hình 3.18: Biểu đồ tuần tự modul xem bảng xếp hạng](vp/png/seq-m2.png)
@@ -751,7 +752,7 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `GET_ONLINE_LIST` | không có dữ liệu; server trả `ONLINE_LIST` cho riêng người hỏi |
 | S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`), không gồm người nhận |
 | C → S | `GET_RANKING` | `page` (số trang, bắt đầu từ 1) hoặc `mine` (`true`: trang chứa người chơi đang đăng nhập) |
-| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi khi `mine`, rỗng nếu chưa có trong bảng), danh sách `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}` của trang |
+| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi, chỉ có khi `mine`), `listRanking` (các dòng của trang, mỗi dòng đúng `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}`); `mine` mà người hỏi là khách hoặc chưa có trong bảng thì không có `me`, `page` và `listRanking` rỗng (client giữ nguyên trang đang xem) |
 | C → S | `INVITE` | `to` |
 | S → C | `INVITE_RECEIVED` | `from`, `timeoutSec` (30): gửi cho người được mời |
 | C → S | `INVITE_CANCEL` | `to`: người mời hủy lời mời đang chờ |

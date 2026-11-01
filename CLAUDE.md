@@ -43,6 +43,8 @@ Code must match the design 100% (user decision 2026-11-01): class names, attribu
 
 Before writing code for each step, ask the user to confirm the open points (one round of questions with recommended options), then code (user decision 2026-11-01).
 
+When code differs from or adds to the design, update the design sources in the repo (`docs/*.md`, `.puml`, `gen_seq.py`) but never Dev 2's Google Doc (user decision 2026-11-01), and record every difference in `thay-doi-thiet-ke.md` (one section per implementation step: what was added, changed or decided, which docs were updated and which figures still need rebuilding), in the same commit as the code.
+
 Key design constraints:
 - The server is the referee. It re-validates every client move with `core`'s path finder on that player's own board and never trusts a client-reported result.
 - Both players start from the same initial board, but each removes pairs on their own copy, so the boards diverge after the first move. The server keeps one board per player, and a deadlock is per player: the server shuffles only that player's board and sends it only to them. The server also owns the 10-minute clock and the finish times.

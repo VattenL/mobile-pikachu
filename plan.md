@@ -364,7 +364,7 @@ JSON, mỗi message một dòng, trường `type` xác định loại:
 | C → S | `GET_ONLINE_LIST` | không có dữ liệu; server trả `ONLINE_LIST` cho riêng người hỏi |
 | S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`), không gồm người nhận |
 | C → S | `GET_RANKING` | `page` (số trang, bắt đầu từ 1) hoặc `mine` (`true`: trang chứa người chơi đang đăng nhập) |
-| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi khi `mine`, rỗng nếu chưa có trong bảng), danh sách `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}` của trang |
+| S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi, chỉ có khi `mine`), `listRanking` (các dòng của trang, mỗi dòng đúng `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}`); `mine` mà người hỏi là khách hoặc chưa có trong bảng thì không có `me`, `page` và `listRanking` rỗng (client giữ nguyên trang đang xem) |
 | C → S | `INVITE` | `to` |
 | S → C | `INVITE_RECEIVED` | `from`, `timeoutSec` (30): gửi cho người được mời |
 | C → S | `INVITE_CANCEL` | `to`: người mời hủy lời mời đang chờ |

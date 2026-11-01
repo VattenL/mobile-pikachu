@@ -59,6 +59,8 @@ M2_CONNECT = [  # khởi động server và kết nối khi mở ứng dụng: h
     ("self", "GameServer", None, "main()", "Lớp `GameServer` gọi hàm `main()`: đọc cổng từ tệp cấu hình `server.properties` và mở `ServerSocket` trên cổng đó."),
     ("msg", "GameServer", "Admin", "hiển thị", "Lớp `GameServer` hiển thị thông báo server đang chạy cho quản trị server và chờ client kết nối."),
     ("msg", "Player", "MainActivity", "mở ứng dụng", "Người chơi mở ứng dụng trên thiết bị Android."),
+    ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi (chưa đăng nhập thì hiện tên \"Khách\")."),
+    ("self", "MainActivity", None, "onResume()", "Lớp `MainActivity` gọi hàm `onResume()`: chưa kết nối tới server thì xin quyền mạng cục bộ nếu chưa có (Android 17 trở lên) rồi yêu cầu kết nối trên một luồng nền, nên giao diện không phải chờ."),
     ("call", "MainActivity", "ServerConnection", "gọi", "Lớp `MainActivity` gọi lớp `ServerConnection` yêu cầu kết nối tới server."),
     ("self", "ServerConnection", None, "connect()", "Lớp `ServerConnection` gọi hàm `connect()`."),
     ("msg", "ServerConnection", "GameServer", "kết nối (TCP)", "Hàm `connect()` mở socket, kết nối qua TCP tới lớp `GameServer` trên server."),
@@ -68,7 +70,7 @@ M2_CONNECT = [  # khởi động server và kết nối khi mở ứng dụng: h
     ("call", "GameServer", "ClientHandler", "run() (luồng mới)", "Lớp `GameServer` chạy hàm `run()` của lớp `ClientHandler` trên một luồng mới; từ đây `ClientHandler` đọc các message của client này."),
     ("ret", "GameServer", "ServerConnection", "chấp nhận (TCP)", "Lớp `GameServer` quay lại chờ client khác; hàm `connect()` nhận được kết nối."),
     ("ret", "ServerConnection", "MainActivity", "trả về", "Hàm `connect()` chạy luồng nền đọc message và bộ hẹn giờ `pingTimer` gửi `PING` mỗi 5 giây, rồi trả kết quả kết nối thành công cho lớp `MainActivity`."),
-    ("msg", "MainActivity", "Player", "hiển thị", "Lớp `MainActivity` hiển thị giao diện chính cho người chơi (chưa đăng nhập thì hiện tên \"Khách\")."),
+    ("deact", "MainActivity"),
 ]
 M2 = [
     *M2_CONNECT,

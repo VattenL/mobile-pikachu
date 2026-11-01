@@ -81,3 +81,11 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 ## 2026-11-01: khóa màn hình ngang
 
 > Trước hết là force xoay ngang cho game đã. Về việc lệch m2 thì chính xác là nó thiếu thôi hay nó lệch hẳn luôn?
+
+## 2026-11-01: ghi lại các chỗ code khác thiết kế
+
+> Ok thế sửa nhưng không sửa vào docs. Note vào một file để có thể nhớ về thay đổi này
+
+Prompt bổ sung trong cùng lượt:
+
+> Không sửa vào doc dev 2 thôi nhé
