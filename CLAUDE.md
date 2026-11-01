@@ -77,3 +77,4 @@ If a build fails with `jlink executable ... does not exist`, a Gradle daemon sta
 - AGP 9.3 with Kotlin DSL and a version catalog (`gradle/libs.versions.toml`). Add new dependencies to the catalog, not inline.
 - All modules are Java (source/target compatibility 11). compileSdk/targetSdk is 37, minSdk is 24.
 - Package and namespace: `ptit.e23cnpm01.pikachu`.
+- Git commit messages and PR descriptions carry no `Co-Authored-By` or "Generated with Claude Code" line (user decision 2026-11-01). Earlier commits keep theirs; history is not rewritten.
