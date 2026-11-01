@@ -862,11 +862,13 @@ DIAGRAMS = [
     # Hình 3.7, 3.15 của tài liệu Dev 2 (bản cuối) là hai bản dựng thử "(dọc)" ngày 28-10 được chỉnh tay trong VP;
     # bản 3.15 có thêm reader, writer của ClientHandler (sửa tay; 01-11 đổi kiểu thành BufferedReader, PrintWriter như
     # puml, nên ảnh trong repo khác Doc ở hai dòng này)
-    ("class-design-m2", "Thử: 3.7 Lớp thiết kế M2 (dọc) 113243",
-     lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2810", oblique_up=True)),
-    ("class-design-m4", "Thử: 3.16 Lớp thiết kế M4 (dọc) 113341",
-     lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2810", oblique_up=True, rows=M4_ROWS)),
-    ("seq-m2", "3.19 Tuần tự thiết kế M2 (28-10)",
+    # Bản "(01-11)", gói _0111: dựng lại sau khi cài đặt bước 1-4 của Dev 2 (thay-doi-thiet-ke.md), bố cục chép từ hai bản
+    # "Thử: ... (dọc)" chỉnh tay bằng tidy.py (TIDY_REF); tài liệu Dev 2 (Google Doc) vẫn dùng ảnh hai bản cũ
+    ("class-design-m2", "3.7 Lớp thiết kế M2 (01-11)",
+     lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_0111", oblique_up=True)),
+    ("class-design-m4", "3.15 Lớp thiết kế M4 (01-11)",
+     lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_0111", oblique_up=True, rows=M4_ROWS)),
+    ("seq-m2", "3.18 Tuần tự thiết kế M2 (01-11)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
     ("seq-m4-4", "3.26 Tuần tự thiết kế M4 (tái đấu) (27-10)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4D_PARTS), seq_steps(gen_seq.M4D_PARTS, gen_seq.M4D))),

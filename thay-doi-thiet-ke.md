@@ -15,7 +15,7 @@ Ghi lại những chỗ code của Dev 2 khác hoặc thêm so với thiết k�
 
 Chưa làm:
 
-- Dựng lại hình trong Visual Paradigm (cần mở VP): Hình 3.7 `class-design-m2` (biểu đồ chỉnh tay, dựng bằng `--add` rồi chỉnh lại bố cục) và Hình 3.18 `seq-m2`. Ảnh `docs/vp/png/` hiện vẫn là bản cũ.
+- Hình 3.7, 3.15, 3.18 đã dựng lại trong Visual Paradigm ngày 2026-11-01 (bản "(01-11)" trong `pikachu.vpp`, ảnh `docs/vp/png/` đã xuất lại). Bố cục 3.7, 3.15 chép từ hai bản chỉnh tay "Thử: ... (dọc)"; 3.15 còn 3 đường cắt qua khối (`MatchController` tới `Board`, `BoardGenerator`, `MatchDAO`), cần chỉnh tay rồi `python docs/vp/build_vp.py --export class-design-m4`. Bản cũ vẫn còn trong `pikachu.vpp` cho tới khi xóa tay.
 - Gạch chân thuộc tính tĩnh (`GameServer.serverSocket`, `ChallengeController.inviteTimer`): `build_vp.py` chưa đọc được `{static}` trong `.puml`, nên chưa vẽ.
 - Google Doc của Dev 2: không sửa (theo quyết định).
 - Biểu đồ của Dev 1 (M1, M3) có vẽ `ServerConnection` nhưng chỉ các phương thức mà modul đó dùng, không cần thêm.
@@ -99,7 +99,7 @@ Phân loại:
 | `BaseActivity` | Khác | `MATCH_START` đóng màn hình hiện tại trừ màn hình gốc (giao diện chính), để sau ván vẫn quay về được | Đã sửa: pha 4 mục 2e |
 | Test | Thêm | `FakeClient`; 3 test tự bỏ qua cho tới khi Dev 1 làm xong `generateBoard()`, `Board.copy()` (đã chạy đạt với bản vá tạm) | không cần |
 
-Hình cần dựng lại trong Visual Paradigm: Hình 3.15 `class-design-m4` (chỉnh tay).
+Hình 3.15 `class-design-m4` đã dựng lại (xem mục trạng thái).
 
 ## Lệch trong tài liệu của Dev 1 (chưa sửa)
 

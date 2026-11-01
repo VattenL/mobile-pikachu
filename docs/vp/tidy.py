@@ -21,8 +21,8 @@ TIDY_REF = {
     "class-analysis-m4": "2.5 Lớp phân tích M4",
     "state-m4": "2.9 Trạng thái M4",
     "class-design-entity": "3.1 Lớp thực thể pha thiết kế (27-10)",
-    "class-design-m2": "3.7 Lớp thiết kế M2 (28-10)",
-    "class-design-m4": "3.16 Lớp thiết kế M4 (28-10)",
+    "class-design-m2": "Thử: 3.7 Lớp thiết kế M2 (dọc) 113243",
+    "class-design-m4": "Thử: 3.16 Lớp thiết kế M4 (dọc) 113341",
 }
 # shape mới (không có trong bản cũ) hoặc cần dời: (shape tham chiếu, dx, dy) so với vị trí shape tham chiếu ở bản cũ
 NEW_POS = {
