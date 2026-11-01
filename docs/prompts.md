@@ -55,3 +55,14 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 > - Phạm vi: Server+CSDL+OnlinePlayer (Message, ServerConfig, GameServer, ClientHandler, DAO, 4 script SQL + phần OnlinePlayerManager mà hạ tầng/Dev 1 cần)
 > - Controller: Xem lại các diagram xem có không, nếu không thì option 1 (tạo bằng new khi cần, inviteTimer static), sau đó giải thích lại cho tôi về việc nó có khớp thiết kế không.
 > - Seed: Option 1 (khớp cả TB điểm đối thủ và TB thời gian thắng của bảng mẫu pha 2), giải thích nó giống thiết kế chỗ nào. Với cả nhớ lưu các prompt làm code vào prompt.md
+
+## 2026-11-01: bước 2, bảng xếp hạng phía server
+
+> Không, giữ giao diện tiếng Việt. Tiếp theo là bước 2: bảng xếp hạng phía server. Như trước, hỏi tôi để xác nhận, với cả thêm một dòng vào @CLAUDE.md là code phải khớp thiết kế 100%.
+
+Trả lời các câu hỏi xác nhận trong cùng lượt:
+
+> - Tên trường danh sách dòng trong RANKING: listRanking
+> - Mỗi dòng: đúng 5 trường {rank, username, totalPoint, avgOpponentPoint, avgWinTime}
+> - mine = true mà người hỏi chưa có trong bảng: trang rỗng (me rỗng, page rỗng, danh sách rỗng, pageCount vẫn đúng)
+> - PlayerRankingDAO.getTotalPoints(): Làm khung.
