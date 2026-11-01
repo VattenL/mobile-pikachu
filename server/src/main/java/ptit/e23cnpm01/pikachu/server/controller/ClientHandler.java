@@ -67,7 +67,7 @@ public class ClientHandler implements Runnable {
                 try {
                     msg = Message.fromJson(line);
                 } catch (IllegalArgumentException e) {
-                    System.err.println(socket.getRemoteSocketAddress() + ": bỏ qua dòng không hợp lệ: " + line);
+                    System.err.println(socket.getRemoteSocketAddress() + ": ignored invalid line: " + line);
                     continue;
                 }
                 String type = msg.getType();
@@ -116,11 +116,11 @@ public class ClientHandler implements Runnable {
                             new MatchController().handleRematchReply(this, msg);
                             break;
                         default:
-                            System.err.println(socket.getRemoteSocketAddress() + ": bỏ qua message loại " + type);
+                            System.err.println(socket.getRemoteSocketAddress() + ": ignored message of type " + type);
                     }
                 } catch (RuntimeException e) {
                     // lỗi khi xử lý một message không làm đứt kết nối của client
-                    System.err.println(socket.getRemoteSocketAddress() + ": lỗi khi xử lý " + line);
+                    System.err.println(socket.getRemoteSocketAddress() + ": error while handling " + line);
                     e.printStackTrace();
                 }
             }

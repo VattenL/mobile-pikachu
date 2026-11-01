@@ -96,7 +96,7 @@ def solve():
     res = milp(obj, constraints=LinearConstraint(np.array(rows), lo, hi),
                integrality=np.ones(nv), bounds=Bounds(0, np.inf), options={"time_limit": 120})
     if res.x is None:  # hết giờ mà chưa có lời giải nào
-        raise SystemExit("Không tìm được bộ ván khớp bảng mẫu: " + res.message)
+        raise SystemExit("No set of matches fits the sample table: " + res.message)
     x = np.round(res.x).astype(int)
     games = []  # (người 1, người 2, kết quả của người 1)
     for k, (a, b) in enumerate(PAIRS):
@@ -160,7 +160,7 @@ def new_board(rng):
 
 def write_seed():
     games, max_pair = solve()
-    assert max_pair >= 2, "cần một cặp gặp nhau ít nhất hai lần"
+    assert max_pair >= 2, "need a pair that met at least twice"
     rng = random.Random(2026)
     rng.shuffle(games)
 
@@ -208,8 +208,8 @@ def write_seed():
     ]
     path = Path(__file__).with_name("seed.sql")
     path.write_text(render(header, [pl[0] for pl in PLAYERS], matches), encoding="utf-8", newline="\n")
-    print(f"{path}: {len(games)} ván, cặp gặp nhau nhiều nhất {max_pair} ván, "
-          f"bỏ cuộc ở ván {forfeit_idx + 1} ({PLAYERS[forfeit_winner][0]} thắng)")
+    print(f"{path}: {len(games)} matches, at most {max_pair} between one pair, "
+          f"forfeit in match {forfeit_idx + 1} (won by {PLAYERS[forfeit_winner][0]})")
 
 
 def write_tiebreak():
@@ -238,7 +238,7 @@ def write_tiebreak():
     path = Path(__file__).with_name("seed-tiebreak.sql")
     path.write_text(render(header, ["hoangnam", "minhanh", "nguoichoic", "nguoichoid"], matches),
                     encoding="utf-8", newline="\n")
-    print(f"{path}: 3 ván")
+    print(f"{path}: 3 matches")
 
 
 def main():

@@ -50,11 +50,11 @@ public class Message {
         try {
             obj = JsonParser.parseString(line).getAsJsonObject();
         } catch (JsonParseException | IllegalStateException e) {
-            throw new IllegalArgumentException("Message không hợp lệ: " + line, e);
+            throw new IllegalArgumentException("Invalid message: " + line, e);
         }
         JsonElement type = obj.remove("type");
         if (type == null || !type.isJsonPrimitive()) {
-            throw new IllegalArgumentException("Message thiếu trường type: " + line);
+            throw new IllegalArgumentException("Message has no type field: " + line);
         }
         Message msg = new Message(type.getAsString());
         msg.data = obj;

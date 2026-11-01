@@ -30,8 +30,8 @@ public final class ServerConfig {
              Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             p.load(reader);
         } catch (IOException e) {
-            throw new UncheckedIOException("Không đọc được " + path.toAbsolutePath()
-                    + " (chép từ server.properties.example rồi điền thông tin)", e);
+            throw new UncheckedIOException("Cannot read " + path.toAbsolutePath()
+                    + " (copy server.properties.example and fill it in)", e);
         }
         return p;
     }

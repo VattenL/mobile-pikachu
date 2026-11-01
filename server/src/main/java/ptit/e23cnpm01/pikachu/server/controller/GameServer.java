@@ -18,7 +18,7 @@ public class GameServer {
         Properties p = ServerConfig.load();
         int port = Integer.parseInt(p.getProperty("port", "9999").trim());
         serverSocket = new ServerSocket(port);
-        System.out.println("Server Pikachu đang chạy trên cổng " + port + ", chờ client kết nối...");
+        System.out.println("Pikachu server listening on port " + port + ", waiting for clients...");
         while (true) {
             Socket socket = serverSocket.accept();
             ClientHandler handler = new ClientHandler(socket);
