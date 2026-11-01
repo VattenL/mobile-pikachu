@@ -34,6 +34,14 @@ public class MainActivity extends BaseActivity {
     private Button btnSettings;
 
     /** Android 17 (API 37) trở lên: cần quyền mạng cục bộ mới kết nối được tới server trong mạng LAN. */
+    /** Mở LoginActivity từ nút Đấu đối kháng; đăng nhập thành công thì vào màn hình đấu đối kháng. */
+    private final ActivityResultLauncher<Intent> loginForMatch =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && ClientSession.player != null) {
+                    startActivity(new Intent(this, LobbyActivity.class));
+                }
+            });
+
     private static boolean permissionAsked;
     private final ActivityResultLauncher<String> localNetworkPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
@@ -99,8 +107,16 @@ public class MainActivity extends BaseActivity {
         // TODO (Dev 1)
     }
 
+    /**
+     * Chưa đăng nhập (khách) thì mở LoginActivity, đăng nhập xong (LoginActivity trả RESULT_OK) thì mở LobbyActivity;
+     * đã đăng nhập thì mở thẳng LobbyActivity.
+     */
     public void onMatchClick(View v) {
-        // TODO (Dev 2, bước sảnh)
+        if (ClientSession.player == null) {
+            loginForMatch.launch(new Intent(this, LoginActivity.class));
+        } else {
+            startActivity(new Intent(this, LobbyActivity.class));
+        }
     }
 
     @Override

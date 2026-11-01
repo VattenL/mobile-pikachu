@@ -74,6 +74,33 @@ Phân loại:
 | Manifest | Thêm | Mọi màn hình khóa ngang `sensorLandscape` (theo quyết định giao diện kiểu game) | Pha 4 mục 1c |
 | Giao diện | Chốt | Tạm dùng Material mặc định, làm theme kiểu game ở bước sau | không cần |
 
+## Bước 4: sảnh, lời mời, tạo ván khi chấp nhận (2026-11-01)
+
+| Lớp, tệp | Loại | Nội dung | Tài liệu |
+|---|---|---|---|
+| Message `ONLINE_LIST` | Chốt | Danh sách nằm trong trường `onlinePlayers`; mỗi dòng đúng `username`, `status`, `totalPoint`; sắp theo tổng điểm giảm dần rồi tên (như Hình 3.10) | Đã sửa: pha 3 mục 7, `plan.md` §5.2 |
+| Message `MATCH_START` | Chốt | `tiles` là lưới 12x12 của đề (có viền), `timeLimitSec` = 600, `opponent` là đối tượng chỉ gồm `username` | Đã sửa: pha 3 mục 7, `plan.md` §5.2 |
+| `BaseActivity` → `MatchActivity` | Chốt | Mở `MatchActivity` kèm extra `EXTRA_MATCH_START` là cả message `MATCH_START` dạng JSON | Đã sửa: pha 4 mục 2e; ghi cho Dev 1 ở `viec-dev-1.md` |
+| `OnlinePlayerManager` | Thêm | `hasInvitation(from)`: `handleInvite()` cần biết người mời đã có lời mời đi chưa (biểu đồ không có hàm nào cho việc này) | Đã sửa: `class-design-m4.puml`, pha 4 mục 2e |
+| `OnlinePlayerManager.updateStatus()` | Chốt | Đặt trạng thái theo tên đăng nhập; trả `false` nếu có người không online | Đã sửa: pha 4 mục 2e |
+| `ChallengeController` | Khác | Bộ hẹn giờ của lời mời cũ (đã trả lời, hủy) vẫn chạy; nếu người đó mời lại cùng người kia trước khi nó chạy thì `onInviteTimeout()` gỡ nhầm lời mời mới (lỗi tìm thấy khi chạy thử: lời mời mới hết hạn sau 20 giây). Sửa: giữ tác vụ hẹn giờ hiện hành của mỗi người mời (`inviteTasks`, tĩnh), tác vụ cũ tự bỏ qua | Đã sửa: pha 4 mục 2e; `class-design-m4.puml` thêm `inviteTasks` |
+| `ChallengeController.handleInviteReply()` | Khác | Kiểm tra lại hai người chưa bận, sinh đề, tạo phòng và chuyển sang bận trong cùng một khối đồng bộ (trên `OnlinePlayerManager`), để hai lời chấp nhận cùng lúc với cùng một người chỉ tạo một ván. Người mời vừa rời mạng hoặc đã bận thì người trả lời nhận `INVITE_CLOSED` (`OFFLINE` hoặc `BUSY`) | Đã sửa: pha 4 mục 2e |
+| `ChallengeController` | Thêm | `handleInvite()`: người được mời rời mạng ngay sau khi ghi lời mời thì gỡ lời mời và báo `OFFLINE`. Các hàm riêng dựng message và gửi theo tên đăng nhập | không cần |
+| `ChallengeController.broadcastOnlineList()` | Chốt | Chỉ gửi cho người đang rỗi (`IDLE`), theo pha 3 mục 4d | không cần |
+| `ChallengeController.handleUpdateStatus()` | Thêm | Bỏ qua trạng thái khác `IDLE`, `TRAINING` (client không được tự đặt `BUSY`) | Đã sửa: pha 4 mục 2e |
+| `MatchManager` | Thêm | Hàm khởi tạo riêng tư, `instance`; hằng `TIME_LIMIT_SEC` = 600; mỗi phòng một `Timer` riêng | không cần |
+| `MatchRoom` (Dev 1) | Thêm | Hàm khởi tạo `MatchRoom(roomId, match, handlers, boards)` (đặt `startMillis`, `rematchReplies`, `ended`) và get/set; Dev 2 viết vì `createMatch()` cần (người dùng chốt) | Đã sửa: `class-design-m4.puml` |
+| `PlayerRankingDAO.getTotalPoints()` | Chốt | Trả một `PlayerRanking` cho mỗi người trong danh sách, cùng thứ tự, giữ `id`, `username`, `status`; danh sách rỗng thì không truy vấn | Đã sửa: pha 4 mục 2e |
+| `MainActivity.onMatchClick()` | Chốt | Khách: mở `LoginActivity` bằng `registerForActivityResult`, nhận `RESULT_OK` thì mở `LobbyActivity` (hợp đồng với Dev 1 ở `viec-dev-1.md`) | Đã sửa: pha 4 mục 2e |
+| `LobbyActivity` | Thêm | Tên người chơi góc phải và dòng "(click tên để thách đấu)" như Hình 3.10 (biểu đồ lớp không có); `showMessage()` để `ChallengeConfirmDialog` hiện lý do; extra `EXTRA_MESSAGE` cho thông báo khi mở; chưa kết nối thì báo "Không kết nối được máy chủ" và đóng | Đã sửa: `class-design-m4.puml`, pha 4 mục 2e |
+| `ChallengeConfirmDialog` | Thêm | Hàm khởi tạo nhận `LobbyActivity` và `opponent`; tiêu đề đổi từ "Xác nhận thách đấu" sang "Đang chờ trả lời" như Hình 3.11; đóng khi nhận `MATCH_START`; không đóng bằng Back | Đã sửa: pha 4 mục 2e |
+| `InvitationDialog` | Thêm | Giữ message lời mời (`invitation`) để cất lại vào hàng đợi khi đổi màn hình; cửa sổ `FLAG_NOT_TOUCH_MODAL` và `FLAG_NOT_FOCUSABLE` (phím Back và chạm ra ngoài đi xuống màn hình bên dưới), không làm mờ nền | Đã sửa: `class-design-m4.puml`, pha 4 mục 2e |
+| `BaseActivity` | Thêm | Chỉ màn hình đang ở trên cùng xử lý ba message chung (lúc chuyển màn hình có hai màn hình cùng đăng ký); popup lời mời chuyển sang màn hình mới khi đổi màn hình, màn hình dừng mà không có màn hình nào nhận thì cất lại vào hàng đợi; `onInvitationClosed()`; hạn của lời mời lưu trong message (trường `deadline` chỉ có trên máy) | Đã sửa: `class-design-m4.puml`, pha 4 mục 2e |
+| `BaseActivity` | Khác | `MATCH_START` đóng màn hình hiện tại trừ màn hình gốc (giao diện chính), để sau ván vẫn quay về được | Đã sửa: pha 4 mục 2e |
+| Test | Thêm | `FakeClient`; 3 test tự bỏ qua cho tới khi Dev 1 làm xong `generateBoard()`, `Board.copy()` (đã chạy đạt với bản vá tạm) | không cần |
+
+Hình cần dựng lại trong Visual Paradigm: Hình 3.15 `class-design-m4` (chỉnh tay).
+
 ## Lệch trong tài liệu của Dev 1 (chưa sửa)
 
 - Biểu đồ lớp thiết kế M1 còn thuộc tính `Player.name` (đã bỏ: tên đăng nhập là tên hiển thị).

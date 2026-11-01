@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import ptit.e23cnpm01.pikachu.core.model.Player;
 import ptit.e23cnpm01.pikachu.core.model.PlayerRanking;
 
@@ -73,10 +74,45 @@ public class PlayerRankingDAO extends DAO {
     }
 
     /**
-     * Tổng điểm của các người chơi trong listPlayer (dùng cho danh sách online), người chưa có ván nào có 0 điểm.
-     * Truy vấn ở pha 4, mục 2e. Làm ở bước sảnh (M4).
+     * Tổng điểm của các người chơi trong listPlayer (dùng cho danh sách online), theo truy vấn ở pha 4, mục 2e: đi từ
+     * tblPlayer và LEFT JOIN sang tblMatchResult nên người chưa có ván nào có 0 điểm. Mỗi người trong danh sách một
+     * PlayerRanking, cùng thứ tự, giữ id, username, status của người đó. Danh sách rỗng thì không truy vấn.
      */
     public ArrayList<PlayerRanking> getTotalPoints(ArrayList<Player> listPlayer) {
-        throw new UnsupportedOperationException("TODO");
+        ArrayList<PlayerRanking> result = new ArrayList<>();
+        if (listPlayer.isEmpty()) {
+            return result;
+        }
+        StringBuilder sql = new StringBuilder("SELECT p.id, COALESCE(SUM(CASE r.result WHEN 'WIN' THEN 1"
+                + " WHEN 'DRAW' THEN 0.5 ELSE 0 END), 0) AS totalPoint"
+                + " FROM tblPlayer p LEFT JOIN tblMatchResult r ON r.playerId = p.id WHERE p.id IN (");
+        for (int i = 0; i < listPlayer.size(); i++) {
+            sql.append(i == 0 ? "?" : ", ?");
+        }
+        sql.append(") GROUP BY p.id");
+        HashMap<Integer, Float> totals = new HashMap<>();
+        synchronized (DAO.class) {
+            try (PreparedStatement ps = con.prepareStatement(sql.toString())) {
+                for (int i = 0; i < listPlayer.size(); i++) {
+                    ps.setInt(i + 1, listPlayer.get(i).getId());
+                }
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        totals.put(rs.getInt("id"), rs.getFloat("totalPoint"));
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        for (Player p : listPlayer) {
+            PlayerRanking pr = new PlayerRanking();
+            pr.setId(p.getId());
+            pr.setUsername(p.getUsername());
+            pr.setStatus(p.getStatus());
+            pr.setTotalPoint(totals.getOrDefault(p.getId(), 0f));
+            result.add(pr);
+        }
+        return result;
     }
 }

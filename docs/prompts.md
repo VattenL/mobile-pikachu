@@ -89,3 +89,14 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 Prompt bổ sung trong cùng lượt:
 
 > Không sửa vào doc dev 2 thôi nhé
+
+## 2026-11-01: bước 4, sảnh, lời mời, tạo ván khi chấp nhận
+
+> Tiếp tục với Bước 4: sảnh, lời mời, tạo ván khi chấp nhận.
+
+Trả lời các câu hỏi xác nhận trong cùng lượt:
+
+> - Phụ thuộc Dev 1: Chỉ MatchRoom, còn lại để dev 1. Note lại các việc mà dev 1 phải làm vào một file md, hiện tại chỉ note các việc mà dev 2 vướng.
+> - Đăng nhập để kiểm thử: Bản vá tạm, không commit
+> - Message: Theo đề xuất (ONLINE_LIST có trường onlinePlayers, mỗi dòng {username, status, totalPoint}, sắp theo tổng điểm giảm dần rồi tên; MATCH_START: tiles 12x12, timeLimitSec 600, opponent {username}; MatchActivity nhận MATCH_START dạng JSON trong một extra của Intent)
+> - Giao diện: Đúng hình, ghi chú phần thêm

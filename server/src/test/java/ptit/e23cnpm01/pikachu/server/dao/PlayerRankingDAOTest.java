@@ -6,12 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ptit.e23cnpm01.pikachu.core.model.Player;
 import ptit.e23cnpm01.pikachu.core.model.PlayerRanking;
 
-/** Pha 4, mục 3b, test 6: PlayerRankingDAO.getRanking(). Cần CSDL đã nạp schema.sql và seed.sql. */
+/** Pha 4, mục 3b, test 6: PlayerRankingDAO.getRanking(), getTotalPoints(). Cần CSDL đã nạp schema.sql và seed.sql. */
 public class PlayerRankingDAOTest {
     private final PlayerRankingDAO dao = new PlayerRankingDAO();
 
@@ -139,6 +141,41 @@ public class PlayerRankingDAOTest {
         ArrayList<PlayerRanking> list = dao.getRanking();
         assertEquals(12, list.size());
         assertEquals(-1, indexOf(list, "thanhtung"));
+    }
+
+    private static Player player(int id, String username, String status) {
+        Player p = new Player();
+        p.setId(id);
+        p.setUsername(username);
+        p.setStatus(status);
+        return p;
+    }
+
+    @Test
+    public void getTotalPoints_nguoiCoVan_dungTongDiem_giuThuTuVaTrangThai() {
+        ArrayList<Player> online = new ArrayList<>(Arrays.asList(
+                player(1, "hoangnam", "IDLE"), player(2, "minhanh", "BUSY")));
+        ArrayList<PlayerRanking> totals = dao.getTotalPoints(online);
+        assertEquals(2, totals.size());
+        assertEquals("hoangnam", totals.get(0).getUsername());
+        assertEquals(3.5f, totals.get(0).getTotalPoint(), 0);
+        assertEquals("IDLE", totals.get(0).getStatus());
+        assertEquals(12.5f, totals.get(1).getTotalPoint(), 0);
+        assertEquals("BUSY", totals.get(1).getStatus());
+    }
+
+    @Test
+    public void getTotalPoints_nguoiChuaCoVan_0Diem() throws SQLException {
+        int id = TestData.addPlayer("thanhtung");
+        ArrayList<PlayerRanking> totals = dao.getTotalPoints(
+                new ArrayList<>(Arrays.asList(player(id, "thanhtung", "IDLE"))));
+        assertEquals(1, totals.size());
+        assertEquals(0f, totals.get(0).getTotalPoint(), 0);
+    }
+
+    @Test
+    public void getTotalPoints_danhSachRong_ketQuaRong() {
+        assertTrue(dao.getTotalPoints(new ArrayList<>()).isEmpty());
     }
 
     @Test

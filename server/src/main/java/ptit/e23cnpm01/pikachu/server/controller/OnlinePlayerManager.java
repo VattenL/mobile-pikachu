@@ -2,6 +2,8 @@ package ptit.e23cnpm01.pikachu.server.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import ptit.e23cnpm01.pikachu.core.model.Player;
 
 /**
@@ -71,22 +73,60 @@ public class OnlinePlayerManager {
         return onlineHandlers.get(username);
     }
 
-    /** Ghi lời mời from -> to; trả null nếu ghi được, "OFFLINE" hoặc "BUSY" nếu không. */
-    public String sendInvitation(String from, String to) {
-        throw new UnsupportedOperationException("TODO");
+    /**
+     * Ghi lời mời from -> to; trả null nếu ghi được, "OFFLINE" nếu to không online, "BUSY" nếu to đang bận (người
+     * luyện tập vẫn nhận lời mời).
+     */
+    public synchronized String sendInvitation(String from, String to) {
+        ClientHandler handler = onlineHandlers.get(to);
+        if (handler == null) {
+            return "OFFLINE";
+        }
+        if ("BUSY".equals(handler.getPlayer().getStatus())) {
+            return "BUSY";
+        }
+        pendingInvites.put(from, to);
+        return null;
     }
 
-    /** Gỡ lời mời from -> to nếu còn; trả false nếu lời mời không còn (đã trả lời, hủy hoặc hết hạn). */
-    public boolean removeInvitation(String from, String to) {
-        throw new UnsupportedOperationException("TODO");
+    /** from đang có một lời mời đi chưa được trả lời (mỗi người mời chỉ có một lời mời đi). */
+    public synchronized boolean hasInvitation(String from) {
+        return pendingInvites.containsKey(from);
+    }
+
+    /**
+     * Gỡ lời mời from -> to nếu còn; trả false nếu lời mời không còn (đã trả lời, hủy hoặc hết hạn). Đồng bộ nên khi
+     * trả lời, hủy và hết hạn đến cùng lúc thì chỉ một lời gọi trả true.
+     */
+    public synchronized boolean removeInvitation(String from, String to) {
+        return pendingInvites.remove(from, to);
     }
 
     /** Gỡ và trả mọi lời mời (người mời -> người được mời) đi hoặc đến username. */
-    public HashMap<String, String> removeInvitationsOf(String username) {
-        throw new UnsupportedOperationException("TODO");
+    public synchronized HashMap<String, String> removeInvitationsOf(String username) {
+        HashMap<String, String> removed = new HashMap<>();
+        Iterator<Map.Entry<String, String>> it = pendingInvites.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, String> e = it.next();
+            if (e.getKey().equals(username) || e.getValue().equals(username)) {
+                removed.put(e.getKey(), e.getValue());
+                it.remove();
+            }
+        }
+        return removed;
     }
 
-    public boolean updateStatus(ArrayList<Player> listPlayer, String status) {
-        throw new UnsupportedOperationException("TODO");
+    /** Đặt trạng thái cho các người chơi trong danh sách (theo tên đăng nhập); trả false nếu có người không online. */
+    public synchronized boolean updateStatus(ArrayList<Player> listPlayer, String status) {
+        boolean all = true;
+        for (Player p : listPlayer) {
+            ClientHandler handler = onlineHandlers.get(p.getUsername());
+            if (handler == null) {
+                all = false;
+            } else {
+                handler.getPlayer().setStatus(status);
+            }
+        }
+        return all;
     }
 }

@@ -32,4 +32,34 @@
     <string name="ranking_empty">Chưa có dữ liệu xếp hạng</string>
     <string name="not_in_ranking">Bạn chưa có trong bảng xếp hạng</string>
     <string name="no_win_time">--</string>
+
+    <!-- Màn hình đấu đối kháng (Hình 3.10) -->
+    <string name="lobby_title">Đấu đối kháng</string>
+    <string name="online_players">Người chơi online</string>
+    <string name="click_to_challenge">(click tên để thách đấu)</string>
+    <string name="col_index">TT</string>
+    <string name="col_status">Trạng thái</string>
+    <string name="status_idle">Rỗi</string>
+    <string name="status_training">Luyện tập</string>
+    <string name="status_busy">Bận</string>
+
+    <!-- Dialog xác nhận thách đấu, popup chờ (Hình 3.11) -->
+    <string name="confirm_title">Xác nhận thách đấu</string>
+    <string name="confirm_message">Bạn muốn thách đấu %1$s?</string>
+    <string name="cancel">Hủy</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="waiting_title">Đang chờ trả lời</string>
+    <string name="waiting_message">Đang chờ %1$s trả lời... (còn %2$d giây)</string>
+    <string name="cancel_invitation">Hủy lời mời</string>
+    <string name="invite_rejected">%1$s đã từ chối lời mời</string>
+    <string name="invite_busy">%1$s đang bận</string>
+    <string name="invite_offline">%1$s không còn online</string>
+    <string name="invite_expired">%1$s không trả lời</string>
+
+    <!-- Popup lời mời (Hình 3.12) -->
+    <string name="invitation_title">Thách đấu!</string>
+    <string name="invitation_challenger">%1$s muốn thách đấu bạn</string>
+    <string name="invitation_countdown">(còn %1$d giây)</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
 </resources>

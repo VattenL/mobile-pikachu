@@ -750,7 +750,7 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `PING` | không có dữ liệu, gửi mỗi 5 giây; server không trả lời |
 | C → S | `UPDATE_STATUS` | `status`: `TRAINING` khi bắt đầu ván với máy, `IDLE` khi ván kết thúc hoặc thoát; server bỏ qua nếu đang `BUSY` |
 | C → S | `GET_ONLINE_LIST` | không có dữ liệu; server trả `ONLINE_LIST` cho riêng người hỏi |
-| S → C | `ONLINE_LIST` | danh sách `PlayerRanking` (thuộc tính kế thừa từ `Player`: `username`, `status` là `IDLE`, `TRAINING` hoặc `BUSY`; thêm `totalPoint`), không gồm người nhận |
+| S → C | `ONLINE_LIST` | `onlinePlayers`: danh sách `PlayerRanking`, mỗi dòng đúng `{username, status, totalPoint}` (`status` là `IDLE`, `TRAINING` hoặc `BUSY`), không gồm người nhận, sắp theo tổng điểm giảm dần rồi theo tên |
 | C → S | `GET_RANKING` | `page` (số trang, bắt đầu từ 1) hoặc `mine` (`true`: trang chứa người chơi đang đăng nhập) |
 | S → C | `RANKING` | `page`, `pageCount`, `me` (thứ hạng của người hỏi, chỉ có khi `mine`), `listRanking` (các dòng của trang, mỗi dòng đúng `{rank, username, totalPoint, avgOpponentPoint, avgWinTime}`); `mine` mà người hỏi là khách hoặc chưa có trong bảng thì không có `me`, `page` và `listRanking` rỗng (client giữ nguyên trang đang xem) |
 | C → S | `INVITE` | `to` |
@@ -759,7 +759,7 @@ Mỗi người chơi cài ứng dụng trên một thiết bị Android; các th
 | C → S | `INVITE_REPLY` | `from`, `accept` |
 | S → C | `INVITE_RESULT` | gửi cho người mời: `to`, `accepted`, `reason` (`REJECTED`: bị từ chối; `BUSY`: người được mời đang bận hoặc vừa vào ván khác; `OFFLINE`: người được mời không online hoặc vừa rời mạng; `EXPIRED`: hết 30 giây chưa được trả lời) |
 | S → C | `INVITE_CLOSED` | gửi cho người được mời khi lời mời không còn hiệu lực: `from`, `reason` (`CANCELLED`: người mời hủy; `EXPIRED`: hết 30 giây, hoặc trả lời một lời mời đã hết hiệu lực; `BUSY`: người mời đã vào ván khác; `OFFLINE`: người mời đăng xuất hoặc mất kết nối) |
-| S → C | `MATCH_START` | `roomId`, `tiles`, `timeLimitSec`, `opponent` |
+| S → C | `MATCH_START` | `roomId`, `tiles` (đề bài, lưới 12x12 có viền), `timeLimitSec` (600), `opponent` (`{username}`) |
 | C → S | `MOVE` | `roomId`, `a`, `b` |
 | S → C | `MOVE_RESULT` | `ok`, `path`, `remaining` |
 | S → C | `BOARD_SHUFFLED` | `tiles` (chỉ gửi cho người có bàn bị bế tắc) |
