@@ -60,7 +60,7 @@ EXPORT_ONLY = False  # --export: chỉ xuất ảnh, không động vào đườ
 STAMP = HERE / "build-stamp.txt"  # mtime của pikachu.vpp ngay sau lần dựng tự động toàn bộ gần nhất (không commit)
 # biểu đồ người dùng chỉnh bố cục bằng tay trong VP sau khi dựng; nội dung vẫn lấy từ nguồn ở đây
 HAND_EDITED = ["class-entity", "class-analysis-m2", "class-analysis-m4", "state-m4", "class-design-entity",
-               "class-design-m2", "class-design-m4"]
+               "class-design-m2", "class-design-m4", "deployment"]
 
 VIS = {"-": "private", "+": "public", "#": "protected", "~": "package", "": "private"}
 
@@ -859,8 +859,13 @@ DIAGRAMS = [
     ("class-design-entity", "3.1 Lớp thực thể pha thiết kế (27-10)",
      lambda n: build_class(n, "pha3/class-design-entity.puml", "pha3_entity_2710", ENTITY_POS)),
     ("erd", "3.2 Cơ sở dữ liệu", build_erd),
-    ("class-design-m2", "3.7 Lớp thiết kế M2 (28-10)", lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2810", oblique_up=True)),
-    ("class-design-m4", "3.16 Lớp thiết kế M4 (28-10)", lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2810", oblique_up=True, rows=M4_ROWS)),
+    # Hình 3.7, 3.15 của tài liệu Dev 2 (bản cuối) là hai bản dựng thử "(dọc)" ngày 28-10 được chỉnh tay trong VP;
+    # bản 3.15 có thêm reader, writer của ClientHandler (sửa tay; 01-11 đổi kiểu thành BufferedReader, PrintWriter như
+    # puml, nên ảnh trong repo khác Doc ở hai dòng này)
+    ("class-design-m2", "Thử: 3.7 Lớp thiết kế M2 (dọc) 113243",
+     lambda n: build_class(n, "pha3/class-design-m2.puml", "pha3_m2_2810", oblique_up=True)),
+    ("class-design-m4", "Thử: 3.16 Lớp thiết kế M4 (dọc) 113341",
+     lambda n: build_class(n, "pha3/class-design-m4.puml", "pha3_m4_2810", oblique_up=True, rows=M4_ROWS)),
     ("seq-m2", "3.19 Tuần tự thiết kế M2 (28-10)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M2_PARTS), seq_steps(gen_seq.M2_PARTS, gen_seq.M2))),
     ("seq-m4-4", "3.26 Tuần tự thiết kế M4 (tái đấu) (27-10)",
@@ -868,7 +873,10 @@ DIAGRAMS = [
     ("seq-m4-5", "3.27 Tuần tự thiết kế M4 (thoát ván)",
      lambda n: build_sequence(n, seq_parts(gen_seq.M4E_PARTS), seq_steps(gen_seq.M4E_PARTS, gen_seq.M4E))),
     ("package", "3.26 Biểu đồ gói (dọc)", build_package),
-    ("deployment", "3.28 Biểu đồ triển khai (28-10)", build_deployment),
+    # Hình 3.27 của tài liệu Dev 2 là bản (27-10) chỉnh tay ngày 28-10 (nhãn TCP hẹp, xuống dòng), không phải bố cục
+    # build_deployment() đặt. Mở lại project thì VP vẽ bản này sai (khối con đè tên node), nên png/deployment.png là ảnh
+    # lấy từ Doc; đừng --export khoá này
+    ("deployment", "3.28 Biểu đồ triển khai (27-10)", build_deployment),
     ("protocol", "3.29 Luồng message (27-10)", build_protocol),
     # hai biểu đồ tuần tự M4 vẽ đủ mọi bước trong một hình, ảnh được cắt thành nhiều phần theo SLICES
     # (Hình 2.13-2.14, 3.21-3.23).

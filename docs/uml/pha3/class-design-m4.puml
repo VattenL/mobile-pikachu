@@ -109,6 +109,8 @@ class ClientHandler #E8F5E9 {
   - socket : Socket
   - player : Player
   - roomId : Integer
+  - reader : BufferedReader
+  - writer : PrintWriter
   + run() : void
   + send(msg : Message) : void
 }
