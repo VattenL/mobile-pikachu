@@ -41,7 +41,7 @@ pikachu/
 │   └── dao/        DAO, PlayerDAO, PlayerRankingDAO, MatchDAO
 ├── server/src/test/java/...         PlayerDAOTest, PlayerRankingDAOTest, MatchDAOTest,
 │                                    OnlinePlayerManagerTest, MatchControllerTest
-└── server/db/      create-db.sql, schema.sql, seed.sql, seed-tiebreak.sql
+└── server/db/      create-db.sql, schema.sql, seed.sql, seed-tiebreak.sql (hai tệp seed sinh bằng gen_seed.py)
 ```
 
 ### c. Môi trường và cấu hình

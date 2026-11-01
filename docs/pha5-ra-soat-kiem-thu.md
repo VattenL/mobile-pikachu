@@ -185,9 +185,11 @@ Cột Kết quả để trống, điền khi thực hiện (Đạt / Không đ�
 - Các ván đối kháng đã kết thúc, chọn sao cho:
   - tổng điểm đúng như kịch bản: B 12.5, C 10.5, D 9, E 8.5, G 8, H 7.5, I 7.5, K 6, L 5.5, M 5, N 4.5, A 3.5. Mỗi ván phát ra đúng 1 điểm (1 + 0 hoặc 0.5 + 0.5), nên tổng điểm của mọi người (88) bằng đúng số ván; 12 người nên bảng xếp hạng có 2 trang và A nằm ở trang 2 (VR_3, VR_4);
   - thứ tự xếp hạng đúng như kịch bản; H và I cùng 7.5 nhưng khác TB điểm đối thủ để kiểm tra tiêu chí 2 (VR_6);
+  - TB điểm đối thủ (làm tròn một chữ số) và TB thời gian thắng (mm:ss) của từng người cũng đúng như bảng của kịch bản;
   - có một ván thắng do đối thủ bỏ cuộc (không có `finishTime`);
   - có một người gặp cùng một đối thủ hai lần.
-- `server/db/seed-tiebreak.sql`: bộ dữ liệu nhỏ riêng cho VR_7, có hai người cùng tổng điểm và cùng TB điểm đối thủ. Dữ liệu này không trộn vào `seed.sql` để bảng xếp hạng mẫu vẫn khớp kịch bản.
+- `server/db/seed-tiebreak.sql`: bộ dữ liệu nhỏ riêng cho VR_7, có hai người cùng tổng điểm và cùng TB điểm đối thủ (`hoangnam`, `minhanh`), và hai người trùng cả ba tiêu chí (`nguoichoic`, `nguoichoid`, cùng hạng 3). Dữ liệu này không trộn vào `seed.sql` để bảng xếp hạng mẫu vẫn khớp kịch bản.
+- Hai tệp dữ liệu mẫu được sinh bằng `server/db/gen_seed.py` (chọn các ván bằng quy hoạch nguyên để khớp bảng của kịch bản), không sửa tay. Mật khẩu mẫu chung là `123456`.
 - Một CSDL rỗng (chỉ chạy `schema.sql`) cho VR_8.
 - Đề thử cố định cho PB_7, CP_9 (bàn gần bế tắc) được nạp bằng seed cố định trong chế độ thử của server.
 
