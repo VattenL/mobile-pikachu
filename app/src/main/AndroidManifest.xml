@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 17 (API 37): kết nối tới địa chỉ LAN (cả 10.0.2.2 của máy ảo) cần quyền mạng cục bộ, xin lúc chạy -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
     <application
         android:allowBackup="true"

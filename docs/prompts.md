@@ -66,3 +66,14 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 > - Mỗi dòng: đúng 5 trường {rank, username, totalPoint, avgOpponentPoint, avgWinTime}
 > - mine = true mà người hỏi chưa có trong bảng: trang rỗng (me rỗng, page rỗng, danh sách rỗng, pageCount vẫn đúng)
 > - PlayerRankingDAO.getTotalPoints(): Làm khung.
+
+## 2026-11-01: bước 3, tầng mạng Android và màn bảng xếp hạng
+
+> Ok tiếp đến Bước 3: network phía Android và màn Bảng xếp hạng. Tương tự vậy. Thêm một dòng vào @CLAUDE.md trước khi code thì hỏi tôi để xác nhận. Không cần commit cái claude md làm một commit riêng
+
+Trả lời các câu hỏi xác nhận trong cùng lượt:
+
+> - MainActivity: Option 1 (layout đủ theo Hình 3.5, chỉ làm logic Dev 2, các nút của Dev 1 để TODO, thêm ClientSession.clear()), giải thích về các việc cần làm để có thể báo cho dev 1
+> - Theme: Material mặc định, theme sau
+> - Kết nối: Option 1 (ServerConnection giữ application Context, có isConnected(); lỗi socket thì hủy pingTimer, xóa phiên, mở MainActivity kèm thông báo; MainActivity.onStart() kết nối lại; connect() trên luồng nền, send() trên luồng ghi riêng), giải thích việc này sẽ ảnh hưởng đến thiết kế như thế nào.
+> - Định dạng số trên bảng xếp hạng: Như bảng mẫu

@@ -41,6 +41,8 @@ Layout (`plan.md` Part II, `docs/pha4-cai-dat.md`): three Gradle modules, all Ja
 
 Code must match the design 100% (user decision 2026-11-01): class names, attributes, method signatures and behaviour follow the design class diagrams, kịch bản v3 / sequence diagrams (`docs/pha3-thiet-ke.md`) and `docs/pha4-cai-dat.md`. Where the design is silent or ambiguous, ask the user before implementing, and report every addition beyond the diagrams (helpers, getters/setters, guards).
 
+Before writing code for each step, ask the user to confirm the open points (one round of questions with recommended options), then code (user decision 2026-11-01).
+
 Key design constraints:
 - The server is the referee. It re-validates every client move with `core`'s path finder on that player's own board and never trusts a client-reported result.
 - Both players start from the same initial board, but each removes pairs on their own copy, so the boards diverge after the first move. The server keeps one board per player, and a deadlock is per player: the server shuffles only that player's board and sends it only to them. The server also owns the 10-minute clock and the finish times.

@@ -13,7 +13,8 @@ public final class ClientSession {
     private ClientSession() {
     }
 
+    /** Xóa người chơi đang đăng nhập (đăng xuất, mất kết nối). */
     public static void clear() {
-        // TODO
+        player = null;
     }
 }
