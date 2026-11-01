@@ -106,13 +106,14 @@ def build():
     wb = Workbook()
     wb.remove(wb.active)
 
-    # Hình 3.5: giao diện chính (khách thấy "Khách" thay cho tên người chơi)
-    s = Screen(wb, "ui-main", 14)
-    s.frame(2, 2, 14, 41, "PIKACHU", user="Người chơi A")
+    # Hình 3.5: giao diện chính khi chưa đăng nhập; nút Đăng nhập ở dưới, căn giữa (yêu cầu của Dev 1)
+    s = Screen(wb, "ui-main", 17)
+    s.frame(2, 2, 17, 41, "PIKACHU", user="Khách")
     s.button(6, 8, 19, "Chơi với máy")
     s.button(6, 24, 35, "Đấu đối kháng")
     s.button(10, 8, 19, "Xem bảng xếp hạng")
     s.button(10, 24, 35, "Cài đặt")
+    s.button(14, 16, 27, "Đăng nhập")
 
     # Hình 3.6: bảng xếp hạng, đang ở trang có dòng của người chơi (sau khi bấm Vị trí của tôi)
     s = Screen(wb, "ui-ranking", 15)
