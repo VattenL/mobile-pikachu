@@ -3,6 +3,7 @@ package ptit.e23cnpm01.pikachu.server.controller;
 import java.util.ArrayList;
 import ptit.e23cnpm01.pikachu.core.logic.BoardGenerator;
 import ptit.e23cnpm01.pikachu.core.model.Board;
+import ptit.e23cnpm01.pikachu.core.model.Match;
 import ptit.e23cnpm01.pikachu.core.model.Player;
 import ptit.e23cnpm01.pikachu.core.protocol.Message;
 
@@ -59,6 +60,23 @@ class FakeClient extends ClientHandler {
             Board b = BoardGenerator.generateBoard(10, 10, 25, 1L);
             b.copy();
             return true;
+        } catch (UnsupportedOperationException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Phần của Dev 1 mà việc kết thúc ván cần đã có chưa: sinh đề, sao bàn, đếm ô còn lại, MatchRoom.getBoard(),
+     * getOpponent().
+     */
+    static boolean matchReady() {
+        try {
+            Board b = BoardGenerator.generateBoard(10, 10, 25, 1L);
+            b.countRemaining();
+            FakeClient x = new FakeClient(0, "x");
+            FakeClient y = new FakeClient(0, "y");
+            MatchRoom room = new MatchRoom(0, new Match(), new ClientHandler[] {x, y}, new Board[] {b, b.copy()});
+            return room.getOpponent(x) == y && room.getBoard(y) != null;
         } catch (UnsupportedOperationException e) {
             return false;
         }

@@ -139,7 +139,7 @@ class MatchController #E8F5E9 {
   + onTimeout(room : MatchRoom) : void
   + onRematchTimeout(room : MatchRoom) : void
   + handleDisconnect(handler : ClientHandler) : void
-  - endMatch(room : MatchRoom, reason : String) : void
+  - endMatch(room : MatchRoom, reason : String, player : ClientHandler) : void
   - stopRematch(room : MatchRoom, stopper : ClientHandler) : void
 }
 
@@ -175,6 +175,7 @@ class MatchRoom #E8F5E9 {
   - timer : Timer
   - rematchReplies : Boolean[]
   - ended : boolean
+  - endReason : String
   + MatchRoom(roomId : int, match : Match, handlers : ClientHandler[], boards : Board[])
   + getBoard(handler : ClientHandler) : Board
   + getOpponent(handler : ClientHandler) : ClientHandler

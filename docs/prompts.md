@@ -100,3 +100,14 @@ Trả lời các câu hỏi xác nhận trong cùng lượt:
 > - Đăng nhập để kiểm thử: Bản vá tạm, không commit
 > - Message: Theo đề xuất (ONLINE_LIST có trường onlinePlayers, mỗi dòng {username, status, totalPoint}, sắp theo tổng điểm giảm dần rồi tên; MATCH_START: tiles 12x12, timeLimitSec 600, opponent {username}; MatchActivity nhận MATCH_START dạng JSON trong một extra của Intent)
 > - Giao diện: Đúng hình, ghi chú phần thêm
+
+## 2026-11-02: bước 5 và 6, kết thúc ván và tái đấu
+
+> Thực hiện bước 5 và 6: kết thúc ván và tái đấu. Note lại các việc mà dev 1 phải làm sau khi làm xong.
+
+Trả lời các câu hỏi xác nhận trong cùng lượt:
+
+> - endMatch: Thêm tham số + endReason (endMatch(room, reason, player): player là người xóa hết ô / người thoát, null khi hết giờ; MatchRoom thêm `endReason : String` để stopRematch biết có hỏi tái đấu không; handleMove của Dev 1 gọi endMatch(room, "CLEARED", handler))
+> - MATCH_END: Theo người nhận ({roomId, result, point, finishTime, remaining, opponentFinishTime, opponentRemaining, reason, rematch, replySec=30})
+> - Dev 1: Option 2 (để hết cho Dev 1: Dev 2 không viết getBoard/getOpponent của MatchRoom; test M4 tự bỏ qua), note lại vào những việc dev 1 cần làm
+> - Giao diện: Theo kịch bản pha 2 (tiêu đề Chiến thắng! / Thất bại / Hòa!; QUIT và DISCONNECT cùng "Đối thủ đã thoát."; chờ: "Đang chờ đối thủ trả lời... (còn N giây)")

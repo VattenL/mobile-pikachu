@@ -62,4 +62,20 @@
     <string name="invitation_countdown">(còn %1$d giây)</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <!-- Dialog kết quả (Hình 3.14), thông báo trên màn hình đấu đối kháng sau ván -->
+    <string name="result_title_win">Chiến thắng!</string>
+    <string name="result_title_lose">Thất bại</string>
+    <string name="result_title_draw">Hòa!</string>
+    <string name="result_win_time">Bạn thắng (+1 điểm). Thời gian hoàn thành %1$s.</string>
+    <string name="result_win_quit">Bạn thắng (+1 điểm). Đối thủ đã thoát.</string>
+    <string name="result_lose">Bạn thua (+0 điểm). Bạn còn %1$d ô.</string>
+    <string name="result_draw">Hòa (+0.5 điểm). Bạn còn %1$d ô.</string>
+    <string name="rematch_question">Bạn có muốn tái đấu không? (còn %1$d giây)</string>
+    <string name="rematch_waiting">Đang chờ đối thủ trả lời... (còn %1$d giây)</string>
+    <string name="reply_countdown">(còn %1$d giây)</string>
+    <string name="stop">Dừng</string>
+    <string name="rematch">Tái đấu</string>
+    <string name="back_to_lobby">Về sảnh</string>
+    <string name="opponent_stopped">%1$s đã dừng chơi</string>
+    <string name="quit_lost">Bạn đã thoát nên bị xử thua (0 điểm)</string>
 </resources>

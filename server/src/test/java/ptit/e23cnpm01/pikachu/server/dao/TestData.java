@@ -57,6 +57,27 @@ public final class TestData {
         addResult(matchId, b, "DRAW", null);
     }
 
+    /** Số dòng tblMatchResult của ván matchId. */
+    public static int countResultsOfMatch(int matchId) throws SQLException {
+        try (PreparedStatement ps = DAO.con.prepareStatement(
+                "SELECT COUNT(*) FROM tblMatchResult WHERE matchId = ?")) {
+            ps.setInt(1, matchId);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
+    /** Số dòng tblMatch. */
+    public static int countMatches() throws SQLException {
+        try (Statement st = DAO.con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM tblMatch")) {
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
+
     private static int addMatch() throws SQLException {
         try (PreparedStatement ps = DAO.con.prepareStatement(
                 "INSERT INTO tblMatch (startTime, endTime, timeLimit, tiles) VALUES (NOW(), NOW(), 600, ?)",

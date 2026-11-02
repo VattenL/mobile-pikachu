@@ -251,7 +251,7 @@ Mỗi người làm một chức năng dễ, một trung bình, một khó. Chia
 - **Ranh giới trong `MatchController`** (hai người cùng làm lớp này):
   - Dev 1: `handleMove()`, `MatchRoom` (bàn riêng của hai người, đồng bộ), `MatchActivity`.
   - Dev 2: `endMatch()`, `onTimeout()` và bộ hẹn giờ 10 phút, `handleLeaveMatch()`, xử lý mất kết nối, `handleRematchReply()`, `stopRematch()`, `onRematchTimeout()`, `MatchDAO`, `ResultDialog`.
-  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED")`. Quyết định 2026-10-27: không tách, giữ `MatchController` chung; phần của Dev 2 gồm thêm `stopRematch()`, `onRematchTimeout()`. `MatchRoom` (Dev 1) có thêm `roomId`, cờ `ended` và dùng lại `timer` để hẹn 30 giây chờ tái đấu; các thuộc tính này do phần của Dev 2 dùng.
+  - Điểm nối duy nhất: `handleMove()` thấy bàn của người gửi đã hết ô thì gọi `endMatch(room, "CLEARED", handler)`. Quyết định 2026-10-27: không tách, giữ `MatchController` chung; phần của Dev 2 gồm thêm `stopRematch()`, `onRematchTimeout()`. `MatchRoom` (Dev 1) có thêm `roomId`, cờ `ended`, lý do kết thúc `endReason` và thay `timer` để hẹn 30 giây chờ tái đấu; các thuộc tính này do phần của Dev 2 dùng.
 - `OnlinePlayerManager` (danh sách online, trạng thái, lời mời) thuộc Dev 2; phần đăng nhập, đăng xuất của Dev 1 gọi `addOnlinePlayer()` và hàm gỡ người chơi khỏi danh sách.
 - Mỗi người chỉ sửa code thuộc phần mình; thay đổi interface dùng chung (mục 5) phải báo người kia.
 - Đề yêu cầu "server lưu toàn bộ thông tin", nên CSDL và tài khoản nằm trên server ngay từ Phase 1, không làm bản offline rồi bỏ.
@@ -377,7 +377,7 @@ JSON, mỗi message một dòng, trường `type` xác định loại:
 | S → C | `BOARD_SHUFFLED` | `tiles` (chỉ gửi cho người có bàn bị bế tắc) |
 | S → C | `OPPONENT_PROGRESS` | `remaining`, `a`, `b`, `path` (nước đối thủ vừa đi), `tiles` (bàn hiện tại của đối thủ), `shuffled` (bàn đối thủ vừa được xáo) |
 | C → S | `LEAVE_MATCH` | `roomId` |
-| S → C | `MATCH_END` | `result`, `point`, `finishTime` và `remaining` của hai bên, `reason` (`CLEARED`, `TIMEOUT`, `QUIT`, `DISCONNECT`), `rematch` (`true` thì hỏi tái đấu; `false` khi đối thủ thoát hoặc mất kết nối), `replySec` (30); với `QUIT`, `DISCONNECT` chỉ gửi cho người còn lại |
+| S → C | `MATCH_END` | `roomId`; `result`, `point`, `finishTime`, `remaining` của người nhận; `opponentFinishTime`, `opponentRemaining` của đối thủ (`finishTime` tính bằng mili giây, không có nếu người đó chưa xóa hết ô); `reason` (`CLEARED`, `TIMEOUT`, `QUIT`, `DISCONNECT`), `rematch` (`true` thì hỏi tái đấu; `false` khi đối thủ thoát hoặc mất kết nối), `replySec` (30); với `QUIT`, `DISCONNECT` chỉ gửi cho người còn lại |
 | C → S | `REMATCH_REPLY` | `roomId`, `accept`; gửi lại được để đổi từ đồng ý sang từ chối |
 | S → C | `OPPONENT_LEFT` | không có dữ liệu; gửi cho người còn ở dialog kết quả khi đối thủ chọn Dừng, hết thời gian trả lời hoặc mất kết nối |
 

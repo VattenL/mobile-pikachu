@@ -17,6 +17,7 @@ Chưa làm:
 
 - Hình 3.7, 3.15, 3.18 đã dựng lại trong Visual Paradigm ngày 2026-11-01 (bản "(01-11)" trong `pikachu.vpp`, ảnh `docs/vp/png/` đã xuất lại). Bố cục 3.7, 3.15 chép từ hai bản chỉnh tay "Thử: ... (dọc)"; 3.15 còn 3 đường cắt qua khối (`MatchController` tới `Board`, `BoardGenerator`, `MatchDAO`), cần chỉnh tay rồi `python docs/vp/build_vp.py --export class-design-m4`. Bản cũ vẫn còn trong `pikachu.vpp` cho tới khi xóa tay.
 - Gạch chân thuộc tính tĩnh (`GameServer.serverSocket`, `ChallengeController.inviteTimer`): `build_vp.py` chưa đọc được `{static}` trong `.puml`, nên chưa vẽ.
+- Hình 3.15 cần dựng lại sau bước 5–6: `MatchController.endMatch()` thêm tham số `player`, `MatchRoom` thêm `endReason` (nguồn `class-design-m4.puml` đã sửa, ảnh PlantUML đã vẽ lại; plugin Visual Paradigm không kết nối được lúc làm nên chưa dựng bản VP: `python docs/vp/build_vp.py --add class-design-m4` hoặc sửa tay hai dòng trong `pikachu.vpp`, rồi `--export class-design-m4`).
 - Google Doc của Dev 2: không sửa (theo quyết định).
 - Biểu đồ của Dev 1 (M1, M3) có vẽ `ServerConnection` nhưng chỉ các phương thức mà modul đó dùng, không cần thêm.
 
@@ -100,6 +101,32 @@ Phân loại:
 | Test | Thêm | `FakeClient`; 3 test tự bỏ qua cho tới khi Dev 1 làm xong `generateBoard()`, `Board.copy()` (đã chạy đạt với bản vá tạm) | không cần |
 
 Hình 3.15 `class-design-m4` đã dựng lại (xem mục trạng thái).
+
+## Bước 5–6: kết thúc ván và tái đấu (2026-11-02)
+
+| Lớp, tệp | Loại | Nội dung | Tài liệu |
+|---|---|---|---|
+| `MatchController.endMatch()` | Chốt | Thêm tham số `player : ClientHandler`: người xóa hết ô (`CLEARED`), người thoát hoặc mất kết nối (`QUIT`, `DISCONNECT`), rỗng khi hết giờ. Thiết kế chỉ có `endMatch(room, reason)` nên không biết ai thắng, ai thoát. `handleMove()` của Dev 1 gọi `endMatch(room, "CLEARED", handler)` | Đã sửa: `class-design-m4.puml`, pha 3 mục 4d, pha 4 mục 2e, `plan.md` Phần II §2. Hình 3.15 (VP) chưa dựng lại |
+| `MatchRoom` (Dev 1) | Chốt | Thêm `endReason : String` (lý do kết thúc) và get/set: `stopRematch()` cần biết ván có hỏi tái đấu không (đối thủ đã thoát thì người còn lại không bị đẩy về sảnh) | Như trên |
+| `MatchController.endMatch()` | Chốt | `finishTime` của người thắng `CLEARED` do `endMatch()` ghi (lúc gọi trừ `startMillis`), không do `handleMove()` ghi (pha 4 cũ ghi `handleMove()` ghi rồi mới gọi `endMatch()`); `endMatch()` được gọi ngay trong khối khóa phòng của nước đi cuối nên hai cách cho cùng thời điểm | Đã sửa: pha 4 mục 2e |
+| Message `MATCH_END` | Chốt | Theo người nhận: `roomId`, `result`, `point`, `finishTime`, `remaining` của người nhận, `opponentFinishTime`, `opponentRemaining`, `reason`, `rematch`, `replySec` (30); `finishTime` tính bằng mili giây, không có trường này nếu người đó chưa xóa hết ô | Đã sửa: pha 3 mục 7, `plan.md` §5.2 |
+| `MatchController.endMatch()` | Khác | Không "dùng lại" `timer` của phòng: `Timer` của Java đã `cancel()` thì không hẹn được nữa, nên hủy `Timer` 10 phút rồi gán một `Timer` mới hẹn 30 giây chờ trả lời tái đấu. Với `QUIT`, `DISCONNECT`, hẹn giờ trước rồi mới `stopRematch()` (pha 4 ghi hẹn giờ ở cuối) | Đã sửa: pha 3 mục 4d, pha 4 mục 2e |
+| `MatchController.endMatch()` | Chốt | `saveMatch()` lỗi thì ghi log, ván vẫn kết thúc và vẫn gửi `MATCH_END` (điểm của ván đó không được tính) | Đã sửa: pha 4 mục 2e |
+| `MatchController` | Chốt | "Còn ở phòng" nghĩa là `roomId` của `ClientHandler` bằng mã phòng; `stopRematch()` "bỏ khỏi phòng" bằng cách đặt `roomId` về rỗng. Message của người đã rời phòng bị bỏ qua | Đã sửa: pha 3 mục 4d, pha 4 mục 2e |
+| `MatchController.stopRematch()` | Thêm | Ghi `false` vào `rematchReplies` của người dừng (cả khi thoát, hết giờ, mất kết nối) | Đã sửa: pha 4 mục 2e |
+| `MatchController.handleRematchReply()` | Thêm | Bỏ qua khi ván chưa kết thúc, hoặc khi đồng ý mà ván không hỏi tái đấu (đối thủ đã thoát) | Đã sửa: pha 4 mục 2e |
+| `MatchController.onRematchTimeout()` | Thêm | Phòng đã bị bỏ (đã tái đấu, mọi người đã dừng) thì không làm gì | Đã sửa: pha 4 mục 2e |
+| `MatchController.handleDisconnect()` | Thêm | Trong lúc chờ khóa phòng cũ, hai người có thể vừa tái đấu (handler đã sang phòng mới); khi đó đọc lại `roomId` rồi khóa đúng phòng, để người mất kết nối bị xử thua ở ván mới | Đã sửa: pha 4 mục 2e |
+| `MatchController` | Thêm | Hằng `REMATCH_REPLY_SEC` = 30; các hàm riêng tìm phòng theo message, kiểm tra còn ở phòng, tính điểm (thắng 1, hòa 0.5, thua 0), dựng `MATCH_END` | không cần |
+| `ChallengeController` | Thêm | `ROWS`, `COLS`, `ICON_TYPES` và `matchStart()` đổi từ `private` sang phạm vi gói để `MatchController` dùng lại khi tái đấu (biểu đồ đã có liên kết `MatchController` – `ChallengeController`) | không cần |
+| `MatchDAO.saveMatch()` | Chốt | Bàn lưu dạng chuỗi 100 mã hình vùng chơi (bỏ viền) theo từng hàng, như pha 3 mục 2b và `seed.sql`; gán `match.id` từ khóa sinh ra; trả `autoCommit` về như lúc được gọi | Đã sửa: pha 4 mục 2e |
+| `ResultDialog` | Thêm | Hàm khởi tạo `ResultDialog(matchActivity, matchEnd, opponent)`: `MatchActivity` truyền message `MATCH_END` và tên đối thủ (để báo "B đã dừng chơi"; `OPPONENT_LEFT` không có dữ liệu) | Đã sửa: pha 3 mục 4d, pha 4 mục 2e; ghi cho Dev 1 ở `viec-dev-1.md` |
+| `ResultDialog` | Chốt | Tiêu đề Chiến thắng! / Thất bại / Hòa!; nội dung theo kịch bản pha 2; `QUIT` và `DISCONNECT` cùng "Đối thủ đã thoát."; thời gian hoàn thành mm:ss | Đã sửa: pha 4 mục 2e |
+| `ResultDialog` | Thêm | Bấm Tái đấu thì khóa nút Tái đấu; không đóng bằng Back hay chạm ra ngoài; cờ `closed` để không về sảnh hai lần (hết giờ đúng lúc nhận `OPPONENT_LEFT`); về sảnh thì mở `LobbyActivity` (extra `EXTRA_MESSAGE`) rồi đóng `MatchActivity` | Đã sửa: pha 4 mục 2e |
+| `strings.xml` | Thêm | `quit_lost` "Bạn đã thoát nên bị xử thua (0 điểm)" cho `MatchActivity.onQuitClick()` của Dev 1 | không cần |
+| Test | Thêm | `MatchDAOTest` (3 test, chạy được ngay); `MatchControllerTest` (13 test theo pha 4 mục 3b test 8, gọi `endMatch()` qua reflection, tự bỏ qua cho tới khi Dev 1 xong `generateBoard()`, `Board.copy()`, `countRemaining()`, `MatchRoom.getBoard()`, `getOpponent()`; đã chạy đạt cả 13 với bản vá tạm); `TestData.countResultsOfMatch()`, `countMatches()`; `FakeClient.matchReady()` | không cần |
+
+Chạy thử (bản vá tạm, không commit: đăng nhập, sinh đề, `Board`, `MatchRoom.getBoard()`, `getOpponent()`, ván 25 giây): `./gradlew :server:test` 63/63 đạt; server thật với hai client qua socket đạt cả 5 tình huống (hết giờ rồi cả hai tái đấu, thoát giữa ván rồi Về sảnh, một người tái đấu một người dừng, mất kết nối giữa ván, hết 30 giây không trả lời); ván lưu đúng vào CSDL (đã xóa sau khi thử). `ResultDialog` chưa chạy trên máy ảo (máy ảo tự thoát lúc khởi động), mới build và lint.
 
 ## Lệch trong tài liệu của Dev 1 (chưa sửa)
 

@@ -28,10 +28,10 @@ import ptit.e23cnpm01.pikachu.server.dao.PlayerRankingDAO;
 public class ChallengeController {
     /** Thời gian chờ trả lời một lời mời, giây. */
     public static final int INVITE_TIMEOUT_SEC = 30;
-    /** Đề bài 10x10 với 25 loại hình, mỗi loại 4 ô (plan.md §8). */
-    private static final int ROWS = 10;
-    private static final int COLS = 10;
-    private static final int ICON_TYPES = 25;
+    /** Đề bài 10x10 với 25 loại hình, mỗi loại 4 ô (plan.md §8); MatchController dùng lại khi tái đấu. */
+    static final int ROWS = 10;
+    static final int COLS = 10;
+    static final int ICON_TYPES = 25;
 
     /**
      * Hẹn giờ 30 giây cho các lời mời đang chờ. Tĩnh vì lớp điều khiển được tạo bằng new ở mỗi lần xử lý message,
@@ -226,8 +226,11 @@ public class ChallengeController {
         return new Message(MessageType.INVITE_CLOSED).put("from", from).put("reason", reason);
     }
 
-    /** MATCH_START: roomId, tiles (lưới 12x12 của đề bài), timeLimitSec, opponent chỉ gồm username. */
-    private static Message matchStart(int roomId, int[][] tiles, int timeLimitSec, String opponent) {
+    /**
+     * MATCH_START: roomId, tiles (lưới 12x12 của đề bài), timeLimitSec, opponent chỉ gồm username. MatchController
+     * dùng lại khi tái đấu.
+     */
+    static Message matchStart(int roomId, int[][] tiles, int timeLimitSec, String opponent) {
         JsonObject opp = new JsonObject();
         opp.addProperty("username", opponent);
         return new Message(MessageType.MATCH_START).put("roomId", roomId).put("tiles", tiles)
