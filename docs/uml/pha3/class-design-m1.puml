@@ -1,149 +1,165 @@
-@startuml class-design-m1
-title Biểu đồ lớp thiết kế - Modul Manage Account
+@startuml
+title Biểu đồ lớp thiết kế - Modul Play With Bot
 
-hide circle
-hide empty members
-skinparam shadowing false
-skinparam linetype ortho
-skinparam nodesep 40
-skinparam ranksep 60
-skinparam classFontSize 13
-skinparam classAttributeFontSize 11
-skinparam class {
-  BorderColor #4A4A4A
-  ArrowColor #4A4A4A
-  FontColor #1A1A1A
-}
-
-' ===== Client Android: tang giao dien =====
-class RegisterActivity #E3F2FD {
-  - edtUsername : EditText
-  - edtPassword : EditText
-  - edtConfirmPassword : EditText
-  - edtName : EditText
-  - tvError : TextView
-  - btnRegister : Button
-  - btnBack : Button
-  + onRegisterClick(v : View) : void
-  + onBackClick(v : View) : void
-  + onMessage(msg : Message) : void
-}
-
-class LoginActivity #E3F2FD {
-  - edtUsername : EditText
-  - edtPassword : EditText
-  - tvError : TextView
-  - btnLogin : Button
-  - btnRegister : Button
-  + onLoginClick(v : View) : void
-  + onRegisterClick(v : View) : void
-  + onMessage(msg : Message) : void
-}
-
-class MainActivity #E3F2FD {
-  - tvPlayer : TextView
-  - btnLogout : Button
+' ========================================================
+' TẦNG 1: GIAO DIỆN CLIENT
+' ========================================================
+class MainActivity {
+  - btnPlayWithBot : Button
   - player : Player
-  + onLogoutClick(v : View) : void
+  + onPlayWithBotClick(v : View) : void
 }
 
-' ===== Client Android: tang mang =====
-class ServerConnection #EDE7F6 {
-  - socket : Socket
-  - listeners : ArrayList<MessageListener>
+class DifficultyActivity {
+  - rgDifficulty : RadioGroup
+  - btnStart : Button
+  - btnBack : Button
+  + onStartClick(v : View) : void
+  + onBackClick(v : View) : void
+}
+
+class BotGameActivity {
+  - boardView : BoardView
+  - botBoardView : BoardView
+  - tvTimer : TextView
+  - tvPlayerRemaining : TextView
+  - tvBotRemaining : TextView
+  - btnQuit : Button
+  - board : Board
+  - botBoard : Board
+  - bot : Bot
+  - firstCell : Cell
+  - timer : CountDownTimer
+  - handler : Handler
+  --
+  + onCellClick(cell : Cell) : void
+  + onBotTurn() : void
+  + onQuitClick(v : View) : void
+  - endGame(result : String) : void
+}
+
+class BotResultDialog {
+  - tvResult : TextView
+  - btnOk : Button
+  + onOkClick(v : View) : void
+}
+
+' ========================================================
+' TẦNG 2: LOGIC XỬ LÝ GAME, THUẬT TOÁN, VIEW VÀ SERVER
+' ========================================================
+class PathFinder {
+  + checkPath(board : Board, a : Cell, b : Cell) : ArrayList<Cell>
+  + findAvailablePair(board : Board) : Cell[]
+}
+
+class Bot {
+  - difficulty : Difficulty
+  --
+  + Bot(difficulty : Difficulty)
+  + getDelayMs() : long
+  + nextMove(board : Board) : Cell[]
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+class ServerConnection {
   + getInstance() : ServerConnection
   + send(msg : Message) : void
-  + addListener(l : MessageListener) : void
-  + removeListener(l : MessageListener) : void
 }
 
-interface MessageListener #EDE7F6 {
-  + onMessage(msg : Message) : void
+class BoardView {
+  - board : Board
+  - path : ArrayList<Cell>
+  --
+  + setBoard(board : Board) : void
+  + setInteractive(b : boolean) : void
+  + showPath(path : ArrayList<Cell>) : void
+  # onDraw(canvas : Canvas) : void
+  + onTouchEvent(e : MotionEvent) : boolean
 }
 
-class ClientSession #EDE7F6 {
-  + player : Player
-  + clear() : void
+class BoardGenerator {
+  + generateBoard(rows : int, cols : int, iconTypes : int, seed : long) : Board
+  + shuffle(board : Board, seed : long) : Board
 }
 
-' ===== Server: tang dieu khien =====
-class ClientHandler #E8F5E9 {
-  - socket : Socket
-  - player : Player
-  + run() : void
-  + send(msg : Message) : void
-}
-
-class LoginController #E8F5E9 {
-  + handleRegister(handler : ClientHandler, msg : Message) : void
-  + handleLogin(handler : ClientHandler, msg : Message) : void
-  + handleLogout(handler : ClientHandler, msg : Message) : void
-}
-
-class OnlinePlayerManager #E8F5E9 {
-  - onlineHandlers : HashMap<String, ClientHandler>
-  + getInstance() : OnlinePlayerManager
-  + addOnlinePlayer(handler : ClientHandler) : boolean
-  + removeOnlinePlayer(handler : ClientHandler) : void
-}
-
-class ChallengeController #E8F5E9 {
-  + broadcastOnlineList() : void
-}
-
-' ===== Server: tang DAO =====
-class DAO #FFF8E1 {
-  # con : Connection
-  + DAO()
-}
-
-class PlayerDAO #FFF8E1 {
-  + PlayerDAO()
-  + addPlayer(player : Player) : boolean
-  + checkLogin(username : String, password : String) : Player
-}
-
-' ===== core: lop thuc the va message =====
-class Message #FFF3E0 {
-  - type : String
-  - data : JsonObject
-  + toJson() : String
-  + fromJson(line : String) : Message
-}
-
-class Player #FFF3E0 {
+' ========================================================
+' TẦNG 3: CÁC LỚP THỰC THỂ (CORE ENTITY)
+' ========================================================
+class Board {
   - id : int
-  - username : String
-  - password : String
-  - name : String
-  - status : String
+  - rowCount : int
+  - columnCount : int
+  - tiles : int[][]
+  --
+  + removePair(a : Cell, b : Cell) : void
+  + isCleared() : boolean
+  + countRemaining() : int
+  + copy() : Board
 }
 
-' giao dien
-RegisterActivity -right- LoginActivity
-LoginActivity -right- MainActivity
-RegisterActivity ..|> MessageListener
-LoginActivity ..|> MessageListener
+class Cell {
+  - row : int
+  - col : int
+}
 
-' giao dien - mang
-RegisterActivity -down- ServerConnection
-LoginActivity -down- ServerConnection
-MainActivity -down- ServerConnection
-LoginActivity -down- ClientSession
-MainActivity -down- ClientSession
-ServerConnection -right- MessageListener
+' ========================================================
+' ĐỊNH HƯỚNG BỐ CỤC THEO CHIỀU DỌC (3 TẦNG)
+' ========================================================
+' Hàng ngang Tầng 1
+MainActivity -[hidden]right- DifficultyActivity
+DifficultyActivity -[hidden]right- BotGameActivity
+BotGameActivity -[hidden]right- BotResultDialog
 
-' mang client - server (TCP)
-ServerConnection -down- ClientHandler : TCP
-ClientHandler -right- LoginController
-LoginController -right- OnlinePlayerManager
-LoginController -right- ChallengeController
+' Từ Tầng 1 xuống Tầng 2
+MainActivity -[hidden]down- PathFinder
+DifficultyActivity -[hidden]down- Bot
+BotGameActivity -[hidden]down- ServerConnection
+BotResultDialog -[hidden]down- BoardGenerator
 
-' dieu khien - DAO
-LoginController -down- PlayerDAO
-DAO <|-down- PlayerDAO
+' Hàng ngang Tầng 2
+PathFinder -[hidden]right- Bot
+Bot -[hidden]right- Difficulty
+Difficulty -[hidden]right- ServerConnection
+ServerConnection -[hidden]right- BoardView
+BoardView -[hidden]right- BoardGenerator
 
-' DAO - thuc the
-PlayerDAO -down- Player
-ClientHandler -[norank]- Message
+' Từ Tầng 2 xuống Tầng 3
+Bot -[hidden]down- Board
+Difficulty -[hidden]down- Cell
+
+' Hàng ngang Tầng 3
+Board -[hidden]right- Cell
+
+' ========================================================
+' CÁC ĐƯỜNG LIÊN KẾT & QUAN HỆ THEO ẢNH
+' ========================================================
+' Tầng 1 liên kết với nhau
+MainActivity -- DifficultyActivity
+DifficultyActivity -- BotGameActivity
+BotGameActivity -- BotResultDialog
+MainActivity -- BotResultDialog
+
+' Tầng 1 nối Tầng 2
+BotGameActivity -- ServerConnection
+BotGameActivity *-- BoardView
+BotGameActivity -- PathFinder
+BotGameActivity -- Bot
+BotGameActivity -- BoardGenerator
+
+' Quan hệ nội bộ Tầng 2
+Bot -- Difficulty
+
+' Tầng 2 nối Tầng 3 & Tầng 1 nối Tầng 3
+PathFinder -- Board
+BoardGenerator -- Board
+BotGameActivity -- Board
+
+' Quan hệ nội bộ Tầng 3
+Board -- Cell
+
 @enduml
