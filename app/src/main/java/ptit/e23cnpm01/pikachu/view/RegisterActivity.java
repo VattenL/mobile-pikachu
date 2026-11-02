@@ -22,7 +22,6 @@ public class RegisterActivity extends AppCompatActivity implements MessageListen
     private EditText edtUsername;
     private EditText edtPassword;
     private EditText edtConfirmPassword;
-    private EditText edtName;
     private TextView tvError;
     private Button btnRegister;
     private Button btnBack;
@@ -34,7 +33,6 @@ public class RegisterActivity extends AppCompatActivity implements MessageListen
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
-        edtName = findViewById(R.id.edtName);
         tvError = findViewById(R.id.tvError);
         btnRegister = findViewById(R.id.btnRegister);
         btnBack = findViewById(R.id.btnBack);
@@ -55,8 +53,7 @@ public class RegisterActivity extends AppCompatActivity implements MessageListen
         String username = edtUsername.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
         String confirmPassword = edtConfirmPassword.getText().toString().trim();
-        String name = edtName.getText().toString().trim();
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || name.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             tvError.setTextColor(0xFFD32F2F);
             tvError.setText("Vui lòng điền đầy đủ các trường");
             return;
@@ -75,14 +72,13 @@ public class RegisterActivity extends AppCompatActivity implements MessageListen
         Message msg = new Message(MessageType.REGISTER);
         msg.put("username", username);
         msg.put("password", password);
-        msg.put("name", name);
         ServerConnection.getInstance().send(msg);
     }
 
     public void onBackClick(View v) {
         finish();
     }
-    
+
     @Override
     public void onMessage(Message msg) {
         if (MessageType.REGISTER_RESULT.equals(msg.getType())) {

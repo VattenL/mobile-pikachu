@@ -45,16 +45,6 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
-                android:id="@+id/edtName"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:hint="Tên hiển thị"
-                android:inputType="textPersonName"
-                android:paddingHorizontal="12dp"
-                android:background="@android:drawable/editbox_background"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
                 android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
