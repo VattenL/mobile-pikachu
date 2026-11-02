@@ -47,6 +47,8 @@
                 android:layout_margin="8dp"
                 android:layout_weight="1"
                 android:onClick="onPlayWithBotClick"
+                android:backgroundTint="#9DC3E6"
+                android:textColor="#000000"
                 android:text="@string/play_with_bot" />
 
             <Button
@@ -56,6 +58,8 @@
                 android:layout_margin="8dp"
                 android:layout_weight="1"
                 android:onClick="onMatchClick"
+                android:backgroundTint="#9DC3E6"
+                android:textColor="#000000"
                 android:text="@string/match" />
         </LinearLayout>
 
@@ -71,6 +75,8 @@
                 android:layout_margin="8dp"
                 android:layout_weight="1"
                 android:onClick="onRankingClick"
+                android:backgroundTint="#9DC3E6"
+                android:textColor="#000000"
                 android:text="@string/ranking" />
 
             <Button
@@ -80,6 +86,8 @@
                 android:layout_margin="8dp"
                 android:layout_weight="1"
                 android:onClick="onSettingsClick"
+                android:backgroundTint="#9DC3E6"
+                android:textColor="#000000"
                 android:text="@string/settings" />
         </LinearLayout>
 
@@ -91,6 +99,8 @@
             android:layout_margin="8dp"
             android:minWidth="200dp"
             android:onClick="onLoginClick"
+            android:backgroundTint="#9DC3E6"
+            android:textColor="#000000"
             android:text="@string/login" />
     </LinearLayout>
 </LinearLayout>
