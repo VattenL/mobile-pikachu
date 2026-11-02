@@ -79,17 +79,18 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
+                android:onClick="onSettingsClick"
                 android:text="@string/settings" />
         </LinearLayout>
 
-        <!-- Khách: Đăng nhập; đã đăng nhập: Đăng xuất (Dev 1) -->
+        <!-- Khách: Đăng nhập; đã đăng nhập: ẩn nút này -->
         <Button
-            android:id="@+id/btnLogout"
+            android:id="@+id/btnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:minWidth="200dp"
-            android:onClick="onLogoutClick"
+            android:onClick="onLoginClick"
             android:text="@string/login" />
     </LinearLayout>
 </LinearLayout>

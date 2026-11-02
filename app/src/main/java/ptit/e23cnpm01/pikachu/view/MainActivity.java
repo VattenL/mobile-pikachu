@@ -26,7 +26,7 @@ import ptit.e23cnpm01.pikachu.network.ServerConnection;
  */
 public class MainActivity extends BaseActivity {
     private TextView tvPlayer;
-    private Button btnLogout;
+    private Button btnLogin;
     private Player player;
     private Button btnPlayWithBot;
     private Button btnMatch;
@@ -55,7 +55,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvPlayer = findViewById(R.id.tvPlayer);
-        btnLogout = findViewById(R.id.btnLogout);
+        btnLogin = findViewById(R.id.btnLogin);
         btnPlayWithBot = findViewById(R.id.btnPlayWithBot);
         btnMatch = findViewById(R.id.btnMatch);
         btnRanking = findViewById(R.id.btnRanking);
@@ -64,19 +64,26 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * Hiện tên người chơi (Khách nếu chưa đăng nhập) và kết nối tới server nếu chưa kết nối. Chạy ở onResume() để
-     * cả khi quay lại từ một màn hình vừa đóng ngay (bảng xếp hạng khi chưa kết nối được) cũng thử kết nối lại.
+     * Cập nhật trạng thái người chơi và hiển thị nút Đăng nhập theo chế độ khách / người chơi.
      */
+    private void updateUI() {
+        player = ClientSession.player;
+        if (player == null) {
+            tvPlayer.setText(getString(R.string.guest));
+            btnLogin.setVisibility(View.VISIBLE);
+        } else {
+            tvPlayer.setText(player.getUsername());
+            btnLogin.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        player = ClientSession.player;
-        tvPlayer.setText(player == null ? getString(R.string.guest) : player.getUsername());
-        btnLogout.setText(player == null ? R.string.login : R.string.logout);
+        updateUI();
         if (!ServerConnection.getInstance().isConnected()) {
             if (Build.VERSION.SDK_INT >= 37 && ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_LOCAL_NETWORK) != PackageManager.PERMISSION_GRANTED) {
-                // hộp thoại xin quyền làm màn hình tạm dừng rồi chạy lại onResume(): chỉ hỏi một lần
                 if (!permissionAsked) {
                     permissionAsked = true;
                     localNetworkPermission.launch(Manifest.permission.ACCESS_LOCAL_NETWORK);
@@ -94,8 +101,14 @@ public class MainActivity extends BaseActivity {
         new Thread(() -> ServerConnection.getInstance().connect(host, port), "connect").start();
     }
 
-    public void onLogoutClick(View v) {
-        // TODO (Dev 1): khách thì mở LoginActivity; đã đăng nhập thì gửi LOGOUT, ClientSession.clear()
+    /** Mở LoginActivity khi người dùng khách bấm Đăng nhập */
+    public void onLoginClick(View v) {
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    /** Mở SettingDialog khi bấm Cài đặt; nếu người dùng chọn Đăng xuất trong dialog thì cập nhật lại UI */
+    public void onSettingsClick(View v) {
+        new SettingDialog(this, this::updateUI).show();
     }
 
     /** Mở RankingActivity; dùng được cả khi là khách. */
