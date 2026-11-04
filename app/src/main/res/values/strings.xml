@@ -2,7 +2,7 @@
     <string name="app_name">pikachu</string>
 
     <!-- Địa chỉ server: máy ảo truy cập máy chạy server qua 10.0.2.2 (pha 4, mục 1c) -->
-    <string name="server_host" translatable="false">10.0.2.2</string>
+    <string name="server_host" translatable="false">127.0.0.1</string>
     <string name="server_port" translatable="false">9999</string>
     <string name="connection_lost">Mất kết nối tới máy chủ, vui lòng đăng nhập lại</string>
     <string name="cannot_connect">Không kết nối được máy chủ</string>
@@ -16,6 +16,19 @@
     <string name="settings">Cài đặt</string>
     <string name="login">Đăng nhập</string>
     <string name="logout">Đăng xuất</string>
+
+    <!-- Chọn độ khó (Modul chơi với máy) -->
+    <string name="difficulty_title">Chọn độ khó</string>
+    <string name="difficulty_easy">Dễ</string>
+    <string name="difficulty_medium">Trung bình</string>
+    <string name="difficulty_hard">Khó</string>
+    <string name="start">Bắt đầu</string>
+
+    <!-- Bổ sung cho BotResultDialog -->
+    <string name="ok">OK</string>
+    <string name="bot_result_win">Chiến thắng! Bạn đã hoàn thành trước máy.</string>
+    <string name="bot_result_lose">Thất bại! Máy đã hoàn thành trước bạn.</string>
+    <string name="bot_result_draw">Hòa cờ! Đã hết 10 phút thi đấu.</string>
 
     <!-- Bảng xếp hạng (Hình 3.6) -->
     <string name="ranking_title">Bảng xếp hạng</string>
