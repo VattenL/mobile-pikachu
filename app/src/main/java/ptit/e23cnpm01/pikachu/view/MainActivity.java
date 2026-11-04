@@ -117,7 +117,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void onPlayWithBotClick(View v) {
-        // TODO (Dev 1)
+        startActivity(new Intent(this, DifficultyActivity.class));
     }
 
     /**

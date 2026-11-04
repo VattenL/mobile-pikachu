@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Giao diện chọn độ khó (Hình 3.8): tiêu đề, nhóm 3 lựa chọn (Dễ, Trung bình, Khó), nút Bắt đầu, nút Quay lại. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Tiêu đề màn hình -->
+    <TextView
+        android:id="@+id/tvDifficultyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/difficulty_title"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+    <!-- Khu vực chọn độ khó -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/rgDifficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbEasy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:padding="12dp"
+                android:text="@string/difficulty_easy"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rbMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:checked="true"
+                android:padding="12dp"
+                android:text="@string/difficulty_medium"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rbHard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:padding="12dp"
+                android:text="@string/difficulty_hard"
+                android:textSize="18sp" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <!-- Hàng nút điều hướng dưới cùng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:onClick="onBackClick"
+            android:text="@string/back" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:backgroundTint="#9DC3E6"
+            android:textColor="#000000"
+            android:onClick="onStartClick"
+            android:text="@string/start" />
+    </LinearLayout>
+</LinearLayout>

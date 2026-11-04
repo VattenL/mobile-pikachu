@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A1C29"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- Bàn cờ chính của Người chơi -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ptit.e23cnpm01.pikachu.view.BoardView
+            android:id="@+id/boardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <!-- Cột bên phải: Thông tin thi đấu & Bàn Bot thu nhỏ -->
+    <LinearLayout
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:background="#24283B"
+        android:elevation="4dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Đồng hồ đếm ngược 10:00 -->
+        <TextView
+            android:id="@+id/tvTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:00"
+            android:textColor="#FFEB3B"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <!-- Thông số số ô còn lại của Người chơi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Bạn còn:"
+                android:textColor="#E0E0E0"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvPlayerRemaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:textColor="#4CAF50"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Tiêu đề bàn máy -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Bàn cờ của Máy"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+
+        <!-- Bàn thu nhỏ của Bot (non-interactive) -->
+        <ptit.e23cnpm01.pikachu.view.BoardView
+            android:id="@+id/botBoardView"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="4dp"
+            android:background="#151722" />
+
+        <!-- Thông số số ô còn lại của Bot -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Máy còn:"
+                android:textColor="#E0E0E0"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvBotRemaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:textColor="#FF7043"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Nút Thoát ván chơi -->
+        <Button
+            android:id="@+id/btnQuit"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:backgroundTint="#D32F2F"
+            android:text="Thoát ván"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -41,19 +41,42 @@ public class Board {
         return tiles[c.row][c.col];
     }
 
+    public int getTile(int row, int col) {
+        return tiles[row][col];
+    }
+
     public void removePair(Cell a, Cell b) {
-        // TODO
+        if (a != null && a.row >= 0 && a.row < rowCount && a.col >= 0 && a.col < columnCount) {
+            tiles[a.row][a.col] = 0;
+        }
+        if (b != null && b.row >= 0 && b.row < rowCount && b.col >= 0 && b.col < columnCount) {
+            tiles[b.row][b.col] = 0;
+        }
     }
 
     public boolean isCleared() {
-        throw new UnsupportedOperationException("TODO");
+        return countRemaining() == 0;
     }
 
     public int countRemaining() {
-        throw new UnsupportedOperationException("TODO");
+        int count = 0;
+        for (int r = 0; r < rowCount; r++) {
+            for (int c = 0; c < columnCount; c++) {
+                if (tiles[r][c] > 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     public Board copy() {
-        throw new UnsupportedOperationException("TODO");
+        int[][] newTiles = new int[rowCount][columnCount];
+        for (int r = 0; r < rowCount; r++) {
+            System.arraycopy(tiles[r], 0, newTiles[r], 0, columnCount);
+        }
+        Board copy = new Board(rowCount, columnCount, newTiles);
+        copy.setId(this.id);
+        return copy;
     }
 }
